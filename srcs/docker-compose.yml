@@ -8,6 +8,15 @@ services:
       - app-network
     env_file:
       .env
+  django:
+    build: ./django
+    container_name: django
+    volumes:
+      - ./django/app:/app/
+    networks:
+      - app-network
+    env_file:
+      .env
 
 networks:
   app-network:
