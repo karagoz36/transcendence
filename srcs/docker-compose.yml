@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres
+    image: postgres:17
     container_name: postgres
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
@@ -8,7 +8,9 @@ services:
       - app-network
     env_file:
       .env
+    restart: always
   django:
+    restart: always
     build: ./django
     container_name: django
     volumes:
@@ -18,7 +20,7 @@ services:
     env_file:
       .env
     ports:
-      - 3434:80
+      - 3434:8000
 
 networks:
   app-network:
