@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 {% block title %}Login/Register{% endblock %}
 {% block content %}
-<link rel="stylesheet" href="static/index.css"></style>
+<link rel="stylesheet" href="/static/index/style.css"></style>
 <div class="d-flex flex-column align-items-center justify-content-center login-registration-form">
-	<form method="post" action="/login-register">
+	<form method="post" action="/login-register/">
 		{% csrf_token %}
 		<div class="mb-3">
-		  <label for="exampleInputEmail1" class="form-label">Username</label>
+		  <label class="form-label">Username</label>
 		  <input name="username" type="text" class="form-control">
 		</div>
 		<div class="mb-3">
-		  <label for="exampleInputPassword1" class="form-label">Password</label>
+		  <label class="form-label">Password</label>
 		  <input name="password" type="password" class="form-control">
 		</div>
 		<button type="submit" class="btn btn-primary">Submit</button>

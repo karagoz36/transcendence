@@ -4,7 +4,9 @@ from django.http.request import HttpRequest
 from django.shortcuts import render
 
 def index(request: HttpRequest):
-    username = ""
-    if "username" in request.GET:
-        username = request.GET.get('username')
-    return render(request, "index.html", { "USERNAME": username })
+    return render(request, "index.html")
+
+def loginRegister(request: HttpRequest):
+    error = ""
+    print(request.method)
+    return render(request, "index.html", { "ERROR_MESSAGE": error })
