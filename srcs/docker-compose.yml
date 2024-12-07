@@ -19,8 +19,18 @@ services:
       - app-network
     env_file:
       .env
+  nginx:
+    restart: always
+    build: ./nginx
+    container_name: nginx
+    volumes: 
+      - ./django/app/transcendence/static:/static
+    networks:
+      - app-network
+    env_file:
+      .env
     ports:
-      - 3434:8000
+      - 8000:80
 
 networks:
   app-network:
