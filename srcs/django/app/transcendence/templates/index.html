@@ -2,7 +2,9 @@
 {% block title %}Login/Register{% endblock %}
 {% block content %}
 <link rel="stylesheet" href="/static/index/style.css"></style>
+<link rel="stylesheet" href="/static/global/style.css"></style>
 <div class="d-flex flex-column align-items-center justify-content-center login-registration-form">
+	<div class="alert alert-danger hide-empty">{{ ERROR_MESSAGE }}</div>
 	<form method="post" action="/login-register/">
 		{% csrf_token %}
 		<div class="mb-3">
