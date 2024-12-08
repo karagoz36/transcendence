@@ -1,5 +1,5 @@
 // @ts-check
-import { getPage } from "../global/main.js"
+import { getPage } from "../global/SPA.js"
 
 /** @param {SubmitEvent} e */
 async function handleLogin(e) {
@@ -10,7 +10,13 @@ async function handleLogin(e) {
 	const username = target['username'].value
 	/** @type {String} */
 	const password = target['password'].value
-	await getPage("/api/login")
+	/** @type {String} */
+	const csrfmiddlewaretoken = target['csrfmiddlewaretoken'].value
+	await getPage("/api/login/", {
+		method: "POST",
+		body: {username, password},
+		headers: {"X-CSRFToken": csrfmiddlewaretoken}
+	})
 }
 
 /** @type {HTMLFormElement|null} */
