@@ -18,7 +18,7 @@ function onAccordionClicked(e) {
 function keepOneAccordionOpened() {
 	/** @type { NodeListOf<HTMLButtonElement> } */
 	const buttons = document.querySelectorAll("button.accordion-button")
-	buttons.forEach(button => button.addEventListener("click", onAccordionClicked))
+	buttons.forEach(button => button.onclick = onAccordionClicked)
 }
 
 keepOneAccordionOpened()
