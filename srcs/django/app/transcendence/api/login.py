@@ -9,7 +9,7 @@ def response(request: Request) -> HttpResponse:
 
     user = authenticate(username=request.data['username'], password=request.data['password'])
     if user is None:
-        return render(request, "auth.html", { "ERRORMESSAGE": "Invalid credentials." }, status=401)
+        return render(request, "auth.html", { "ERROR_MESSAGE": "Invalid credentials." }, status=401)
 
     login(request, user)
     return redirect("/")
