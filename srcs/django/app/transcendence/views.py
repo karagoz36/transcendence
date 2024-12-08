@@ -1,6 +1,5 @@
-from collections import defaultdict
-from typing import DefaultDict, reveal_type
 from django.http.request import HttpRequest
+from django.contrib.auth.models import User
 from django.shortcuts import render
 
 def index(request: HttpRequest):
