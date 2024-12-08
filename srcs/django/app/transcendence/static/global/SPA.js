@@ -42,7 +42,7 @@ export async function getPage(url, options = {}) {
 	/** @type {Response|String} */
 	let res
 	res = await fetch(url, convertOptionsToRequestInit(options))
-	history.replaceState(null, "", res.url)
+	history.pushState({page: url}, "", res.url)
 	res = await res.text()
 
 	const parser = new DOMParser()
@@ -58,3 +58,7 @@ export async function getPage(url, options = {}) {
 	oldMainContainer.innerHTML = newMainContainer.innerHTML
 	refreshScripts(newMainContainer, oldMainContainer)
 }
+
+window.addEventListener("popstate", (e) => {
+	getPage(window.location.href)
+})
