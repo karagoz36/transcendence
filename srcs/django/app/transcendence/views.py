@@ -1,10 +1,9 @@
 from django.http.request import HttpRequest
 from django.contrib.auth.models import User
-from django.shortcuts import render
+from transcendence import api
 
 def index(request: HttpRequest):
-    return render(request, "index.html")
+    return api.index.response(request)
 
-def loginRegister(request: HttpRequest):
-    error = "Failed to connect"
-    return render(request, "index.html", { "ERROR_MESSAGE": error })
+def login(request: HttpRequest):
+    return api.login.response(request)
