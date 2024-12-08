@@ -30,7 +30,7 @@ function convertOptionsToRequestInit(options) {
 	let init = {}
 	if (options.method == "POST" && (options.headers == undefined || options.headers['X-CSRFToken'] == undefined))
 		throw new Error("CSRF token missing for POST method")
-	init.body = JSON.stringify(options)
+	init.body = JSON.stringify(options.body)
 	init.method = options.method
 	init.headers = options.headers
 	return init
@@ -41,7 +41,8 @@ function convertOptionsToRequestInit(options) {
 export async function getPage(url, options = {}) {
 	/** @type {Response|String} */
 	let res
-	res = await fetch("/api/login", convertOptionsToRequestInit(options))
+	res = await fetch(url, convertOptionsToRequestInit(options))
+	history.replaceState(null, "", res.url)
 	res = await res.text()
 
 	const parser = new DOMParser()

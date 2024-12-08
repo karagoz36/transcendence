@@ -19,6 +19,8 @@ services:
       - app-network
     env_file:
       .env
+    depends_on:
+      - postgres
   nginx:
     restart: always
     build: ./nginx

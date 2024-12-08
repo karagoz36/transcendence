@@ -1,4 +1,7 @@
 // @ts-check
+
+import {getPage} from "../global/SPA.js"
+
 /** @param {Event} e */
 function onAccordionClicked(e) {
 	const toFind = ".accordion-collapse.collapsing"
@@ -21,4 +24,17 @@ function keepOneAccordionOpened() {
 	buttons.forEach(button => button.onclick = onAccordionClicked)
 }
 
-keepOneAccordionOpened()
+
+/** @returns {Promise<boolean>} */
+async function isAuthenticated() {
+	/** @type {Response|string} */
+	let res = await fetch("/api/check-authentication")
+	res = await res.text()
+	return res == "true"
+}
+
+async function main() {
+	keepOneAccordionOpened()
+}
+
+main()

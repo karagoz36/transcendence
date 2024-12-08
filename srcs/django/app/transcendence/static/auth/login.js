@@ -12,10 +12,13 @@ async function handleLogin(e) {
 	const password = target['password'].value
 	/** @type {String} */
 	const csrfmiddlewaretoken = target['csrfmiddlewaretoken'].value
-	await getPage("/api/login/", {
+	await getPage("/api/login", {
 		method: "POST",
 		body: {username, password},
-		headers: {"X-CSRFToken": csrfmiddlewaretoken}
+		headers: {
+			"X-CSRFToken": csrfmiddlewaretoken,
+			"content-type": "application/json",
+		}
 	})
 }
 
