@@ -2,28 +2,6 @@
 {% block title %}Login/Register{% endblock %}
 {% block content %}
 <link rel="stylesheet" href="/static/global/style.css">
-<script>
-	/** @param {Event: e} */
-	function onAccordionClicked(e) {
-		/** @type { HTMLButtonElement } */
-		const target = e.target
-		/** @type { NodeList } */
-		const accordionContent = document.querySelectorAll(".accordion-collapse.collapsing")
-		
-		if (accordionContent.length == 1) {
-			accordionContent[0].classList.add("show")
-			accordionContent[0].classList.add("collapse")
-			accordionContent[0].classList.remove("collapsing")
-		}
-	}
-
-	function keepOneAccordionOpened() {
-		/** @type { HTMLButtonElement[] } */
-		const buttons = document.querySelectorAll(".accordion-button")
-		buttons.forEach(button => button.addEventListener('click', onAccordionClicked))
-	}
-	document.addEventListener("DOMContentLoaded", keepOneAccordionOpened)
-</script>
 <div class="d-flex flex-column align-items-center justify-content-center login-registration-form"
 	style="height: 100vh; padding: 1rem;">
 	<div class="alert alert-danger hide-empty">{{ ERROR_MESSAGE }}</div>
@@ -38,7 +16,7 @@
 			<div id="collapse-login" class="accordion-collapse collapse show"
 				data-bs-parent="#accordion-login-register">
 				<div class="accordion-body">
-					<form class="accordion-body">
+					<form class="accordion-body" id="login">
 						{% csrf_token %}
 						<h1>Login</h1>
 						<div class="mb-3">
@@ -63,7 +41,7 @@
 			</h2>
 			<div id="collapse-register" class="accordion-collapse collapse" data-bs-parent="#accordion-login-register">
 				<div class="accordion-body">
-					<form class="accordion-body">
+					<form class="accordion-body" id="register">
 						{% csrf_token %}
 						<h1>Register</h1>
 						<div class="mb-3">
@@ -81,4 +59,6 @@
 		</div>
 	</div>
 </div>
+<script src="/static/index/accordion.js"></script>
+<script type="module" src="/static/index/login.js"></script>
 {% endblock %}

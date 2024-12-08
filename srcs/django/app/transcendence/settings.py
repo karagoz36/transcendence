@@ -29,7 +29,7 @@ DEBUG = True
 
 CSRF_TRUSTED_ORIGINS = ["http://localhost:8000"]
 
-ALLOWED_HOSTS = ["506f-88-160-69-156.ngrok-free.app"]
+ALLOWED_HOSTS = ["*.ngrok-free.app", "localhost"]
 
 
 # Application definition
