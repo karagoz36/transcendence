@@ -33,8 +33,11 @@ async function isAuthenticated() {
 	return res == "true"
 }
 
-async function main() {
-	keepOneAccordionOpened()
-}
+keepOneAccordionOpened()
 
-main()
+const urlParams = new URLSearchParams(window.location.search)
+if (urlParams.get("register") != null) {
+	/** @type {HTMLDivElement|undefined|void} */
+	document.querySelector("#collapse-login")?.classList.remove("show")
+	document.querySelector("#collapse-register")?.classList.add("show")
+}

@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="/static/global/style.css">
 <div class="d-flex flex-column align-items-center justify-content-center login-registration-form"
 	style="height: 100vh; padding: 1rem;">
-	<div class="alert alert-danger hide-empty">{{ ERROR_MESSAGE }}</div>
+	<p class="alert alert-danger hide-empty">{{ ERROR_MESSAGE }}</p>
 	<div class="accordion" id="accordion-login-register">
 		<div class="accordion-item">
 			<h2 class="accordion-header">
@@ -59,6 +59,7 @@
 		</div>
 	</div>
 </div>
-<script type="module" src="/static/auth/main.js"></script>
+<script type="module" src="/static/auth/accordion.js"></script>
 <script type="module" src="/static/auth/login.js"></script>
+<script type="module" src="/static/auth/register.js"></script>
 {% endblock %}

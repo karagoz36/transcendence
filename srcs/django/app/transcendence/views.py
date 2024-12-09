@@ -7,15 +7,18 @@ from transcendence import api
 def auth(request: Request):
     return api.auth.response(request)
 
+@api_view(['GET'])
+def logout(request: Request):
+    return api.logout.response(request)
+
 @api_view(['POST'])
 def login(request: Request):
     return api.login.response(request)
 
+@api_view(['POST'])
+def register(request: Request):
+    return api.register.response(request)
+
 @api_view(['GET'])
 def index(request: Request):
     return api.index.response(request)
-
-@api_view(['GET'])
-def logout(request: Request):
-    print(request.method,flush=True)
-    return api.logout.response(request)
