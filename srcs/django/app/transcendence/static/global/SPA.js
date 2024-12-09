@@ -38,11 +38,12 @@ function convertOptionsToRequestInit(options) {
 
 /** @param {String} url */
 /** @param {PageOptions} options */
-export async function getPage(url, options = {}) {
+export async function getPage(url, options = {}, addToHistory = true) {
 	/** @type {Response|String} */
 	let res
 	res = await fetch(url, convertOptionsToRequestInit(options))
-	history.pushState({page: url}, "", res.url)
+	if (addToHistory)
+		history.pushState({page: url}, "", res.url)
 	res = await res.text()
 
 	const parser = new DOMParser()
@@ -60,5 +61,5 @@ export async function getPage(url, options = {}) {
 }
 
 window.addEventListener("popstate", (e) => {
-	getPage(window.location.href)
+	getPage(window.location.href, {}, false)
 })

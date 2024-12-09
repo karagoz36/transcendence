@@ -6,7 +6,7 @@ from urllib.parse import quote
 
 def response(request: Request) -> HttpResponse:
 	if "username" not in request.data or "password" not in request.data:
-		return render(request, "auth.html", { "ERROR_MESSAGE": "Invalid body." }, status=400)
+		return redirect(f"/auth?error={quote("Missing password or username")}")
 	user = authenticate(username=request.data['username'], password=request.data['password'])
 	if user is None:
 		return redirect(f"/auth?error={quote("Invalid credentials")}")
