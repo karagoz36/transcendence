@@ -30,7 +30,7 @@ DEBUG = True
 DOMAIN_NAME = os.getenv("DOMAIN_NAME")
 # CSRF_TRUSTED_ORIGINS = ["http://localhost:8000", f"http://{DOMAIN_NAME}:8000"]
 
-ALLOWED_HOSTS = ["*.ngrok-free.app", "localhost", DOMAIN_NAME]
+ALLOWED_HOSTS = ["*.ngrok-free.app", "localhost", DOMAIN_NAME, "django"]
 
 
 # Application definition
