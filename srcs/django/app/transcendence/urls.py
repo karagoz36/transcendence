@@ -22,6 +22,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.index, name="index"),
     path("auth/", views.auth, name="auth"),
+    path("settings/", views.settings, name="settings"),
     path("api/login", views.login, name="login"),
     path("api/logout", views.logout, name="logout"),
     path("api/register", views.register, name="register"),

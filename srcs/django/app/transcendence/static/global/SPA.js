@@ -4,6 +4,7 @@
  * @param {Element} oldMainContainer
  * */
 function refreshScripts(newMainContainer, oldMainContainer) {
+	/** @type {NodeListOf<HTMLScriptElement>} */
 	let scripts = newMainContainer.querySelectorAll("script")
 
 	scripts.forEach(script => {
@@ -36,12 +37,15 @@ function convertOptionsToRequestInit(options) {
 	return init
 }
 
-/** @param {String} url */
+/** @param {string} url */
 /** @param {PageOptions} options */
+/** @param {boolean} addToHistory */
 export async function getPage(url, options = {}, addToHistory = true) {
 	/** @type {Response|String} */
 	let res
 	res = await fetch(url, convertOptionsToRequestInit(options))
+	if (res.status >= 400)
+		throw new Error(`SPA: failed to fetch page at ${url} status`)
 	if (addToHistory)
 		history.pushState({page: url}, "", res.url)
 	res = await res.text()
@@ -63,3 +67,14 @@ export async function getPage(url, options = {}, addToHistory = true) {
 window.addEventListener("popstate", (e) => {
 	getPage(window.location.href, {}, false)
 })
+
+/** @param {MouseEvent} e */
+/** @this HTMLAnchorElement */
+function preventAnchorReloading(e) {
+	e.preventDefault()
+	getPage(this.href)
+}
+
+/** @type {NodeListOf<HTMLAnchorElement>} */
+const links = document.querySelectorAll("a")
+links.forEach(curr => curr.addEventListener("click", preventAnchorReloading))

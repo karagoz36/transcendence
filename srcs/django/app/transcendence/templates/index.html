@@ -1,7 +1,9 @@
 {% extends "base.html" %}
-{% block title %}Index{% endblock %}
+{% block title %}Home{% endblock %}
 {% block content %}
-<h1>Index</h1>
+{% include "navbar.html" %}
+<h1>Welcome {{ USERNAME }}</h1>
 <button id="logout">LOGOUT</button>
 <script type="module" src="/static/index/main.js"></script>
+<script type="module" src="/static/global/SPA.js"></script>
 {% endblock %}

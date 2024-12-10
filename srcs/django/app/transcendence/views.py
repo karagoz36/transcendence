@@ -22,3 +22,7 @@ def register(request: Request):
 @api_view(['GET'])
 def index(request: Request):
     return api.index.response(request)
+
+@api_view(['GET'])
+def settings(request: Request):
+    return api.settings.response(request)

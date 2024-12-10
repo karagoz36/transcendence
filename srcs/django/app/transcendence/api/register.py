@@ -15,4 +15,4 @@ def response(request: Request) -> HttpResponse:
 		user = User.objects.create_user(username, '', password)
 		login(request, user)
 		return redirect("/")
-	return redirect("/auth/?register&error=Username already taken.")
+	return redirect("/auth/?register&error=Username already taken")
