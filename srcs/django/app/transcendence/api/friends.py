@@ -5,5 +5,5 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 
 def response(request: Request) -> HttpResponse:
-	friends = ["test", "oui", "coucou"]
-	return render(request, "friends.html", {"friends": friends})
+	friends = [{"username": "test", "status": "online", "id": 0}]
+	return render(request, "friendlist.html", {"friends": friends})

@@ -53,6 +53,7 @@ export async function getPage(url, options = {}, addToHistory = true) {
 
 	const parser = new DOMParser()
 	const newPage = parser.parseFromString(res, "text/html")
+	document.title = newPage.title
 
 	const oldMainContainer = document.querySelector(".main-container")
 	if (!oldMainContainer)

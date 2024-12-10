@@ -1,9 +1,10 @@
-<div class="card" style="margin-bottom: 0.5rem;">
+<div class="card" style="margin-bottom: 0.5rem; width: 20rem; max-width: 90vw;">
 	<div class="card-header">
-	  {{user}}
+		{{user.username}}
 	</div>
 	<div class="card-body">
-	  <h5 class="card-title">Special title treatment</h5>
-	  <a href="#" class="btn btn-primary">Send message</a>
+		<h5 class="card-title">{{user.status}}</h5>
+		<button data-bs-toggle="modal" data-bs-target="#exampleModal"
+		id="send-message" user-id={{user.id}} class="btn btn-primary">Send message</button>
 	</div>
 </div>
