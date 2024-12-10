@@ -72,9 +72,19 @@ window.addEventListener("popstate", (e) => {
 /** @this HTMLAnchorElement */
 function preventAnchorReloading(e) {
 	e.preventDefault()
-	getPage(this.href)
+	getPage(e.target.href)
 }
 
-/** @type {NodeListOf<HTMLAnchorElement>} */
-const links = document.querySelectorAll("a")
-links.forEach(curr => curr.addEventListener("click", preventAnchorReloading))
+function setAnchorEvent() {
+	/** @type {NodeListOf<HTMLAnchorElement>} */
+	const links = document.querySelectorAll("a")
+	links.forEach(curr => curr.addEventListener("click", preventAnchorReloading))
+}
+
+setAnchorEvent()
+
+const mainContainer = document.querySelector(".main-container")
+if (!mainContainer)
+	throw new Error("mutation observer: could not find main container")
+const observer = new MutationObserver(setAnchorEvent)
+observer.observe(mainContainer, { attributes: true, childList: true, subtree: true })
