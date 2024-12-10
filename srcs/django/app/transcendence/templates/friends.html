@@ -1,0 +1,13 @@
+{% extends "modules/base.html" %}
+{% block title %}Friend List{% endblock %}
+{% block content %}
+{% include "navbar.html" %}
+<h1>FRIEND LIST</h1>
+<ul style="list-style-type: none; margin: 0; padding: 0; display: flex; align-items: center; flex-direction: column;">
+	{% for friend in friends %}
+		{% with user=friend %}
+			{% include "modules/friend.html" %}
+		{% endwith %}
+	{% endfor %}
+</ul>
+{% endblock %}

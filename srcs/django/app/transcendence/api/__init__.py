@@ -4,3 +4,4 @@ from . import index
 from . import logout
 from . import register
 from . import settings
+from . import friends

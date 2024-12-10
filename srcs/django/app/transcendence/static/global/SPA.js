@@ -2,15 +2,16 @@
 /** 
  * @param {Element} newMainContainer
  * @param {Element} oldMainContainer
- * */
+*/
 function refreshScripts(newMainContainer, oldMainContainer) {
 	/** @type {NodeListOf<HTMLScriptElement>} */
-	let scripts = newMainContainer.querySelectorAll("script")
+	let scripts = oldMainContainer.querySelectorAll("script")
 
 	scripts.forEach(script => {
 		const newScript = document.createElement("script")
 		newScript.src = script.src + `?v=${Date.now()}`
 		newScript.type = script.type
+		script.replaceWith(newScript)
 		script.remove()
 		oldMainContainer.appendChild(newScript)
 	})
@@ -21,7 +22,7 @@ function refreshScripts(newMainContainer, oldMainContainer) {
  * @property {string} [method]
  * @property {HeadersInit} [headers]
  * @property {Object} [body]
-*/
+ */
 
 /**
  * @param {PageOptions} options
@@ -44,8 +45,8 @@ export async function getPage(url, options = {}, addToHistory = true) {
 	/** @type {Response|String} */
 	let res
 	res = await fetch(url, convertOptionsToRequestInit(options))
-	if (res.status == 404)
-		throw new Error(`SPA: failed to fetch page at ${url} status`)
+	if (res.status == 404 || res.status >= 500)
+		throw new Error(`SPA: failed to fetch ${url}`)
 	if (addToHistory)
 		history.pushState({page: url}, "", res.url)
 	res = await res.text()

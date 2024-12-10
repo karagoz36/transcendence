@@ -26,3 +26,7 @@ def index(request: Request):
 @api_view(['GET'])
 def settings(request: Request):
     return api.settings.response(request)
+
+@api_view(['GET'])
+def friends(request: Request):
+    return api.friends.response(request)
