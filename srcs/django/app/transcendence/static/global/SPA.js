@@ -5,15 +5,15 @@
 */
 function refreshScripts(newMainContainer, oldMainContainer) {
 	/** @type {NodeListOf<HTMLScriptElement>} */
-	let scripts = oldMainContainer.querySelectorAll("script")
+	const oldScripts = oldMainContainer.querySelectorAll("script")
+	const newScripts = newMainContainer.querySelectorAll("script")
 
-	scripts.forEach(script => {
+	oldScripts.forEach(script => script.remove())
+	newScripts.forEach(script => {
 		const newScript = document.createElement("script")
 		newScript.src = script.src + `?v=${Date.now()}`
 		newScript.type = script.type
-		script.replaceWith(newScript)
-		script.remove()
-		oldMainContainer.appendChild(newScript)
+		document.querySelector(".main-container")?.append(newScript)
 	})
 }
 
