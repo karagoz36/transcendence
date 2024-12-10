@@ -44,7 +44,7 @@ export async function getPage(url, options = {}, addToHistory = true) {
 	/** @type {Response|String} */
 	let res
 	res = await fetch(url, convertOptionsToRequestInit(options))
-	if (res.status >= 400)
+	if (res.status == 404)
 		throw new Error(`SPA: failed to fetch page at ${url} status`)
 	if (addToHistory)
 		history.pushState({page: url}, "", res.url)
