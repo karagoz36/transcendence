@@ -4,14 +4,14 @@ import { getPage } from "../global/SPA.js"
 /** @param {SubmitEvent} e */
 async function handleLogin(e) {
 	e.preventDefault()
-	/** @type {HTMLFormElement} */ // @ts-ignore
-	const target = e.target
+	if (!e.target)
+		throw new Error("handleLogin: e.target null")
 	/** @type {String} */
-	const username = target['username'].value
+	const username = e.target['username'].value
 	/** @type {String} */
-	const password = target['password'].value
+	const password = e.target['password'].value
 	/** @type {String} */
-	const csrfmiddlewaretoken = target['csrfmiddlewaretoken'].value
+	const csrfmiddlewaretoken = e.target['csrfmiddlewaretoken'].value
 	await getPage("/api/login", {
 		method: "POST",
 		body: {username, password},

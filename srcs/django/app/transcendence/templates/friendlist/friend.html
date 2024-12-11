@@ -1,0 +1,16 @@
+<div class="card">
+	{% with friend=friend.friend %}
+	<div class="card-header">
+		{{friend.username}}
+	</div>
+	<div class="card-body">
+		{% if user.friend.invitePending %}
+		<button data-bs-toggle="modal" data-bs-target="#exampleModal" 
+		id="send-message" user-id={{friend.id}} class="btn btn-primary">Send message</button>
+		<button id="play" user-id={{friend.id}} class="btn btn-primary">Invite to play</button>
+		{% else %}
+		Waiting for {{friend.username}} to accept friendship...
+		{% endif %}
+	</div>
+	{% endwith %}
+</div>

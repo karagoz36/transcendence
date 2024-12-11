@@ -27,4 +27,7 @@ urlpatterns = [
     path("api/login", views.login, name="login"),
     path("api/logout", views.logout, name="logout"),
     path("api/register", views.register, name="register"),
+    path("api/add-friend", views.addFriend, name="addFriend"),
+    path("api/accept-friend", views.acceptFriend, name="acceptFriend"),
+    path("api/reject-friend", views.rejectFriend, name="rejectFriend"),
 ]

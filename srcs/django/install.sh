@@ -2,8 +2,8 @@ if [ ! -e /app/manage.py ]; then
 	django-admin startproject transcendence app
 fi
 
-python /app/manage.py migrate
 python /app/manage.py makemigrations
+python /app/manage.py migrate
 python /app/manage.py createsuperuser --email '' --username $POSTGRES_USER --noinput
 python /app/manage.py shell -c "
 from django.contrib.auth import get_user_model

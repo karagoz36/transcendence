@@ -1,32 +1,44 @@
 from rest_framework.request import Request
 from django.contrib.auth.models import User
 from rest_framework.decorators import api_view
-from transcendence import api
+from . import pages
 
 @api_view(['GET'])
 def auth(request: Request):
-    return api.auth.response(request)
+    return pages.auth.response(request)
 
 @api_view(['GET'])
 def logout(request: Request):
-    return api.logout.response(request)
+    return pages.logout.response(request)
 
 @api_view(['POST'])
 def login(request: Request):
-    return api.login.response(request)
+    return pages.login.response(request)
 
 @api_view(['POST'])
 def register(request: Request):
-    return api.register.response(request)
+    return pages.register.response(request)
 
 @api_view(['GET'])
 def index(request: Request):
-    return api.index.response(request)
+    return pages.index.response(request)
 
 @api_view(['GET'])
 def settings(request: Request):
-    return api.settings.response(request)
+    return pages.settings.response(request)
 
 @api_view(['GET'])
 def friends(request: Request):
-    return api.friends.response(request)
+    return pages.friends.response(request)
+
+@api_view(['POST'])
+def addFriend(request: Request):
+    return pages.addFriend.response(request)
+
+@api_view(['POST'])
+def acceptFriend(request: Request):
+    return pages.acceptFriend.response(request)
+
+@api_view(['POST'])
+def rejectFriend(request: Request):
+    return pages.rejectFriend.response(request)

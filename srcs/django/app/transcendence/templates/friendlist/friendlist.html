@@ -1,0 +1,21 @@
+{% extends 'modules/base.html' %}
+{% block title %}
+  Friend List
+{% endblock %}
+{% block content %}
+  {% include 'modules/navbar.html' %}
+  <p style="margin: 0 auto; max-width: 95vw; width: 20rem; text-align: center; padding: 0.5rem; margin-bottom: 1rem;" class="alert alert-danger hide-empty" id="error-text"></p>
+  <p style="margin: 0 auto; max-width: 95vw; width: 20rem; text-align: center; padding: 0.5rem; margin-bottom: 1rem;" class="alert alert-success hide-empty" id="success-text"></p>
+  {% include 'friendlist/add-friend.html' %}
+  {% for user in friendOf %}
+  	{% include 'friendlist/pending-invite.html' %}
+  {% endfor %}
+  <ul style="list-style-type: none; margin: 0; padding: 0; display: flex; align-items: center; flex-direction: column;">
+    {% for friend in friends %}
+      {% include 'friendlist/friend.html' %}
+    {% endfor %}
+  </ul>
+  {% include 'friendlist/message-modal.html' %}
+  <script src="/static/friends/message.js"></script>
+  <script type="module" src="/static/friends/add-friend.js"></script>
+{% endblock %}

@@ -1,0 +1,5 @@
+<form style="width: 20rem; margin: 0 auto; max-width: 95vw;" class="input-group mb-3" id="add-friend-form">
+    {% csrf_token %}
+    <input style="border-top-left-radius: 5px; border-bottom-left-radius: 5px;" type="text" class="form-control" name="username" id="friend-username-input" placeholder="Insert username..." />
+    <button type="submit" class="btn btn-outline-primary">Add friend</button>
+  </form>

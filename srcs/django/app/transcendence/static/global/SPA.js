@@ -52,6 +52,22 @@ function convertOptionsToRequestInit(options) {
 	return init
 }
 
+function setErrorSuccessText() {
+	const urlParams = new URLSearchParams(window.location.search)
+
+	const error = urlParams.get("error")
+	if (error != null) {
+		const errorText = document.querySelector("#error-text")
+		if (errorText) errorText.textContent = error
+	}
+
+	const success = urlParams.get("success")
+	if (success != null) {
+		const successText = document.querySelector("#success-text")
+		if (successText) successText.textContent = success
+	}
+}
+
 /** @param {string} url */
 /** @param {PageOptions} options */
 /** @param {boolean} addToHistory */
@@ -63,20 +79,25 @@ export async function getPage(url, options = {}, addToHistory = true) {
 		throw new Error(`SPA: failed to fetch ${url}`)
 	if (addToHistory)
 		history.pushState({page: url}, "", res.url)
+	if (res.headers.get("content-type") == "application/json") {
+		console.error(await res.json())
+		throw new Error("got json instead of html")	
+	}
 	res = await res.text()
-
+	
 	const parser = new DOMParser()
 	const newPage = parser.parseFromString(res, "text/html")
 	document.title = newPage.title
-
+	
 	const oldMainContainer = document.querySelector(".main-container")
 	if (!oldMainContainer)
 		throw new Error("failed to find main-container in current body")
-
+	
 	const newMainContainer = newPage.querySelector(".main-container")
 	if (!newMainContainer)
 		throw new Error(`failed to find main-container in fetched body at ${url}`)
 	oldMainContainer.innerHTML = newMainContainer.innerHTML
+	setErrorSuccessText()
 	setAnchorEvent()
 	refreshScripts(newMainContainer, oldMainContainer)
 }

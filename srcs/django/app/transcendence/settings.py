@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
-import socket
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,7 +27,7 @@ SECRET_KEY = 'django-insecure-471zhka30$t^r^g6n@5_@wuuf(m^&5(cgc@da70lt24d=wa_vh
 DEBUG = True
 
 DOMAIN_NAME = os.getenv("DOMAIN_NAME")
-# CSRF_TRUSTED_ORIGINS = ["http://localhost:8000", f"http://{DOMAIN_NAME}:8000"]
+CSRF_TRUSTED_ORIGINS = ["https://localhost:8000", f"https://{DOMAIN_NAME}:8000"]
 
 ALLOWED_HOSTS = ["*.ngrok-free.app", "localhost", DOMAIN_NAME, "django"]
 
@@ -36,6 +35,7 @@ ALLOWED_HOSTS = ["*.ngrok-free.app", "localhost", DOMAIN_NAME, "django"]
 # Application definition
 
 INSTALLED_APPS = [
+	'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 	'rest_framework',
+	'database',
 ]
 
 MIDDLEWARE = [
@@ -133,3 +134,4 @@ STATIC_ROOT = '/app/static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+ASGI_APPLICATION = "transcendence.asgi.application"

@@ -3,7 +3,7 @@
 function sendMessage(e) {
 	e.preventDefault()
 	/** @type {HTMLInputElement} */
-	const input = e.target['message']
+	const message = e.target['message']
 }
 
 function main() {

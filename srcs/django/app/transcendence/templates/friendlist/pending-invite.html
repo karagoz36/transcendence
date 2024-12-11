@@ -1,0 +1,15 @@
+{% with user=user.user %}
+<div class="card">
+	<div class="card-header">
+		Friend invite received from {{ user.username }}
+	</div>
+	<div class="card-body">
+		<form id="invite-pending-form">
+			{% csrf_token %}
+			<button type="submit" user-id={{user.id}} class="btn btn-success">Accept</button>
+			<button type="submit" user-id={{user.id}} class="btn btn-danger">Reject</button>
+		</form>
+	</div>
+  </div>
+{% endwith %}
+<script type="module" src="/static/friends/handle-friend-request.js"></script>

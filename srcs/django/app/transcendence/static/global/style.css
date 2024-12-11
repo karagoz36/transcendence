@@ -1,3 +1,16 @@
 .hide-empty:empty {
 	display: none;
 }
+
+.card {
+	margin: 0 auto;
+	margin-bottom: 0.5rem;
+	width: 20rem;
+	max-width: 90vw;
+}
+
+.alert {
+	margin: 0 auto;
+	max-width: 95vw;
+	width: 20rem; text-align: center; padding: 0.5rem; margin-bottom: 1rem;
+}
