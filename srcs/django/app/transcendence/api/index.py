@@ -6,6 +6,4 @@ from django.contrib.auth.models import User
 
 def response(request: Request) -> HttpResponse:
 	user: User = request.user
-	if not user.is_active:
-		return redirect("/auth")
 	return render(request, "index.html", {"USERNAME": user.username})
