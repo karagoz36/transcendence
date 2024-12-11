@@ -1,5 +1,7 @@
 // @ts-check
 
+const event = new Event("page-changed")
+
 /** @param {MouseEvent} e */
 /** @this HTMLAnchorElement */
 function preventAnchorReloading(e) {
@@ -22,7 +24,10 @@ function refreshScripts(newMainContainer, oldMainContainer) {
 	const oldScripts = oldMainContainer.querySelectorAll("script")
 	const newScripts = newMainContainer.querySelectorAll("script")
 
-	oldScripts.forEach(script => script.remove())
+	oldScripts.forEach(script => {
+		script.type = "application/json"
+		script.remove()
+	})
 	newScripts.forEach(script => {
 		const newScript = document.createElement("script")
 		newScript.src = script.src + `?v=${Date.now()}`
@@ -100,6 +105,7 @@ export async function getPage(url, options = {}, addToHistory = true) {
 	setErrorSuccessText()
 	setAnchorEvent()
 	refreshScripts(newMainContainer, oldMainContainer)
+	dispatchEvent(event)
 }
 
 window.addEventListener("popstate", (e) => {

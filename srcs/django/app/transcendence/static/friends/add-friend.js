@@ -39,6 +39,7 @@ function main() {
 	const inputMessage = document.querySelector("#add-friend-form")
 	if (inputMessage)
 		inputMessage.onsubmit = addFriend
+	console.log("test")
 }
 
 main()
