@@ -14,7 +14,7 @@ async function addFriend(e) {
 	const csrfmiddlewaretoken = e.target['csrfmiddlewaretoken'].value
 	/** @type {string} */
 	const username = e.target['username'].value
-	await getPage("/api/add-friend", {
+	await getPage("/api/friend/add", {
 		method: "POST",
 		body: {username},
 		headers: {

@@ -5,7 +5,6 @@ from channels.generic.websocket import WebsocketConsumer
 
 class Notification(WebsocketConsumer):
     def connect(self):
-        print(self.scope["url_route"], flush=True)
         self.accept()
         self.send("test")
 

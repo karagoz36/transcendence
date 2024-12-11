@@ -5,7 +5,7 @@ import {getPage} from "../global/SPA.js"
  * @param {number} friendID 
 */
 async function acceptFriendInvitation(csrfmiddlewaretoken, friendID) {
-	await getPage("/api/accept-friend", {
+	await getPage("/api/friend/accept", {
 		method: "POST",
 		headers: {
 			"X-CSRFToken": csrfmiddlewaretoken,
@@ -21,7 +21,7 @@ async function acceptFriendInvitation(csrfmiddlewaretoken, friendID) {
  * @param {number} friendID 
 */
 async function rejectFriendInvitation(csrfmiddlewaretoken, friendID) {
-	await getPage("/api/reject-friend", {
+	await getPage("/api/friend/reject", {
 		method: "POST",
 		headers: {
 			"X-CSRFToken": csrfmiddlewaretoken,
