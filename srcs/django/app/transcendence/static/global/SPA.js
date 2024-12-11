@@ -1,4 +1,18 @@
 // @ts-check
+
+/** @param {MouseEvent} e */
+/** @this HTMLAnchorElement */
+function preventAnchorReloading(e) {
+	e.preventDefault()
+	getPage(e.target.href)
+}
+
+function setAnchorEvent() {
+	/** @type {NodeListOf<HTMLAnchorElement>} */
+	const links = document.querySelectorAll("a")
+	links.forEach(curr => curr.addEventListener("click", preventAnchorReloading))
+}
+
 /** 
  * @param {Element} newMainContainer
  * @param {Element} oldMainContainer
@@ -63,6 +77,7 @@ export async function getPage(url, options = {}, addToHistory = true) {
 	if (!newMainContainer)
 		throw new Error(`failed to find main-container in fetched body at ${url}`)
 	oldMainContainer.innerHTML = newMainContainer.innerHTML
+	setAnchorEvent()
 	refreshScripts(newMainContainer, oldMainContainer)
 }
 
@@ -70,23 +85,4 @@ window.addEventListener("popstate", (e) => {
 	getPage(window.location.href, {}, false)
 })
 
-/** @param {MouseEvent} e */
-/** @this HTMLAnchorElement */
-function preventAnchorReloading(e) {
-	e.preventDefault()
-	getPage(e.target.href)
-}
-
-function setAnchorEvent() {
-	/** @type {NodeListOf<HTMLAnchorElement>} */
-	const links = document.querySelectorAll("a")
-	links.forEach(curr => curr.addEventListener("click", preventAnchorReloading))
-}
-
 setAnchorEvent()
-
-const mainContainer = document.querySelector(".main-container")
-if (!mainContainer)
-	throw new Error("mutation observer: could not find main container")
-const observer = new MutationObserver(setAnchorEvent)
-observer.observe(mainContainer, { attributes: true, childList: true, subtree: true })

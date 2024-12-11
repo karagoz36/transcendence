@@ -22,8 +22,12 @@ async function handleRegister(e) {
 	})
 }
 
-/** @type {HTMLFormElement|null} */
-const form = document.querySelector("#register")
-if (form == null)
-	throw new Error("querySelector: could not find register form")
-form.onsubmit = handleRegister
+function main() {
+	/** @type {HTMLFormElement|null} */
+	const form = document.querySelector("#register")
+	if (form == null)
+		throw new Error("querySelector: could not find register form")
+	form.onsubmit = handleRegister
+}
+
+main()

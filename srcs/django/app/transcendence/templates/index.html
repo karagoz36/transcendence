@@ -1,8 +1,6 @@
 {% extends "modules/base.html" %}
 {% block title %}Home{% endblock %}
 {% block content %}
-{% include "navbar.html" %}
+{% include "modules/navbar.html" %}
 <h1>Welcome {{ USERNAME }}</h1>
-<button id="logout">LOGOUT</button>
-<script type="module" src="/static/index/main.js"></script>
 {% endblock %}

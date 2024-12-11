@@ -22,8 +22,12 @@ async function handleLogin(e) {
 	})
 }
 
-/** @type {HTMLFormElement|null} */
-const form = document.querySelector("#login")
-if (form == null)
-	throw new Error("querySelector: could not find login form")
-form.onsubmit = handleLogin
+function main() {
+	/** @type {HTMLFormElement|null} */
+	const form = document.querySelector("#login")
+	if (form == null)
+		throw new Error("querySelector: could not find login form")
+	form.onsubmit = handleLogin
+}
+
+main()

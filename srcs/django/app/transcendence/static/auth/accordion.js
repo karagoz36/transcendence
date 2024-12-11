@@ -33,11 +33,15 @@ async function isAuthenticated() {
 	return res == "true"
 }
 
-keepOneAccordionOpened()
-
-const urlParams = new URLSearchParams(window.location.search)
-if (urlParams.get("register") != null) {
-	/** @type {HTMLDivElement|undefined|void} */
-	document.querySelector("#collapse-login")?.classList.remove("show")
-	document.querySelector("#collapse-register")?.classList.add("show")
+function main() {
+	keepOneAccordionOpened()
+	
+	const urlParams = new URLSearchParams(window.location.search)
+	if (urlParams.get("register") != null) {
+		/** @type {HTMLDivElement|undefined|void} */
+		document.querySelector("#collapse-login")?.classList.remove("show")
+		document.querySelector("#collapse-register")?.classList.add("show")
+	}
 }
+
+main()
