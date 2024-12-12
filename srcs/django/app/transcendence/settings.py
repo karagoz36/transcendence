@@ -50,7 +50,7 @@ INSTALLED_APPS = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework_simplejwt.authentication.JWTAuthentication',]
+    'DEFAULT_AUTHENTICATION_CLASSES': ['transcendence.middleware.CustomAuthentication']
 }
 
 
@@ -62,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'transcendence.middleware.RequiredLoginMiddleware',
 ]
 
 ROOT_URLCONF = 'transcendence.urls'

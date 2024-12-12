@@ -4,7 +4,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import logout
 
 def response(request: Request):
-	logout(request)
+	if "logout" in request.query_params:
+		logout(request)
+		response = render(request, "auth.html")
+		response.delete_cookie("access_token")
+		response.delete_cookie("session_id")
+		return response
 	error = ""
 	status = 200
 

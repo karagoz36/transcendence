@@ -1,3 +1,16 @@
+/** 
+ * @typedef {Object} JWT
+ * @property {string} [access]
+ * @property {string} [refresh]
+ */
+
+/** @param {string} accessToken */
+function setAccessTokenCookie(accessToken) {
+	document.cookie = `access_token=${accessToken};`
+	+ "max-age=86400;SameSite=Lax;"
+	+ "path=/;"
+}
+
 /**
  * @param {string} csrfmiddlewaretoken
  * @param {string} username
@@ -12,8 +25,11 @@ export async function setJWT(csrfmiddlewaretoken, username, password) {
 			"content-type": "application/json",
 		}
 	})
+	/** @type {JWT} */
 	const jwt = await res.text()
 	localStorage.setItem("JWT", jwt)
+	const accessToken = JSON.parse(jwt).access
+	setAccessTokenCookie(accessToken)
 }
 
 export async function refreshJWT() {
@@ -25,13 +41,8 @@ export async function refreshJWT() {
 	})
 	const newJWT = await res.text()
 	localStorage.setItem("JWT", newJWT)
+	setAccessTokenCookie(newJWT.access)
 }
-
-/** 
- * @typedef {Object} JWT
- * @property {string} [access]
- * @property {string} [refresh]
- */
 
 /**
  * @returns {JWT}

@@ -6,5 +6,4 @@ from django.contrib.auth.models import User
 
 def response(request: Request) -> HttpResponse:
 	user: User = request.user
-	print(user.is_active, flush=True)
 	return render(request, "index.html", {"USERNAME": user.username})
