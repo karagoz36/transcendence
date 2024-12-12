@@ -38,7 +38,7 @@ function refreshScripts(newMainContainer, oldMainContainer) {
 	})
 }
 
-/** 
+/**
  * @typedef {Object} PageOptions
  * @property {string} [method]
  * @property {HeadersInit} [headers]
@@ -79,15 +79,17 @@ function setErrorSuccessText() {
 	}
 }
 
-/** @param {string} url */
-/** @param {PageOptions} options */
-/** @param {boolean} addToHistory */
-export async function getPage(url, options = {}, addToHistory = true) {
+/**
+ * 
+ * @param {string} url
+ * @param {RequestInit} options
+ * @param {boolean} addToHistory
+ * @returns 
+ */
+async function getHTML(url, options, addToHistory) {
 	/** @type {Response|String} */
 	let res
-	const requestInit = convertOptionsToRequestInit(options)
-	console.log(requestInit)
-	res = await fetch(url, requestInit)
+	res = await fetch(url, options)
 	if (res.status == 404 || res.status >= 500)
 		throw new Error(`SPA: failed to fetch ${url}`)
 	if (addToHistory)
@@ -96,8 +98,16 @@ export async function getPage(url, options = {}, addToHistory = true) {
 		console.error(await res.json())
 		throw new Error("got json instead of html")	
 	}
-	res = await res.text()
-	
+	return await res.text()
+}
+
+/** 
+ * @param {string} url
+ * @param {PageOptions} options
+ * @param {boolean} addToHistory */
+export async function getPage(url, options = {}, addToHistory = true) {
+	const requestInit = convertOptionsToRequestInit(options)
+	const res = await getHTML(url, requestInit, addToHistory)
 	const parser = new DOMParser()
 	const newPage = parser.parseFromString(res, "text/html")
 	document.title = newPage.title
@@ -121,3 +131,7 @@ window.addEventListener("popstate", (e) => {
 })
 
 setAnchorEvent()
+
+window.onload = () => {
+	getPage(window.location.pathname)
+}
