@@ -24,6 +24,26 @@ async function addFriend(e) {
 	})
 }
 
+/** @param {SubmitEvent} e */
+async function getToken(e) {
+	e.preventDefault()
+	if (!e.target)
+		throw new Error("addFriend: e.target null")
+	/** @type {string} */
+	const csrfmiddlewaretoken = e.target['csrfmiddlewaretoken'].value
+	/** @type {string} */
+	const username = e.target['username'].value
+	const res = await fetch("/api/friend/add", {
+		method: "POST",
+		body: JSON.stringify({username},),
+		headers: {
+			"X-CSRFToken": csrfmiddlewaretoken,
+			"content-type": "application/json",
+		}
+	})
+	console.log(await res.text())
+}
+
 function fillUsernameField() {
 	const urlParams = new URLSearchParams(window.location.search)
 	const username = urlParams.get("username")
@@ -37,9 +57,8 @@ function main() {
 	fillUsernameField()
 	/** @type {HTMLFormElement} */ // @ts-ignore
 	const inputMessage = document.querySelector("#add-friend-form")
-	if (inputMessage)
-		inputMessage.onsubmit = addFriend
-	console.log("test")
+	// inputMessage.onsubmit = addFriend
+	inputMessage.onsubmit = getToken
 }
 
 main()

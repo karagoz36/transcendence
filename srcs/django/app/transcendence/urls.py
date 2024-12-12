@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from . import views
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -30,6 +31,6 @@ urlpatterns = [
     path("api/friend/add", views.addFriend, name="addFriend"),
     path("api/friend/accept", views.acceptFriend, name="acceptFriend"),
     path("api/friend/reject", views.rejectFriend, name="rejectFriend"),
-    path("api/token", views.rejectFriend, name="rejectFriend"),
-    path("api/token/refresh", views.rejectFriend, name="rejectFriend"),
+    path("api/token", TokenObtainPairView.as_view(), name="rejectFriend"),
+    path("api/token/refresh", TokenRefreshView.as_view(), name="rejectFriend"),
 ]

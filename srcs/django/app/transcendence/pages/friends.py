@@ -6,5 +6,6 @@ from django.contrib.auth.models import User
 from database.models import FriendList
 
 def response(request: Request) -> HttpResponse:
+	print(request.user, flush=True)
 	return render(request, "friendlist/friendlist.html",
 		{"friends": request.user.friends.all(), "friendOf": request.user.friendOf.all()})
