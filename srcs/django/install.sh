@@ -3,7 +3,7 @@ if [ ! -e /app/manage.py ]; then
 fi
 
 python /app/manage.py makemigrations database
-python /app/manage.py migrate dabase
+python /app/manage.py migrate database
 
 python /app/manage.py makemigrations
 python /app/manage.py migrate
