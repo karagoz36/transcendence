@@ -1,5 +1,6 @@
 // @ts-check
 import { getPage } from "../global/SPA.js"
+import { setJWT } from "../global/JWT.js"
 
 /** @param {SubmitEvent} e */
 async function handleLogin(e) {
@@ -12,6 +13,7 @@ async function handleLogin(e) {
 	const password = e.target['password'].value
 	/** @type {String} */
 	const csrfmiddlewaretoken = e.target['csrfmiddlewaretoken'].value
+	await setJWT(csrfmiddlewaretoken, username, password)
 	await getPage("/api/login", {
 		method: "POST",
 		body: {username, password},

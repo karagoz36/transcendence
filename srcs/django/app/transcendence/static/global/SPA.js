@@ -1,5 +1,7 @@
 // @ts-check
 
+import { getJWT } from "./JWT.js"
+
 const event = new Event("page-changed")
 
 /** @param {MouseEvent} e */
@@ -51,9 +53,13 @@ function convertOptionsToRequestInit(options) {
 	let init = {}
 	if (options.method == "POST" && (options.headers == undefined || options.headers['X-CSRFToken'] == undefined))
 		throw new Error("CSRF token missing for POST method")
+	const jwtToken = getJWT()
 	init.body = JSON.stringify(options.body)
 	init.method = options.method
-	init.headers = options.headers
+	init.headers = {
+		...options.headers,
+		authorization: `Bearer ${jwtToken}`
+	}
 	return init
 }
 
