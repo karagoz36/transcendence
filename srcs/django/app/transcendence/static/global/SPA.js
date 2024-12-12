@@ -58,7 +58,7 @@ function convertOptionsToRequestInit(options) {
 	init.method = options.method
 	init.headers = {
 		...options.headers,
-		authorization: `Bearer ${jwtToken}`
+		authorization: `Bearer ${jwtToken.access}`
 	}
 	return init
 }
@@ -85,7 +85,9 @@ function setErrorSuccessText() {
 export async function getPage(url, options = {}, addToHistory = true) {
 	/** @type {Response|String} */
 	let res
-	res = await fetch(url, convertOptionsToRequestInit(options))
+	const requestInit = convertOptionsToRequestInit(options)
+	console.log(requestInit)
+	res = await fetch(url, requestInit)
 	if (res.status == 404 || res.status >= 500)
 		throw new Error(`SPA: failed to fetch ${url}`)
 	if (addToHistory)

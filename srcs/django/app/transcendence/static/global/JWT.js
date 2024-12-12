@@ -12,7 +12,8 @@ export async function setJWT(csrfmiddlewaretoken, username, password) {
 			"content-type": "application/json",
 		}
 	})
-	localStorage.setItem("JWT", await res.text())
+	const jwt = await res.text()
+	localStorage.setItem("JWT", jwt)
 }
 
 export async function refreshJWT() {
@@ -22,7 +23,8 @@ export async function refreshJWT() {
 		headers: {"content-type": "application/json"},
 		body: JSON.stringify({refresh: jwt.refresh})
 	})
-	localStorage.setItem("JWT", await res.text())
+	const newJWT = await res.text()
+	localStorage.setItem("JWT", newJWT)
 }
 
 /** 
