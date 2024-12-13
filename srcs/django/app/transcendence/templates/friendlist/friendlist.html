@@ -4,8 +4,8 @@
 {% endblock %}
 {% block content %}
   {% include 'modules/navbar.html' %}
-  <p style="margin: 0 auto; max-width: 95vw; width: 20rem; text-align: center; padding: 0.5rem; margin-bottom: 1rem;" class="alert alert-danger hide-empty" id="error-text"></p>
-  <p style="margin: 0 auto; max-width: 95vw; width: 20rem; text-align: center; padding: 0.5rem; margin-bottom: 1rem;" class="alert alert-success hide-empty" id="success-text"></p>
+  <div style="margin: 0 auto; max-width: 95vw; width: 20rem; text-align: center; padding: 0.5rem; margin-bottom: 1rem;" class="alert alert-danger hide-empty">{{ERROR_MESSAGE}}</div>
+  <div style="margin: 0 auto; max-width: 95vw; width: 20rem; text-align: center; padding: 0.5rem; margin-bottom: 1rem;" class="alert alert-success hide-empty">{{SUCCESS_MESSAGE}}</div>
   {% include 'friendlist/add-friend.html' %}
   {% for user in invitesReceived %}
   	{% include 'friendlist/pending-invite.html' %}

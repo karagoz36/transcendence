@@ -42,13 +42,11 @@ from websockets.consumers import userIsLoggedIn
 
 @api_view(['POST'])
 async def addFriend(request: Request):
-	user: User = await User.objects.aget(username="test")
-	print(userIsLoggedIn(user), flush=True)
 	return await pages.addFriend.response(request)
 
 @api_view(['POST'])
-def acceptFriend(request: Request):
-	return pages.acceptFriend.response(request)
+async def acceptFriend(request: Request):
+	return await pages.acceptFriend.response(request)
 
 @api_view(['POST'])
 async def removeFriend(request: Request):
