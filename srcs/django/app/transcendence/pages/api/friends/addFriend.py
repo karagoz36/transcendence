@@ -1,10 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from rest_framework.request import Request
 from django.http.response import HttpResponse
 from django.contrib.auth.models import User
 from database.models import FriendList
-from channels.layers import get_channel_layer, BaseChannelLayer
-from asgiref.sync import sync_to_async
+from websockets.consumers import sendNotification
 
 async def response(request: Request) -> HttpResponse:
 	if "username" not in request.data:
@@ -25,11 +24,5 @@ async def response(request: Request) -> HttpResponse:
 	except:
 		pass
 	await FriendList.objects.acreate(user=user, friend=friend)
-
-	user: User = request.user
-	layer: BaseChannelLayer = get_channel_layer()
-	await layer.group_send(f"{friend.username}_notifications", {
-		"type": "sendMessage",
-		"message": f"Friend invitation received from {user.username}."
-	})
+	await sendNotification(friend, f"Friend invitation received from {user.username}.")
 	return redirect("/friends/?success=Friend invitation successfully sent!")

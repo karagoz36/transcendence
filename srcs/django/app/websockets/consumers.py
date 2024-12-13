@@ -4,6 +4,15 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from channels.layers import get_channel_layer, BaseChannelLayer
 from django.contrib.auth.models import User, AnonymousUser
 
+async def sendNotification(receiver: User, message: str) -> None:
+	layer: BaseChannelLayer = get_channel_layer()
+	print(receiver.username, flush=True)
+	print(message, flush=True)
+	await layer.group_send(f"{receiver.username}_notifications", {
+		"type": "sendMessage",
+		"message": message
+	})
+
 class Notification(AsyncWebsocketConsumer):
 	async def connect(self):
 		user: User = self.scope["user"]
