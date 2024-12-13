@@ -27,14 +27,12 @@ function pushNotif(e) {
 	setTimeout(() => toastContainer.removeChild(toast), 10000)
 }
 
-function webSocket() {
-	const socket = new WebSocket(`wss://${window.location.host}/websocket/notifications/test/`)
-	socket.onmessage = pushNotif
-	socket.onopen = () => socket.send("coucou")
-}
-
 function main() {
-	webSocket()
+	const socket = new WebSocket(`wss://${window.location.host}/websocket/notifications/test/`)
+	socket.onerror = () => console.log("test")
+	socket.onmessage = pushNotif
+	socket.onopen = () => socket.send("Message sent to server")
 }
 
 main()
+

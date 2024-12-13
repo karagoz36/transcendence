@@ -1,5 +1,5 @@
-from rest_framework_simplejwt.tokens import Token
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.tokens import Token
 from django.contrib.auth.models import User, AnonymousUser
 from rest_framework.request import Request
 from django.shortcuts import redirect

@@ -1,7 +1,7 @@
 from rest_framework.request import Request
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
-from rest_framework.decorators import api_view
+from adrf.decorators import api_view
 from rest_framework.decorators import authentication_classes, permission_classes
 from . import pages
 
@@ -22,12 +22,12 @@ def login(request: Request):
 @api_view(['POST'])
 @authentication_classes([])
 @permission_classes([AllowAny])
-def register(request: Request):
-    return pages.register.response(request)
+async def register(request: Request):
+    return await pages.register.response(request)
 
 @api_view(['GET'])
-def index(request: Request):
-    return pages.index.response(request)
+async def index(request: Request):
+    return await pages.index.response(request)
 
 @api_view(['GET'])
 def settings(request: Request):

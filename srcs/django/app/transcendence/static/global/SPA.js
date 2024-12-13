@@ -132,6 +132,4 @@ window.addEventListener("popstate", (e) => {
 
 setAnchorEvent()
 
-window.onload = () => {
-	getPage(window.location.pathname)
-}
+window.onload = () => getPage(window.location.pathname)
