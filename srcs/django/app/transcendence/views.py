@@ -6,8 +6,8 @@ from rest_framework.decorators import authentication_classes, permission_classes
 from . import pages
 
 @api_view(['GET'])
-def auth(request: Request):
-    return pages.auth.response(request)
+async def auth(request: Request):
+    return await pages.auth.response(request)
 
 @api_view(['GET'])
 def logout(request: Request):

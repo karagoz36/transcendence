@@ -51,7 +51,6 @@ function refreshScripts(newMainContainer, oldMainContainer) {
 function convertOptionsToRequestInit(options) {
 	/** @type {RequestInit} */
 	let init = {}
-	const jwtToken = getJWT()
 	init.body = JSON.stringify(options.body)
 	init.method = options.method
 	init.headers = {

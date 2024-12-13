@@ -2,18 +2,25 @@ from django.contrib.auth.models import User, AnonymousUser
 from rest_framework.request import Request
 from rest_framework.response import Response
 from django.shortcuts import render, redirect
+from channels.layers import get_channel_layer, BaseChannelLayer
 from django.contrib.auth import logout
 
-def logoutUser(request: Request) -> Response:
-	logout(request)
+async def closeWebSockets(id: int):
+	layer: BaseChannelLayer = get_channel_layer()
+	await layer.group_send(f"{id}_notifications", {
+		"type": "closeConnection"
+	})
+
+async def logoutUser(request: Request) -> Response:
 	response = render(request, "auth.html")
 	response.delete_cookie("access_token")
-	response.delete_cookie("session_id")
+	response.delete_cookie("sessionid")
+	await closeWebSockets(request.user.id)
 	return response
 
-def response(request: Request):
+async def response(request: Request):
 	if "logout" in request.query_params:
-		return logoutUser(request)
+		return await logoutUser(request)
 	user: User = request.user
 	if not type(user) is AnonymousUser:
 		return redirect("/")
