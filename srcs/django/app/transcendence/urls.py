@@ -30,7 +30,7 @@ urlpatterns = [
     path("api/register", views.register, name="register"),
     path("api/friend/add", views.addFriend, name="addFriend"),
     path("api/friend/accept", views.acceptFriend, name="acceptFriend"),
-    path("api/friend/reject", views.rejectFriend, name="rejectFriend"),
-    path("api/token", TokenObtainPairView.as_view(), name="createToken"),
-    path("api/token/refresh", TokenRefreshView.as_view(), name="refreshToken"),
+    path("api/friend/remove", views.removeFriend, name="rejectFriend"),
+    path("api/token", views.getToken, name="createToken"),
+    path("api/token/refresh", views.refreshToken, name="refreshToken"),
 ]

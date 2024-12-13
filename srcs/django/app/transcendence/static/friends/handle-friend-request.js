@@ -19,7 +19,7 @@ async function acceptFriendInvitation(friendID) {
  * @param {number} friendID 
 */
 async function rejectFriendInvitation(friendID) {
-	await getPage("/api/friend/reject", {
+	await getPage("/api/friend/remove", {
 		method: "POST",
 		headers: {
 			"content-type": "application/json"

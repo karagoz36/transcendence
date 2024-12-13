@@ -5,6 +5,18 @@ from channels.layers import get_channel_layer, BaseChannelLayer
 from django.contrib.auth.models import User, AnonymousUser
 import json
 
+async def userIsLoggedIn(user: User) -> bool:
+	layer: BaseChannelLayer = get_channel_layer()
+
+	try:
+		await layer.group_send(f"{user.id}_notifications", {
+			"type": "sendMessage",
+			"message": ""
+		})
+	except:
+		return False
+	return True
+
 async def sendNotification(receiver: User, message: str) -> None:
 	layer: BaseChannelLayer = get_channel_layer()
 

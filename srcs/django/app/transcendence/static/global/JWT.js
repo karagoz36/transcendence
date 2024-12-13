@@ -12,18 +12,24 @@ function setAccessTokenCookie(accessToken) {
 }
 
 /**
+ * @param {string} csrftoken
  * @param {string} username
  * @param {string} password
  */
-export async function setJWT(username, password) {
+export async function setJWT(csrftoken, username, password) {
 	const res = await fetch("/api/token", {
 		method: "POST",
 		body: JSON.stringify({username, password}),
 		headers: {
 			cookie: document.cookie,
 			"content-type": "application/json",
+			"X-CSRFToken": csrftoken
 		}
 	})
+	if (res.status != 200) {
+		console.error(await res.text())
+		throw new Error(`fetch at /api/token failed`)
+	}
 	/** @type {JWT} */
 	const jwt = await res.text()
 	localStorage.setItem("JWT", jwt)

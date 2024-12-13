@@ -6,8 +6,6 @@ all:
 
 build:
 	sed -i "s/^DOMAIN_NAME=.*/DOMAIN_NAME=$(DOMAIN_NAME)/" srcs/.env
-	mkdir -p $(HOME)/data/wp
-	mkdir -p $(HOME)/data/db
 	docker compose -f srcs/docker-compose.yml build
 
 up:

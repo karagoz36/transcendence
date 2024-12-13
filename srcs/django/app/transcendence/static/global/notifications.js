@@ -30,11 +30,8 @@ function addNotif(message) {
 /** @param {MessageEvent} e */
 function receiveMessage(e) {
 	const data = JSON.parse(e.data)
-	if (!data.message) {
-		console.error(data.message)
-		throw new Error("notification receive: expected message field")
-	}
-	addNotif(data.message)
+	if (data.message)
+		addNotif(data.message)
 	if (data.refresh == window.location.pathname)
 		getPage(data.refresh)
 }
