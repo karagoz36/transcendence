@@ -5,5 +5,4 @@ from django.contrib.auth import logout
 from django.shortcuts import redirect
 
 def response(request: Request) -> HttpResponse:
-	logout(request)
-	return redirect("/auth")
+	return redirect("/auth?logout")

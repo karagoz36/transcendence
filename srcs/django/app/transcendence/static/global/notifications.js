@@ -1,3 +1,5 @@
+import {getPage} from "./SPA.js"
+
 /**
  * @param {str} text 
  * @returns {HTMLDivElement}
@@ -11,30 +13,35 @@ function createToast(text) {
 	toast.setAttribute("aria-atomic", "true");
 	toast.innerHTML = `
 	<div class="toast-header">
-    	<strong class="me-auto">Bootstrap</strong>
-      	<small>11 mins ago</small>
+    	<strong class="me-auto">Notification</strong>
       	<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
     <div class="toast-body">${text}</div>`
 	return toast
 }
 
-/** @param {MessageEvent} e */
-function pushNotif(e) {
-	const toast = createToast(e.data)
+/** @param {string} message */
+function addNotif(message) {	
+	const toast = createToast(message)
 	const toastContainer = document.querySelector(".toast-container")
 	toastContainer.append(toast)
-	setTimeout(() => toastContainer.removeChild(toast), 10000)
 }
-
-function webSocket() {
-	const socket = new WebSocket(`wss://${window.location.host}/websocket/notifications/test/`)
-	socket.onmessage = pushNotif
-	socket.onopen = () => socket.send("coucou")
+/** @param {EventMessage} e */
+function receiveMessage(e) {
+	const data = JSON.parse(e.data)
+	if (!data.message) {
+		console.error(data.message)
+		throw new Error("notification receive: expected message field")
+	}
+	addNotif(data.message)
+	if (data.refresh == window.location.pathname)
+		getPage(data.refresh)
 }
 
 function main() {
-	webSocket()
+	const socket = new WebSocket(`wss://${window.location.host}/websocket/notifications/`)
+	socket.onmessage = receiveMessage
 }
 
 main()
+

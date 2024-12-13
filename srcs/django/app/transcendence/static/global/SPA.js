@@ -38,7 +38,7 @@ function refreshScripts(newMainContainer, oldMainContainer) {
 	})
 }
 
-/** 
+/**
  * @typedef {Object} PageOptions
  * @property {string} [method]
  * @property {HeadersInit} [headers]
@@ -51,14 +51,12 @@ function refreshScripts(newMainContainer, oldMainContainer) {
 function convertOptionsToRequestInit(options) {
 	/** @type {RequestInit} */
 	let init = {}
-	if (options.method == "POST" && (options.headers == undefined || options.headers['X-CSRFToken'] == undefined))
-		throw new Error("CSRF token missing for POST method")
 	const jwtToken = getJWT()
 	init.body = JSON.stringify(options.body)
 	init.method = options.method
 	init.headers = {
 		...options.headers,
-		authorization: `Bearer ${jwtToken}`
+		cookie: document.cookie,
 	}
 	return init
 }
@@ -79,13 +77,17 @@ function setErrorSuccessText() {
 	}
 }
 
-/** @param {string} url */
-/** @param {PageOptions} options */
-/** @param {boolean} addToHistory */
-export async function getPage(url, options = {}, addToHistory = true) {
+/**
+ * 
+ * @param {string} url
+ * @param {RequestInit} options
+ * @param {boolean} addToHistory
+ * @returns 
+ */
+async function getHTML(url, options, addToHistory) {
 	/** @type {Response|String} */
 	let res
-	res = await fetch(url, convertOptionsToRequestInit(options))
+	res = await fetch(url, options)
 	if (res.status == 404 || res.status >= 500)
 		throw new Error(`SPA: failed to fetch ${url}`)
 	if (addToHistory)
@@ -94,8 +96,16 @@ export async function getPage(url, options = {}, addToHistory = true) {
 		console.error(await res.json())
 		throw new Error("got json instead of html")	
 	}
-	res = await res.text()
-	
+	return await res.text()
+}
+
+/** 
+ * @param {string} url
+ * @param {PageOptions} options
+ * @param {boolean} addToHistory */
+export async function getPage(url, options = {}, addToHistory = true) {
+	const requestInit = convertOptionsToRequestInit(options)
+	const res = await getHTML(url, requestInit, addToHistory)
 	const parser = new DOMParser()
 	const newPage = parser.parseFromString(res, "text/html")
 	document.title = newPage.title
@@ -108,6 +118,7 @@ export async function getPage(url, options = {}, addToHistory = true) {
 	if (!newMainContainer)
 		throw new Error(`failed to find main-container in fetched body at ${url}`)
 	oldMainContainer.innerHTML = newMainContainer.innerHTML
+
 	setErrorSuccessText()
 	setAnchorEvent()
 	refreshScripts(newMainContainer, oldMainContainer)
@@ -119,3 +130,5 @@ window.addEventListener("popstate", (e) => {
 })
 
 setAnchorEvent()
+
+window.onload = () => getPage(window.location.pathname)

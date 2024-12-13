@@ -1,18 +1,34 @@
+/** 
+ * @typedef {Object} JWT
+ * @property {string} [access]
+ * @property {string} [refresh]
+ */
+
+/** @param {string} accessToken */
+function setAccessTokenCookie(accessToken) {
+	document.cookie = `access_token=${accessToken};`
+	+ "max-age=86400;SameSite=Lax;"
+	+ "path=/;"
+}
+
 /**
- * @param {string} csrfmiddlewaretoken
  * @param {string} username
  * @param {string} password
  */
-export async function setJWT(csrfmiddlewaretoken, username, password) {
+export async function setJWT(username, password) {
 	const res = await fetch("/api/token", {
 		method: "POST",
 		body: JSON.stringify({username, password}),
 		headers: {
-			"X-CSRFToken": csrfmiddlewaretoken,
+			cookie: document.cookie,
 			"content-type": "application/json",
 		}
 	})
-	localStorage.setItem("JWT", await res.text())
+	/** @type {JWT} */
+	const jwt = await res.text()
+	localStorage.setItem("JWT", jwt)
+	const accessToken = JSON.parse(jwt).access
+	setAccessTokenCookie(accessToken)
 }
 
 export async function refreshJWT() {
@@ -22,14 +38,10 @@ export async function refreshJWT() {
 		headers: {"content-type": "application/json"},
 		body: JSON.stringify({refresh: jwt.refresh})
 	})
-	localStorage.setItem("JWT", await res.text())
+	const newJWT = await res.text()
+	localStorage.setItem("JWT", newJWT)
+	setAccessTokenCookie(newJWT.access)
 }
-
-/** 
- * @typedef {Object} JWT
- * @property {string} [access]
- * @property {string} [refresh]
- */
 
 /**
  * @returns {JWT}

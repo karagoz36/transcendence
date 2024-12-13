@@ -4,7 +4,7 @@
 <div class="d-flex flex-column align-items-center justify-content-center login-registration-form"
 	style="height: 100vh; padding: 1rem;">
 	<p class="alert alert-danger hide-empty">{{ ERROR_MESSAGE }}</p>
-	<div class="accordion" id="accordion-login-register">
+	<div class="accordion" style="width: 20rem; max-width: 95vw;" id="accordion-login-register">
 		<div class="accordion-item">
 			<h2 class="accordion-header">
 				<button class="accordion-button" type="button" data-bs-toggle="collapse"
@@ -16,7 +16,6 @@
 				data-bs-parent="#accordion-login-register">
 				<div class="accordion-body">
 					<form class="accordion-body" id="login">
-						{% csrf_token %}
 						<h1>Login</h1>
 						<div class="mb-3">
 							<label class="form-label">Username</label>
@@ -41,7 +40,6 @@
 			<div id="collapse-register" class="accordion-collapse collapse" data-bs-parent="#accordion-login-register">
 				<div class="accordion-body">
 					<form class="accordion-body" id="register">
-						{% csrf_token %}
 						<h1>Register</h1>
 						<div class="mb-3">
 							<label class="form-label">Username</label>
@@ -58,7 +56,6 @@
 		</div>
 	</div>
 </div>
-<script type="module" src="/static/auth/accordion.js"></script>
 <script type="module" src="/static/auth/login.js"></script>
 <script type="module" src="/static/auth/register.js"></script>
 {% endblock %}

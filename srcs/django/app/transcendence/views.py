@@ -1,6 +1,8 @@
 from rest_framework.request import Request
 from django.contrib.auth.models import User
-from rest_framework.decorators import api_view
+from rest_framework.permissions import AllowAny
+from adrf.decorators import api_view
+from rest_framework.decorators import authentication_classes, permission_classes
 from . import pages
 
 @api_view(['GET'])
@@ -12,10 +14,14 @@ def logout(request: Request):
     return pages.logout.response(request)
 
 @api_view(['POST'])
+@authentication_classes([])
+@permission_classes([AllowAny])
 def login(request: Request):
     return pages.login.response(request)
-
+	
 @api_view(['POST'])
+@authentication_classes([])
+@permission_classes([AllowAny])
 def register(request: Request):
     return pages.register.response(request)
 
@@ -32,8 +38,8 @@ def friends(request: Request):
     return pages.friends.response(request)
 
 @api_view(['POST'])
-def addFriend(request: Request):
-    return pages.addFriend.response(request)
+async def addFriend(request: Request):
+    return await pages.addFriend.response(request)
 
 @api_view(['POST'])
 def acceptFriend(request: Request):

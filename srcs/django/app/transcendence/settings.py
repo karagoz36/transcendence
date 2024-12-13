@@ -30,6 +30,8 @@ DOMAIN_NAME = os.getenv("DOMAIN_NAME")
 CSRF_TRUSTED_ORIGINS = ["https://localhost:8000", f"https://{DOMAIN_NAME}:8000"]
 
 ALLOWED_HOSTS = ["*.ngrok-free.app", "localhost", DOMAIN_NAME, "django"]
+# Ensure you have this in your settings
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 
 # Application definition
@@ -47,9 +49,9 @@ INSTALLED_APPS = [
 	'rest_framework_simplejwt',
 ]
 
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework_simplejwt.authentication.JWTAuthentication',]
-# }
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': ['transcendence.middleware.CustomAuthentication']
+}
 
 
 MIDDLEWARE = [
@@ -60,7 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-	'transcendence.middleware.LoginRequiredMiddleware'
+    'transcendence.middleware.RequiredLoginMiddleware',
 ]
 
 ROOT_URLCONF = 'transcendence.urls'
