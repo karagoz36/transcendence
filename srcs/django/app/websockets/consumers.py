@@ -8,6 +8,7 @@ async def sendNotification(receiver: User, message: str) -> None:
 	layer: BaseChannelLayer = get_channel_layer()
 	print(receiver.username, flush=True)
 	print(message, flush=True)
+
 	await layer.group_send(f"{receiver.username}_notifications", {
 		"type": "sendMessage",
 		"message": message
@@ -30,5 +31,5 @@ class Notification(AsyncWebsocketConsumer):
 		pass
 	
 	async def sendMessage(self, event):
-		message = event["message"]
+		message: str = event["message"]
 		await self.send(message)

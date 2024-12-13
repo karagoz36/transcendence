@@ -4,6 +4,7 @@ from django.http.response import HttpResponse
 from django.contrib.auth.models import User
 from database.models import FriendList
 from websockets.consumers import sendNotification
+import json
 
 async def response(request: Request) -> HttpResponse:
 	if "username" not in request.data:
@@ -24,5 +25,6 @@ async def response(request: Request) -> HttpResponse:
 	except:
 		pass
 	await FriendList.objects.acreate(user=user, friend=friend)
-	await sendNotification(friend, f"Friend invitation received from {user.username}.")
+	message = json.dumps({"message": f"Friend invitation received from {user.username}.", "refresh": "/friends/"})
+	await sendNotification(friend, message)
 	return redirect("/friends/?success=Friend invitation successfully sent!")
