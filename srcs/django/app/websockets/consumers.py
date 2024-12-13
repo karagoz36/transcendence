@@ -1,12 +1,12 @@
-from channels.generic.websocket import WebsocketConsumer
+from channels.generic.websocket import AsyncWebsocketConsumer
 
-class Notification(WebsocketConsumer):
-    def connect(self):
+class Notification(AsyncWebsocketConsumer):
+    async def connect(self):
         self.accept()
         self.send("test")
 
-    def disconnect(self, close_code):
+    async def disconnect(self, close_code):
         pass
 
-    def receive(self, text_data: str):
+    async def receive(self, text_data: str):
         self.send(text_data=text_data)

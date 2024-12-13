@@ -13,7 +13,7 @@ class CustomAuthentication(JWTAuthentication):
 			validatedToken = self.get_validated_token(accessToken)
 			user = self.get_user(validatedToken)
 		except:
-			pass
+			user = AnonymousUser()
 		return user, validatedToken
 
 class RequiredLoginMiddleware:
@@ -21,7 +21,7 @@ class RequiredLoginMiddleware:
 		self.get_response = get_response
 
 	def __call__(self, request: Request):
-		user: User = request.user
+		user, _ = CustomAuthentication().authenticate(request=request)
 		path: str = request.path
 
 		if path.startswith("/api"):
