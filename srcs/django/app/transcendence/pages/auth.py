@@ -13,10 +13,9 @@ def logoutUser(request: Request) -> Response:
 
 def response(request: Request):
 	if "logout" in request.query_params:
-		response = logoutUser(request)
-		request.user = None
-		return response
-	if not type(request.user) is AnonymousUser:
+		return logoutUser(request)
+	user: User = request.user
+	if not type(user) is AnonymousUser:
 		return redirect("/")
 	error = ""
 	status = 200

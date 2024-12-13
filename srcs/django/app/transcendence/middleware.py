@@ -1,17 +1,16 @@
-from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.tokens import Token
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from rest_framework.request import Request
 from django.shortcuts import redirect
 
 class CustomAuthentication(JWTAuthentication):
 	def authenticate(self, request):
-		if "auth" in request.path:
-			return None
 		accessToken: str = request.COOKIES.get("access_token")
-		validatedToken = self.get_validated_token(accessToken)
-		user: User
+		user: User = AnonymousUser()
+		validatedToken: Token = None
 		try:
+			validatedToken = self.get_validated_token(accessToken)
 			user = self.get_user(validatedToken)
 		except:
 			pass
@@ -24,9 +23,9 @@ class RequiredLoginMiddleware:
 	def __call__(self, request: Request):
 		user: User = request.user
 		path: str = request.path
-		
+
 		if path.startswith("/api"):
 			return self.get_response(request)
-		if not path.startswith("/auth") and user is None:
+		if not path.startswith("/auth") and type(user) is AnonymousUser:
 			return redirect("/auth")
 		return self.get_response(request)
