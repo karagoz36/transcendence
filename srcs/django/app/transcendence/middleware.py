@@ -10,9 +10,11 @@ class CustomAuthentication(JWTAuthentication):
 			return None
 		accessToken: str = request.COOKIES.get("access_token")
 		validatedToken = self.get_validated_token(accessToken)
-		user: User = self.get_user(validatedToken)
-		if user is None:
-			redirect("/auth")
+		user: User|None = None
+		try:
+			user = self.get_user(validatedToken)
+		except:
+			pass
 		return user, validatedToken
 
 class RequiredLoginMiddleware:
@@ -22,12 +24,9 @@ class RequiredLoginMiddleware:
 	def __call__(self, request: Request):
 		user: User = request.user
 		path: str = request.path
-		print(path, flush=True)
 		
 		if path.startswith("/api"):
 			return self.get_response(request)
-		if not path.startswith("/auth") and not user.is_authenticated:
+		if not path.startswith("/auth") and user is None:
 			return redirect("/auth")
-		if "auth" in request.path:
-			print("test")
 		return self.get_response(request)

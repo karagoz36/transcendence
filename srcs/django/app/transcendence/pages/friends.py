@@ -6,7 +6,6 @@ from database.models import FriendList
 from rest_framework_simplejwt.tokens import AccessToken
 
 def response(request: Request) -> HttpResponse:
-	print(request.user, flush=True)
 	if type(request.user) is AnonymousUser:
 		return HttpResponse("c kc")
 	return render(request, "friendlist/friendlist.html",

@@ -4,6 +4,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import logout
 
 def response(request: Request):
+	if not request.user is None:
+		return redirect("/")
 	if "logout" in request.query_params:
 		logout(request)
 		response = render(request, "auth.html")
