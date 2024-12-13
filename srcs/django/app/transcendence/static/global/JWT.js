@@ -1,3 +1,5 @@
+// @ts-check
+
 /** 
  * @typedef {Object} JWT
  * @property {string} [access]
@@ -27,13 +29,14 @@ export async function setJWT(csrftoken, username, password) {
 		}
 	})
 	if (res.status != 200) {
+		/** @type {HTMLDivElement|null} */
 		console.error(await res.text())
-		throw new Error(`fetch at /api/token failed`)
+		return
 	}
 	/** @type {JWT} */
-	const jwt = await res.text()
-	localStorage.setItem("JWT", jwt)
-	const accessToken = JSON.parse(jwt).access
+	const jwt = await res.json()
+	localStorage.setItem("JWT", JSON.stringify(jwt))
+	const accessToken = jwt.access // @ts-ignore
 	setAccessTokenCookie(accessToken)
 }
 
@@ -44,8 +47,9 @@ export async function refreshJWT() {
 		headers: {"content-type": "application/json"},
 		body: JSON.stringify({refresh: jwt.refresh})
 	})
-	const newJWT = await res.text()
-	localStorage.setItem("JWT", newJWT)
+	/** @type {JWT} */
+	const newJWT = await res.json()
+	localStorage.setItem("JWT", JSON.stringify(newJWT)) // @ts-ignore
 	setAccessTokenCookie(newJWT.access)
 }
 
