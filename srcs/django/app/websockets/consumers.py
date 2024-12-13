@@ -3,19 +3,10 @@ from rest_framework_simplejwt.tokens import Token
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from channels.layers import get_channel_layer, BaseChannelLayer
 from django.contrib.auth.models import User, AnonymousUser
-import json
+from django.core.cache import cache
 
-async def userIsLoggedIn(user: User) -> bool:
-	layer: BaseChannelLayer = get_channel_layer()
-
-	try:
-		await layer.group_send(f"{user.id}_notifications", {
-			"type": "sendMessage",
-			"message": ""
-		})
-	except:
-		return False
-	return True
+def userIsLoggedIn(user: User) -> bool:
+	return cache.get(f"{user.id}_notifications") is not None
 
 async def sendNotification(receiver: User, message: str) -> None:
 	layer: BaseChannelLayer = get_channel_layer()
@@ -33,10 +24,12 @@ class Notification(AsyncWebsocketConsumer):
 			await self.close()
 			return
 		self.group_name = f"{user.id}_notifications"
+		cache.set(self.group_name, "")
 		await self.channel_layer.group_add(self.group_name, self.channel_name)
 
 	async def disconnect(self, close_code):
-		pass
+		print(f"WebSocket: {self.group_name} closed", flush=True)
+		cache.delete(self.group_name)
 
 	async def receive(self, text_data: str):
 		pass

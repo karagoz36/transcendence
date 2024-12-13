@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
 from adrf.decorators import api_view
 from rest_framework.decorators import authentication_classes, permission_classes
+from django.core.cache import cache
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from . import pages
 
@@ -37,9 +38,12 @@ def settings(request: Request):
 @api_view(['GET'])
 def friends(request: Request):
 	return pages.friends.response(request)
+from websockets.consumers import userIsLoggedIn
 
 @api_view(['POST'])
 async def addFriend(request: Request):
+	user: User = await User.objects.aget(username="test")
+	print(userIsLoggedIn(user), flush=True)
 	return await pages.addFriend.response(request)
 
 @api_view(['POST'])
