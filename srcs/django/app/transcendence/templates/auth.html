@@ -16,7 +16,6 @@
 				data-bs-parent="#accordion-login-register">
 				<div class="accordion-body">
 					<form class="accordion-body" id="login">
-						{% csrf_token %}
 						<h1>Login</h1>
 						<div class="mb-3">
 							<label class="form-label">Username</label>
@@ -41,7 +40,6 @@
 			<div id="collapse-register" class="accordion-collapse collapse" data-bs-parent="#accordion-login-register">
 				<div class="accordion-body">
 					<form class="accordion-body" id="register">
-						{% csrf_token %}
 						<h1>Register</h1>
 						<div class="mb-3">
 							<label class="form-label">Username</label>

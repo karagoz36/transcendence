@@ -12,16 +12,15 @@ function setAccessTokenCookie(accessToken) {
 }
 
 /**
- * @param {string} csrfmiddlewaretoken
  * @param {string} username
  * @param {string} password
  */
-export async function setJWT(csrfmiddlewaretoken, username, password) {
+export async function setJWT(username, password) {
 	const res = await fetch("/api/token", {
 		method: "POST",
 		body: JSON.stringify({username, password}),
 		headers: {
-			"X-CSRFToken": csrfmiddlewaretoken,
+			cookie: document.cookie,
 			"content-type": "application/json",
 		}
 	})

@@ -1,26 +1,19 @@
 // @ts-check
 import {getPage} from "../global/SPA.js"
 
-async function submitForm(e) {
-	const csrfmiddlewaretoken = e.target['csrfmiddlewaretoken'].value
-}
-
 /** @param {SubmitEvent} e */
 async function addFriend(e) {
 	e.preventDefault()
 	if (!e.target)
 		throw new Error("addFriend: e.target null")
 	/** @type {string} */
-	const csrfmiddlewaretoken = e.target['csrfmiddlewaretoken'].value
-	/** @type {string} */
 	const username = e.target['username'].value
 	await getPage("/api/friend/add", {
 		method: "POST",
-		body: {username},
 		headers: {
-			"X-CSRFToken": csrfmiddlewaretoken,
 			"content-type": "application/json",
-		}
+		},
+		body: {username},
 	})
 }
 

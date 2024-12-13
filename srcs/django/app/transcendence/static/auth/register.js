@@ -10,13 +10,10 @@ async function handleRegister(e) {
 	const username = target['username'].value
 	/** @type {String} */
 	const password = target['password'].value
-	/** @type {String} */
-	const csrfmiddlewaretoken = target['csrfmiddlewaretoken'].value
 	await getPage("/api/register", {
 		method: "POST",
 		body: {username, password},
 		headers: {
-			"X-CSRFToken": csrfmiddlewaretoken,
 			"content-type": "application/json",
 		}
 	})

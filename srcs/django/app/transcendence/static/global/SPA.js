@@ -51,14 +51,12 @@ function refreshScripts(newMainContainer, oldMainContainer) {
 function convertOptionsToRequestInit(options) {
 	/** @type {RequestInit} */
 	let init = {}
-	if (options.method == "POST" && (options.headers == undefined || options.headers['X-CSRFToken'] == undefined))
-		throw new Error("CSRF token missing for POST method")
 	const jwtToken = getJWT()
 	init.body = JSON.stringify(options.body)
 	init.method = options.method
 	init.headers = {
 		...options.headers,
-		authorization: `Bearer ${jwtToken.access}`
+		cookie: document.cookie,
 	}
 	return init
 }
@@ -120,6 +118,7 @@ export async function getPage(url, options = {}, addToHistory = true) {
 	if (!newMainContainer)
 		throw new Error(`failed to find main-container in fetched body at ${url}`)
 	oldMainContainer.innerHTML = newMainContainer.innerHTML
+
 	setErrorSuccessText()
 	setAnchorEvent()
 	refreshScripts(newMainContainer, oldMainContainer)

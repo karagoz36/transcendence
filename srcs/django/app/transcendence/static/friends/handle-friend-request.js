@@ -1,14 +1,12 @@
 import {getPage} from "../global/SPA.js"
 
 /**
- * @param {number} csrfmiddlewaretoken 
  * @param {number} friendID 
 */
-async function acceptFriendInvitation(csrfmiddlewaretoken, friendID) {
+async function acceptFriendInvitation(friendID) {
 	await getPage("/api/friend/accept", {
 		method: "POST",
 		headers: {
-			"X-CSRFToken": csrfmiddlewaretoken,
 			"content-type": "application/json"
 		},
 		body: {
@@ -20,11 +18,10 @@ async function acceptFriendInvitation(csrfmiddlewaretoken, friendID) {
 /**
  * @param {number} friendID 
 */
-async function rejectFriendInvitation(csrfmiddlewaretoken, friendID) {
+async function rejectFriendInvitation(friendID) {
 	await getPage("/api/friend/reject", {
 		method: "POST",
 		headers: {
-			"X-CSRFToken": csrfmiddlewaretoken,
 			"content-type": "application/json"
 		},
 		body: {
@@ -36,16 +33,14 @@ async function rejectFriendInvitation(csrfmiddlewaretoken, friendID) {
 /** @param {SubmitEvent} e */
 async function handleFriendRequest(e) {
 	e.preventDefault()
-	/** @type {number} */
-	const csrfmiddlewaretoken = e.target['csrfmiddlewaretoken'].value
 	/** @type {HTMLButtonElement} */
 	const button = e.submitter
 	const friendID = Number(button.getAttribute("user-id"))
 
 	if (button.textContent == "Reject")
-		rejectFriendInvitation(csrfmiddlewaretoken, friendID)
+		await rejectFriendInvitation(friendID)
 	else
-		await acceptFriendInvitation(csrfmiddlewaretoken, friendID)
+		await acceptFriendInvitation(friendID)
 }
 
 function main() {
