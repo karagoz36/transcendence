@@ -13,13 +13,12 @@ class Notification(AsyncWebsocketConsumer):
 			return
 		self.group_name = f"{user.username}_notifications"
 		await self.channel_layer.group_add(self.group_name, self.channel_name)
-		await self.send("Accepted websocket")
 
 	async def disconnect(self, close_code):
 		pass
 
 	async def receive(self, text_data: str):
-		await self.send(text_data=text_data)
+		pass
 	
 	async def sendMessage(self, event):
 		message = event["message"]

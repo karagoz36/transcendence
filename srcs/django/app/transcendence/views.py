@@ -22,12 +22,12 @@ def login(request: Request):
 @api_view(['POST'])
 @authentication_classes([])
 @permission_classes([AllowAny])
-async def register(request: Request):
-    return await pages.register.response(request)
+def register(request: Request):
+    return pages.register.response(request)
 
 @api_view(['GET'])
-async def index(request: Request):
-    return await pages.index.response(request)
+def index(request: Request):
+    return pages.index.response(request)
 
 @api_view(['GET'])
 def settings(request: Request):
@@ -38,8 +38,8 @@ def friends(request: Request):
     return pages.friends.response(request)
 
 @api_view(['POST'])
-def addFriend(request: Request):
-    return pages.addFriend.response(request)
+async def addFriend(request: Request):
+    return await pages.addFriend.response(request)
 
 @api_view(['POST'])
 def acceptFriend(request: Request):
