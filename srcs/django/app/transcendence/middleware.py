@@ -10,7 +10,7 @@ class CustomAuthentication(JWTAuthentication):
 			return None
 		accessToken: str = request.COOKIES.get("access_token")
 		validatedToken = self.get_validated_token(accessToken)
-		user: User|None = None
+		user: User
 		try:
 			user = self.get_user(validatedToken)
 		except:

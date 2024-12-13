@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from rest_framework.request import Request
 from rest_framework.response import Response
 from django.shortcuts import render, redirect
@@ -16,7 +16,7 @@ def response(request: Request):
 		response = logoutUser(request)
 		request.user = None
 		return response
-	if not request.user is None:
+	if not type(request.user) is AnonymousUser:
 		return redirect("/")
 	error = ""
 	status = 200
