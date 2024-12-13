@@ -51,8 +51,8 @@ def acceptFriend(request: Request):
 	return pages.acceptFriend.response(request)
 
 @api_view(['POST'])
-def removeFriend(request: Request):
-	return pages.removeFriend.response(request)
+async def removeFriend(request: Request):
+	return await pages.removeFriend.response(request)
 
 @authentication_classes([])
 @permission_classes([AllowAny])
