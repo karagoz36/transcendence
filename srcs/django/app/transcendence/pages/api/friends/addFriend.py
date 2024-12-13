@@ -5,7 +5,9 @@ from django.contrib.auth.models import User
 from database.models import FriendList
 from websockets.consumers import sendNotification
 import json
+from django.contrib.auth.decorators import login_required
 
+@login_required(login_url="/auth")
 async def response(request: Request) -> HttpResponse:
 	if "username" not in request.data:
 		return redirect("/friends/?error=Invalid body")

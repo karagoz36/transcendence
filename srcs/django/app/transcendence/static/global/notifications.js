@@ -25,7 +25,6 @@ function addNotif(message) {
 	const toast = createToast(message)
 	const toastContainer = document.querySelector(".toast-container")
 	toastContainer.append(toast)
-	setTimeout(() => toastContainer.removeChild(toast), 10000)
 }
 /** @param {EventMessage} e */
 function receiveMessage(e) {
