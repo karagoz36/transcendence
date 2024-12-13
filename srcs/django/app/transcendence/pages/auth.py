@@ -1,17 +1,23 @@
 from django.contrib.auth.models import User
 from rest_framework.request import Request
+from rest_framework.response import Response
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout
 
+def logoutUser(request: Request) -> Response:
+	logout(request)
+	response = render(request, "auth.html")
+	response.delete_cookie("access_token")
+	response.delete_cookie("session_id")
+	return response
+
 def response(request: Request):
+	if "logout" in request.query_params:
+		response = logoutUser(request)
+		request.user = None
+		return response
 	if not request.user is None:
 		return redirect("/")
-	if "logout" in request.query_params:
-		logout(request)
-		response = render(request, "auth.html")
-		response.delete_cookie("access_token")
-		response.delete_cookie("session_id")
-		return response
 	error = ""
 	status = 200
 
