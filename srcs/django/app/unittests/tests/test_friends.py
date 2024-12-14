@@ -23,7 +23,7 @@ class FriendTest(APITestCase):
 
     def testFriendListGET(self):
         response = self.client.get("/friends", follow=True)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
 
     def testAddEmptyFriend(self):
         response = self.client.post("/api/friend/add", follow=True)
