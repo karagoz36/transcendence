@@ -17,17 +17,7 @@ async function addFriend(e) {
 	})
 }
 
-function fillUsernameField() {
-	const urlParams = new URLSearchParams(window.location.search)
-	const username = urlParams.get("username")
-	if (!username) return
-	/** @type {HTMLInputElement} */ // @ts-ignore
-	const usernameField = document.querySelector("#friend-username-input")
-	usernameField.value = username
-}
-
 function main() {
-	fillUsernameField()
 	/** @type {HTMLFormElement} */ // @ts-ignore
 	const inputMessage = document.querySelector("#add-friend-form")
 	// inputMessage.onsubmit = addFriend

@@ -51,7 +51,6 @@ function refreshScripts(newMainContainer, oldMainContainer) {
 function convertOptionsToRequestInit(options) {
 	/** @type {RequestInit} */
 	let init = {}
-	const jwtToken = getJWT()
 	init.body = JSON.stringify(options.body)
 	init.method = options.method
 	init.headers = {
@@ -59,22 +58,6 @@ function convertOptionsToRequestInit(options) {
 		cookie: document.cookie,
 	}
 	return init
-}
-
-function setErrorSuccessText() {
-	const urlParams = new URLSearchParams(window.location.search)
-
-	const error = urlParams.get("error")
-	if (error != null) {
-		const errorText = document.querySelector("#error-text")
-		if (errorText) errorText.textContent = error
-	}
-
-	const success = urlParams.get("success")
-	if (success != null) {
-		const successText = document.querySelector("#success-text")
-		if (successText) successText.textContent = success
-	}
 }
 
 /**
@@ -119,7 +102,6 @@ export async function getPage(url, options = {}, addToHistory = true) {
 		throw new Error(`failed to find main-container in fetched body at ${url}`)
 	oldMainContainer.innerHTML = newMainContainer.innerHTML
 
-	setErrorSuccessText()
 	setAnchorEvent()
 	refreshScripts(newMainContainer, oldMainContainer)
 	dispatchEvent(event)

@@ -1,3 +1,5 @@
+// @ts-check
+
 /** 
  * @typedef {Object} JWT
  * @property {string} [access]
@@ -12,22 +14,29 @@ function setAccessTokenCookie(accessToken) {
 }
 
 /**
+ * @param {string} csrftoken
  * @param {string} username
  * @param {string} password
  */
-export async function setJWT(username, password) {
+export async function setJWT(csrftoken, username, password) {
 	const res = await fetch("/api/token", {
 		method: "POST",
 		body: JSON.stringify({username, password}),
 		headers: {
 			cookie: document.cookie,
 			"content-type": "application/json",
+			"X-CSRFToken": csrftoken
 		}
 	})
+	if (res.status != 200) {
+		/** @type {HTMLDivElement|null} */
+		console.error(await res.text())
+		return
+	}
 	/** @type {JWT} */
-	const jwt = await res.text()
-	localStorage.setItem("JWT", jwt)
-	const accessToken = JSON.parse(jwt).access
+	const jwt = await res.json()
+	localStorage.setItem("JWT", JSON.stringify(jwt))
+	const accessToken = jwt.access // @ts-ignore
 	setAccessTokenCookie(accessToken)
 }
 
@@ -38,8 +47,9 @@ export async function refreshJWT() {
 		headers: {"content-type": "application/json"},
 		body: JSON.stringify({refresh: jwt.refresh})
 	})
-	const newJWT = await res.text()
-	localStorage.setItem("JWT", newJWT)
+	/** @type {JWT} */
+	const newJWT = await res.json()
+	localStorage.setItem("JWT", JSON.stringify(newJWT)) // @ts-ignore
 	setAccessTokenCookie(newJWT.access)
 }
 

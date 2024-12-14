@@ -32,7 +32,7 @@ CSRF_TRUSTED_ORIGINS = ["https://localhost:8000", f"https://{DOMAIN_NAME}:8000"]
 ALLOWED_HOSTS = ["*.ngrok-free.app", "localhost", DOMAIN_NAME, "django"]
 # Ensure you have this in your settings
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
-
+TEST_RUNNER = "redgreenunittest.django.runner.RedGreenDiscoverRunner"
 
 # Application definition
 

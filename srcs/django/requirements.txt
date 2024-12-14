@@ -1,0 +1,9 @@
+django
+psycopg
+djangorestframework
+channels
+daphne
+channels-redis
+djangorestframework-simplejwt
+adrf
+redgreenunittest

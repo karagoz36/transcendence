@@ -1,7 +1,8 @@
+// @ts-check
 import {getPage} from "./SPA.js"
 
 /**
- * @param {str} text 
+ * @param {string} text 
  * @returns {HTMLDivElement}
  **/
 function createToast(text) {
@@ -24,24 +25,33 @@ function createToast(text) {
 function addNotif(message) {	
 	const toast = createToast(message)
 	const toastContainer = document.querySelector(".toast-container")
-	toastContainer.append(toast)
+	toastContainer?.append(toast)
 }
-/** @param {EventMessage} e */
+/** @param {MessageEvent} e */
 function receiveMessage(e) {
 	const data = JSON.parse(e.data)
-	if (!data.message) {
-		console.error(data.message)
-		throw new Error("notification receive: expected message field")
-	}
-	addNotif(data.message)
+	if (data.message)
+		addNotif(data.message)
 	if (data.refresh == window.location.pathname)
 		getPage(data.refresh)
 }
 
+class NotificationHandler {
+	constructor() {
+		this.createSocket = this.createSocket.bind(this)
+		this.createSocket()
+	}
+
+	createSocket() {
+		removeEventListener("page-changed", this.createSocket)
+		this.socket = new WebSocket(`wss://${window.location.host}/websocket/notifications/`)
+		this.socket.onmessage = receiveMessage
+		this.socket.onclose = () => addEventListener("page-changed", this.createSocket)
+	}
+}
+
 function main() {
-	const socket = new WebSocket(`wss://${window.location.host}/websocket/notifications/`)
-	socket.onmessage = receiveMessage
+	const notif = new NotificationHandler()
 }
 
 main()
-

@@ -10,4 +10,4 @@ from .api.auth import register
 
 from .api.friends import addFriend
 from .api.friends import acceptFriend
-from .api.friends import rejectFriend
+from .api.friends import removeFriend

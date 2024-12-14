@@ -1,16 +1,22 @@
-<div class="card">
-	{% with friend=friend.friend %}
+<style>
+.friend-button-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.friend-button {
+	margin: 0.2rem;
+}
+</style>
+<div style="width: 30rem;" class="card">
 	<div class="card-header">
 		{{friend.username}}
 	</div>
-	<div class="card-body">
-		{% if user.friend.invitePending %}
+	<div class="card-body friend-button-container">
 		<button data-bs-toggle="modal" data-bs-target="#exampleModal" 
-		id="send-message" user-id={{friend.id}} class="btn btn-primary">Send message</button>
-		<button id="play" user-id={{friend.id}} class="btn btn-primary">Invite to play</button>
-		{% else %}
-		Waiting for {{friend.username}} to accept friendship...
-		{% endif %}
+		id="send-message" user-id={{friend.id}} class="btn friend-button btn-primary">Send message</button>
+		<button id="play" user-id={{friend.id}} class="btn friend-button btn-primary">Invite to play</button>
+		<button id="remove-friend" user-id={{friend.id}} class="btn friend-button btn-danger">Remove friend</button>
 	</div>
-	{% endwith %}
 </div>
