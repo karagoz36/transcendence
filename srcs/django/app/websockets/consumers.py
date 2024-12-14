@@ -20,10 +20,10 @@ class Notification(AsyncWebsocketConsumer):
 	async def connect(self):
 		user: User = self.scope["user"]
 		await self.accept()
+		self.group_name = f"{user.id}_notifications"
 		if user.username == "":
 			await self.close()
 			return
-		self.group_name = f"{user.id}_notifications"
 		cache.set(self.group_name, "")
 		await self.channel_layer.group_add(self.group_name, self.channel_name)
 
