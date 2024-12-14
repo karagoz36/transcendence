@@ -12,14 +12,15 @@ async def response(request: Request):
 	if "friendID" not in request.data:
 		return redirect("/friends?error=friendID must be present in body request", status=400)
 
+	id: int = request.data["friendID"]
 	try:
 		friend = await User.objects.aget(id=id)
 	except:
 		return redirect("/friends?error=Invalid friendID sent", status=400)
 
-	friendship: FriendList = await getFriendship(request.user, friend)
+	friendship: FriendList = await getFriendship(user, friend)
 	if friendship is None:
 		return redirect("/friends?error=Friendship not found", status=400)
 
 	await friendship.adelete()
-	return redirect("/friends?error=Friend successfully removed")
+	return redirect("/friends?success=Friend successfully removed")
