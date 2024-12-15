@@ -3,7 +3,6 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from django.shortcuts import render, redirect
 from channels.layers import get_channel_layer, BaseChannelLayer
-from django.contrib.auth import logout
 
 async def closeWebSockets(id: int):
 	layer: BaseChannelLayer = get_channel_layer()

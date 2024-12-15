@@ -46,18 +46,23 @@ def getFriends(request: Request):
         })
     return res
 
+def getContext(request: Request, err: str, success: str) -> dict:
+    context = {}
+    context["friends"] = getFriends(request)
+    context["invitesReceived"] = getInvitesReceived(request)
+    context["invitesSent"] = getInvitesSent(request)
+    context["ERROR_MESSAGE"] = err
+    context["SUCCESS_MESSAGE"] = success
+    context["showModal"] = "show"
+    return context
+
 def response(request: Request) -> HttpResponse:
-    invitesReceived = getInvitesReceived(request)
-    invitesSent = getInvitesSent(request)
-    friends = getFriends(request)
     status = 200
     err = ""
     success = ""
  
     if "error" in request.query_params:
         status = 401
-        err = request.query_params["error"]
     if "success" in request.query_params:
         success = request.query_params["success"]
-    return render(request, "friendlist/friendlist.html", status=status,
-        context={"friends": friends, "invitesReceived": invitesReceived, "invitesSent": invitesSent, "ERROR_MESSAGE": err, "SUCCESS_MESSAGE": success})
+    return render(request, "friendlist/friendlist.html", status=status, context=getContext(request, err, success))

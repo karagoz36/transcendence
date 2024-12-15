@@ -52,6 +52,10 @@ async def acceptFriend(request: Request):
 async def removeFriend(request: Request):
 	return await pages.removeFriend.response(request)
 
+@api_view(['POST'])
+async def sendMessage(request: Request):
+	return await pages.sendMessage.response(request)
+
 @authentication_classes([])
 @permission_classes([AllowAny])
 def getToken(request: Request):
