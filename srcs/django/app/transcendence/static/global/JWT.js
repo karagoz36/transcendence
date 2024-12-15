@@ -40,12 +40,18 @@ export async function setJWT(csrftoken, username, password) {
 	setAccessTokenCookie(accessToken)
 }
 
-export async function refreshJWT() {
+/**
+ * @param {string} csrftoken
+ */
+export async function refreshJWT(csrftoken) {
 	const jwt = getJWT()
-	const res = await fetch("/api/token", {
+	const res = await fetch("/api/token/refresh", {
 		method: "POST",
-		headers: {"content-type": "application/json"},
-		body: JSON.stringify({refresh: jwt.refresh})
+		headers: {
+			"content-type": "application/json",
+			"X-CSRFToken": csrftoken
+		},
+		body: JSON.stringify({refresh: jwt.refresh}),
 	})
 	/** @type {JWT} */
 	const newJWT = await res.json()

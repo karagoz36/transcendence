@@ -1,6 +1,6 @@
 // @ts-check
 
-import { getJWT } from "./JWT.js"
+import { refreshJWT } from "./JWT.js"
 
 const event = new Event("page-changed")
 

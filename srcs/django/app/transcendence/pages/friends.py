@@ -9,6 +9,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 def getInvitesReceived(request: Request):
     res = []
     invitesReceived = FriendList.objects.filter(friend=request.user, invitePending=True)
+
     for invite in invitesReceived:
         res.append({
             "id": invite.user.id,
@@ -19,6 +20,7 @@ def getInvitesReceived(request: Request):
 def getInvitesSent(request: Request):
     res = []
     invitesSent = FriendList.objects.filter(user=request.user, invitePending=True)
+
     for invite in invitesSent:
         res.append({
             "id": invite.friend.id,
@@ -28,12 +30,14 @@ def getInvitesSent(request: Request):
 
 def getFriends(request: Request):
     res = []
+
     friends = FriendList.objects.filter(user=request.user, invitePending=False)
     for friend in friends:
         res.append({
             "id": friend.friend.id,
             "username": friend.friend.username
         })
+
     friends = FriendList.objects.filter(friend=request.user, invitePending=False)
     for friend in friends:
         res.append({

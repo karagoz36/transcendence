@@ -10,7 +10,6 @@ def userIsLoggedIn(user: User) -> bool:
 
 async def sendNotification(receiver: User, message: str) -> None:
 	layer: BaseChannelLayer = get_channel_layer()
-
 	await layer.group_send(f"{receiver.id}_notifications", {
 		"type": "sendMessage",
 		"message": message
@@ -36,6 +35,7 @@ class Notification(AsyncWebsocketConsumer):
 	
 	async def sendMessage(self, event):
 		message: str = event["message"]
+		print(message, flush=True)
 		await self.send(message)
 	
 	async def closeConnection(self, event):

@@ -142,6 +142,7 @@ STATIC_ROOT = '/app/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ASGI_APPLICATION = "transcendence.asgi.application"
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",

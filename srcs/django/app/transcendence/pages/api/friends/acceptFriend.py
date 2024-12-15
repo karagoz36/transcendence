@@ -1,3 +1,4 @@
+import json
 from django.contrib.auth.models import User
 from rest_framework.request import Request
 from database.models import getFriendship
@@ -24,5 +25,6 @@ async def response(request: Request):
 
     friendship.invitePending = False
     await friendship.asave()
-    await sendNotification(friend, {"message": f"{user.username} accepted your friend invitation.", "refresh": "/friends/"})
+    message = {"message": f"{user.username} accepted your friend invitation.", "refresh": "/friends/"}
+    await sendNotification(friend, json.dumps(message))
     return redirect("/friends?success=Friend invite accepted!")

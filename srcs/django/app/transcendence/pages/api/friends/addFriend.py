@@ -29,6 +29,6 @@ async def response(request: Request) -> HttpResponse:
 
 	await FriendList.objects.acreate(user=user, friend=friend)
 
-	message = json.dumps({"message": f"Friend invitation received from {user.username}.", "refresh": "/friends/"})
-	await sendNotification(friend, message)
+	message = {"message": f"Friend invitation received from {user.username}.", "refresh": "/friends/"}
+	await sendNotification(friend, json.dumps(message))
 	return redirect("/friends/?success=Friend invitation successfully sent!")
