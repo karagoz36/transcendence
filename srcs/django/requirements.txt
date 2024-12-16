@@ -8,3 +8,4 @@ djangorestframework-simplejwt
 adrf
 redgreenunittest
 pyotp
+python-decouple
