@@ -1,5 +1,6 @@
 // @ts-check
 import {getPage} from "./SPA.js"
+import BaseWebSocket from "./websockets.js";
 
 /**
  * @param {string} text 
@@ -27,31 +28,20 @@ function addNotif(message) {
 	const toastContainer = document.querySelector(".toast-container")
 	toastContainer?.append(toast)
 }
-/** @param {MessageEvent} e */
-function receiveMessage(e) {
-	const data = JSON.parse(e.data)
-	if (data.message)
-		addNotif(data.message)
-	if (data.refresh == window.location.pathname)
-		getPage(data.refresh)
-}
 
-class NotificationHandler {
-	constructor() {
-		this.createSocket = this.createSocket.bind(this)
-		this.createSocket()
-	}
-
-	createSocket() {
-		removeEventListener("page-changed", this.createSocket)
-		this.socket = new WebSocket(`wss://${window.location.host}/websocket/notifications/`)
-		this.socket.onmessage = receiveMessage
-		this.socket.onclose = () => addEventListener("page-changed", this.createSocket)
+class NotificationHandler extends BaseWebSocket {
+	/** @param {MessageEvent} e */
+	receive(e) {
+		const data = JSON.parse(e.data)
+		if (data.message)
+			addNotif(data.message)
+		if (data.refresh == window.location.pathname)
+			getPage(data.refresh)
 	}
 }
 
 function main() {
-	const notif = new NotificationHandler()
+	const notif = new NotificationHandler("notifications")
 }
 
 main()

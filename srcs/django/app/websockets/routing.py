@@ -7,4 +7,5 @@ from . import consumers
 # ALWAYS START ROUTE WITH websocket/
 websocket_urlpatterns = [
     re_path(r"websocket/notifications/", consumers.Notification.as_asgi()),
+    re_path(r"websocket/messages/", consumers.Messages.as_asgi()),
 ]

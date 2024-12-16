@@ -15,11 +15,16 @@ async def sendNotification(receiver: User, message: str) -> None:
 		"message": message
 	})
 
-class Notification(AsyncWebsocketConsumer):
+
+class BaseConsumer(AsyncWebsocketConsumer):
+	def __init__(self, consumerName: str):
+		super().__init__()
+		self.consumerName = consumerName
+
 	async def connect(self):
 		user: User = self.scope["user"]
 		await self.accept()
-		self.group_name = f"{user.id}_notifications"
+		self.group_name = f"{user.id}_{self.consumerName}"
 		if user.username == "":
 			await self.close()
 			return
@@ -35,8 +40,17 @@ class Notification(AsyncWebsocketConsumer):
 	
 	async def sendMessage(self, event):
 		message: str = event["message"]
-		print(message, flush=True)
 		await self.send(message)
 	
 	async def closeConnection(self, event):
 		await self.close()
+
+
+class Notification(BaseConsumer):
+	def __init__(self):
+		super().__init__("notifications")
+
+
+class Messages(BaseConsumer):
+	def __init__(self):
+		super().__init__("messages")
