@@ -19,3 +19,8 @@ async def getFriendship(user: User, friend: User) -> FriendList|None:
 	except:
 		pass
 	return None
+
+class Messages(models.Model):
+	friendship = models.ForeignKey(FriendList, on_delete=models.CASCADE)
+	message = models.TextField()
+	sender = models.ForeignKey(User, on_delete=models.CASCADE)

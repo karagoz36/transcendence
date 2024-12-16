@@ -1,32 +1,54 @@
 // @ts-check
-
-/** @param {HTMLButtonElement} sendMessageButton */
-function passFriendIDToModal(sendMessageButton) {
-	/** @type {NodeListOf<HTMLButtonElement>} */
-	const buttons = document.querySelectorAll("button#open-chat-modal")
-	
-	buttons.forEach(button => {
-		button.onclick = () => {
-			// @ts-ignore
-			sendMessageButton.setAttribute("user-id", button.getAttribute("user-id"))
-		}
-	})
-}
+import {getPage} from "../global/SPA.js"
 
 /** @param {MouseEvent} e */
-function sendMessage(e) {
-	e.preventDefault()
-	/** @type {HTMLButtonElement} */ // @ts-ignore
+function transferID(e) {
+   	/** @type {HTMLButtonElement|EventTarget|null} */
 	const button = e.target
+	if (!button) return
+    /** @type {HTMLButtonElement|null} */
+    const modalButton = document.querySelector("#send-message")
+	if (modalButton == null)
+		return
+	/** @type {string|null} */ // @ts-ignore
+	const userId = button.getAttribute("user-id")
+	if (userId == null)
+			return
+    modalButton.setAttribute("user-id", userId)
+}
+
+/** @param {HTMLButtonElement} button */
+function connectButton(button) {
+    button.onclick = transferID
+}
+
+/** @param {SubmitEvent} event */
+async function sendMessage(event) {
+	event.preventDefault();
+	if (!event.target) return
+	/** @type {string} */
+	const message = event.target["message"].value
+	/** @type {HTMLButtonElement} */ // @ts-ignore
+	const button = event.submitter
 	const friendID = Number(button.getAttribute("user-id"))
-	console.log(friendID)
+	await getPage("/api/friend/send-message", {
+		method: "POST",
+		headers: {"content-type": "application/json"},
+		body: {			
+			"friendID": friendID,
+			"message": message
+		}
+	}, true, "#messages-container")
 }
 
 function main() {
-	/** @type {HTMLButtonElement} */ // @ts-ignore
-	const button = document.querySelector("button#send-message")
-	passFriendIDToModal(button)
-	button.onclick = sendMessage
+	/** @type {HTMLFormElement|null} */
+	const forms = document.querySelectorAll("form#send-message-form")
+	if (forms == null)
+		return
+	// form.onsubmit = logSubmit
+	forms.forEach(form => form.onsubmit = sendMessage)
+	document.querySelectorAll("#open-chat-modal").forEach(connectButton)
 }
 
 main()

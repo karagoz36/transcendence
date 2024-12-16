@@ -63,6 +63,7 @@ def response(request: Request) -> HttpResponse:
  
     if "error" in request.query_params:
         status = 401
+        err = request.query_params["error"]
     if "success" in request.query_params:
         success = request.query_params["success"]
     return render(request, "friendlist/friendlist.html", status=status, context=getContext(request, err, success))

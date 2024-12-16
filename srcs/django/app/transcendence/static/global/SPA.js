@@ -85,21 +85,23 @@ async function getHTML(url, options, addToHistory) {
 /** 
  * @param {string} url
  * @param {PageOptions} options
- * @param {boolean} addToHistory */
-export async function getPage(url, options = {}, addToHistory = true) {
+ * @param {boolean} addToHistory 
+ * @param {string} toUpdate
+ **/
+export async function getPage(url, options = {}, addToHistory = true, toUpdate = ".main-container") {
 	const requestInit = convertOptionsToRequestInit(options)
 	const res = await getHTML(url, requestInit, addToHistory)
 	const parser = new DOMParser()
 	const newPage = parser.parseFromString(res, "text/html")
 	document.title = newPage.title
-	
-	const oldMainContainer = document.querySelector(".main-container")
+
+	const oldMainContainer = document.querySelector(toUpdate)
 	if (!oldMainContainer)
-		throw new Error("failed to find main-container in current body")
-	
-	const newMainContainer = newPage.querySelector(".main-container")
+		throw new Error(`failed to find ${toUpdate} in current body`)
+
+	const newMainContainer = newPage.querySelector(toUpdate)
 	if (!newMainContainer)
-		throw new Error(`failed to find main-container in fetched body at ${url}`)
+		throw new Error(`failed to find ${toUpdate} in fetched body at ${url}`)
 	oldMainContainer.innerHTML = newMainContainer.innerHTML
 
 	setAnchorEvent()

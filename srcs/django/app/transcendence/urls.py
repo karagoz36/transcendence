@@ -31,7 +31,7 @@ urlpatterns = [
     path("api/friend/add", views.addFriend, name="addFriend"),
     path("api/friend/accept", views.acceptFriend, name="acceptFriend"),
     path("api/friend/remove", views.removeFriend, name="rejectFriend"),
-    path("api/friend/send-message", views.sendMessage, name="rejectFriend"),
+    path("api/friend/send-message", views.sendMessage, name="sendMessage"),
     path("api/token", views.getToken, name="createToken"),
     path("api/token/refresh", views.refreshToken, name="refreshToken"),
 ]
