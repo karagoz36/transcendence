@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import pyotp
 
 class FriendList(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="friends")
@@ -19,3 +20,17 @@ async def getFriendship(user: User, friend: User) -> FriendList|None:
 	except:
 		pass
 	return None
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    is_2fa_enabled = models.BooleanField(default=False)
+    otp_secret = models.CharField(max_length=32, blank=True, null=True)
+
+    def generate_otp_secret(self):
+        if not self.otp_secret:
+            self.otp_secret = pyotp.random_base32()
+            self.save()
+
+    def get_otp(self):
+        totp = pyotp.TOTP(self.otp_secret)
+        return totp.now()
