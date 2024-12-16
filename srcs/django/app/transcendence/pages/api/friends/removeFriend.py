@@ -6,8 +6,10 @@ from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from websockets.consumers import sendNotification
 
-@login_required(login_url="/auth")
 async def response(request: Request):
+	type = ""
+	if "type" in request.query_params:
+		type = request.query_params["type"]
 	user: User = request.user
 	friend: User
 
@@ -24,5 +26,8 @@ async def response(request: Request):
 	if friendship is None:
 		return redirect("/friends?error=Friendship not found", status=400)
 	await friendship.adelete()
-	await sendNotification(friend, json.dumps({"refresh": "/friends/"}))
+	if type == "remove":
+		await sendNotification(friend, json.dumps({"message": f"{user.username} does not want to be your friend anymore.", "refresh": "/friends/"}))
+	elif type == "reject":
+		await sendNotification(friend, json.dumps({"message": f"{user.username} rejected your friend invitation.", "refresh": "/friends/"}))
 	return redirect("/friends?success=Friend successfully removed")

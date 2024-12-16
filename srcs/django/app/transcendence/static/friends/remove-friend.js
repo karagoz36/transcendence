@@ -3,7 +3,7 @@ import {getPage} from "../global/SPA.js"
 
 /** @param {number} friendID */
 async function removeFriend(friendID) {
-	await getPage("/api/friend/remove", {
+	await getPage("/api/friend/remove?type=remove", {
 		method: "POST",
 		headers: {
 			"content-type": "application/json",
