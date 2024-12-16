@@ -4,7 +4,7 @@ from rest_framework.request import Request
 from database.models import getFriendship
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
-from websockets.consumers import sendNotification
+from websockets.consumers import sendMessageWS
 
 @login_required(login_url="/auth")
 async def response(request: Request):
@@ -26,5 +26,5 @@ async def response(request: Request):
     friendship.invitePending = False
     await friendship.asave()
     message = {"message": f"{user.username} accepted your friend invitation.", "refresh": "/friends/"}
-    await sendNotification(friend, json.dumps(message))
+    await sendMessageWS(friend, "notifications", json.dumps(message))
     return redirect("/friends?success=Friend invite accepted!")

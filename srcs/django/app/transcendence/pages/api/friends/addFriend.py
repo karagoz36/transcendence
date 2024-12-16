@@ -3,7 +3,7 @@ from rest_framework.request import Request
 from django.http.response import HttpResponse
 from django.contrib.auth.models import User
 from database.models import FriendList, getFriendship
-from websockets.consumers import sendNotification
+from websockets.consumers import sendMessageWS
 import json
 from django.contrib.auth.decorators import login_required
     
@@ -30,5 +30,5 @@ async def response(request: Request) -> HttpResponse:
 	await FriendList.objects.acreate(user=user, friend=friend)
 
 	message = {"message": f"Friend invitation received from {user.username}.", "refresh": "/friends/"}
-	await sendNotification(friend, json.dumps(message))
+	await sendMessageWS(friend, "notifications", json.dumps(message))
 	return redirect("/friends/?success=Friend invitation successfully sent!")

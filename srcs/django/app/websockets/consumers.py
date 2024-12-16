@@ -8,13 +8,12 @@ from django.core.cache import cache
 def userIsLoggedIn(user: User) -> bool:
 	return cache.get(f"{user.id}_notifications") is not None
 
-async def sendNotification(receiver: User, message: str) -> None:
+async def sendMessageWS(receiver: User, groupName: str, message: str) -> None:
 	layer: BaseChannelLayer = get_channel_layer()
-	await layer.group_send(f"{receiver.id}_notifications", {
+	await layer.group_send(f"{receiver.id}_{groupName}", {
 		"type": "sendMessage",
 		"message": message
 	})
-
 
 class BaseConsumer(AsyncWebsocketConsumer):
 	def __init__(self, consumerName: str):
@@ -49,7 +48,6 @@ class BaseConsumer(AsyncWebsocketConsumer):
 class Notification(BaseConsumer):
 	def __init__(self):
 		super().__init__("notifications")
-
 
 class Messages(BaseConsumer):
 	def __init__(self):

@@ -1,5 +1,5 @@
 <div id="messages-container">
     {% for message in messages %}
-    <p>{{message.text}} {{message.sender}}</p>
+    {% include "friendlist/message.html" %}
     {%endfor%}
 </div>

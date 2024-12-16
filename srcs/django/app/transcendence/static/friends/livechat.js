@@ -5,10 +5,13 @@ import BaseWebSocket from "../global/websockets.js";
 class MessagesHandler extends BaseWebSocket {
     /** @param {MessageEvent} e */
 	receive(e) {
-		const data = JSON.parse(e.data)
+		/** @type {HTMLDivElement} */ // @ts-ignore
+		const messageContainer = document.querySelector("#messages-container")
+		const div = document.createElement("div")
+		div.innerHTML = e.data
+		messageContainer.appendChild(div)
 	}
 }
-
 
 function main() {
 	const notif = new MessagesHandler("messages")

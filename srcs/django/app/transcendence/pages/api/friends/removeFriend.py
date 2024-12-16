@@ -4,7 +4,7 @@ from database.models import FriendList, getFriendship
 from rest_framework.request import Request
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
-from websockets.consumers import sendNotification
+from websockets.consumers import sendMessageWS
 
 async def response(request: Request):
 	type = ""
@@ -27,7 +27,7 @@ async def response(request: Request):
 		return redirect("/friends?error=Friendship not found", status=400)
 	await friendship.adelete()
 	if type == "remove":
-		await sendNotification(friend, json.dumps({"message": f"{user.username} does not want to be your friend anymore.", "refresh": "/friends/"}))
+		await sendMessageWS(friend, "notifications", json.dumps({"message": f"{user.username} does not want to be your friend anymore.", "refresh": "/friends/"}))
 	elif type == "reject":
-		await sendNotification(friend, json.dumps({"message": f"{user.username} rejected your friend invitation.", "refresh": "/friends/"}))
+		await sendMessageWS(friend, "notifications", json.dumps({"message": f"{user.username} rejected your friend invitation.", "refresh": "/friends/"}))
 	return redirect("/friends?success=Friend successfully removed")

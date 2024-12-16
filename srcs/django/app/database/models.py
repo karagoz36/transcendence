@@ -9,12 +9,12 @@ class FriendList(models.Model):
 async def getFriendship(user: User, friend: User) -> FriendList|None:
 	friendship: FriendList
 	try:
-		friendship = await FriendList.objects.aget(user=user, friend=friend)
+		friendship = await FriendList.objects.select_related("user", "friend").aget(user=user, friend=friend)
 		return friendship
 	except:
 		pass
 	try:
-		friendship = await FriendList.objects.aget(user=friend, friend=user)
+		friendship = await FriendList.objects.select_related("user", "friend").aget(user=friend, friend=user)
 		return friendship
 	except:
 		pass

@@ -3,16 +3,24 @@ from rest_framework.response import Response
 from django.http.response import HttpResponse
 from django.contrib.auth.models import User
 from database.models import FriendList, getFriendship, Messages
+from websockets.consumers import sendMessageWS
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-from asgiref.sync import sync_to_async
+from django.template.loader import render_to_string
 
 async def getMessages(friendship: FriendList):
 	arr = []
+
 	async for message in Messages.objects.select_related("sender").filter(friendship=friendship):
 		arr.append({"text": message.message, "sender": message.sender.username})
 	arr.reverse()
 	return arr
+
+async def sendNewMessageToFriend(sender: User, receiver: User, message: str):
+	context = {}
+	context["message"] = {"sender": sender.username, "text": message}
+	html = render_to_string("friendlist/message.html", context=context)
+	await sendMessageWS(receiver, "messages", html)
 
 @login_required(login_url="/auth")
 async def response(request: Request) -> HttpResponse:
@@ -37,4 +45,9 @@ async def response(request: Request) -> HttpResponse:
 
 	await Messages.objects.acreate(friendship=friendship, message=message, sender=user)
 	messageList = await getMessages(friendship)
-	return render(request, "friendlist/messages.html", context={"messages": messageList })
+
+	friend: User = friendship.friend
+	if friend.id == user.id:
+		friend = friendship.user
+	await sendNewMessageToFriend(user, friend, message)
+	return render(request, "friendlist/message-list.html", context={"messages": messageList })

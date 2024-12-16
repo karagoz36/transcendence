@@ -19,6 +19,7 @@ export default class BaseWebSocket {
 		this.socket = new WebSocket(`wss://${window.location.host}/websocket/${url}/`)
 		this.socket.onmessage = this.receive
         this.socket.onopen = this.connect
+        this.socket.onerror = () => {throw new Error("")}
 		this.socket.onclose = () => addEventListener("page-changed", this.createSocket)
 	}
 }
