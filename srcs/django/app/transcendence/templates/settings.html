@@ -2,20 +2,25 @@
 {% block title %}Settings{% endblock %}
 {% block content %}
 {% include "modules/navbar.html" %}
+
 <h1>Settings</h1>
 
-<form method="post" action="/settings/update/">
+<form method="post" action="{% url 'update_settings' %}">
     {% csrf_token %}
     <label for="email">Email Address:</label>
     <input type="email" id="email" name="email" value="{{ user.email }}" required>
-    <br>
+    <br><br>
+
     <label for="2fa">Enable Two-Factor Authentication (2FA):</label>
-    <input type="checkbox" id="2fa" name="is_2fa_enabled" {% if user.profile.is_2fa_enabled %}checked{% endif %}>
-    <br>
+    <input type="checkbox" id="2fa" name="is_2fa_enabled" 
+           {% if profile.is_2fa_enabled %}checked{% endif %}>
+    <br><br>
+
     <button type="submit">Save Changes</button>
 </form>
 
 {% if message %}
-<p>{{ message }}</p>
+    <p style="color: green;">{{ message }}</p>
 {% endif %}
+
 {% endblock %}
