@@ -19,11 +19,9 @@ function setAccessTokenCookie(accessToken) {
  * @param {string} password
  */
 export async function setJWT(csrftoken, username, password) {
-	const otp = prompt("Enter your 2FA code:", "");
-	
 	const res = await fetch("/api/token", {
 		method: "POST",
-		body: JSON.stringify({username, password, otp}),
+		body: JSON.stringify({username, password}),
 		headers: {
 			cookie: document.cookie,
 			"content-type": "application/json",

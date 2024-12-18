@@ -36,4 +36,5 @@ urlpatterns = [
     path("api/token/refresh", views.refreshToken, name="refreshToken"),
     path("settings/", settings_view, name="settings"),
     path("settings/update/", settings_view, name="update_settings"),
+    path("api/user/is_2fa_enabled/", views.is_2fa_enabled, name="is_2fa_enabled"),
 ]

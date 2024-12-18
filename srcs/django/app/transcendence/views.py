@@ -1,11 +1,13 @@
 from rest_framework.request import Request
 from django.contrib.auth.models import User
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 from adrf.decorators import api_view
 from rest_framework.decorators import authentication_classes, permission_classes
 from django.core.cache import cache
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from . import pages
+from database.models import UserProfile
 
 @api_view(['GET'])
 async def auth(request: Request):
@@ -51,6 +53,21 @@ async def acceptFriend(request: Request):
 @api_view(['POST'])
 async def removeFriend(request: Request):
 	return await pages.removeFriend.response(request)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def is_2fa_enabled(request):
+    username = request.data.get("username")
+    if not username:
+        return Response({"error": "Username is required"}, status=400)
+    try:
+        user = User.objects.get(username=username)
+        user_profile = UserProfile.objects.get(user=user)
+        return Response({"is_2fa_enabled": user_profile.is_2fa_enabled}, status=200)
+    except User.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+    except UserProfile.DoesNotExist:
+        return Response({"is_2fa_enabled": False}, status=200)
 
 @authentication_classes([])
 @permission_classes([AllowAny])

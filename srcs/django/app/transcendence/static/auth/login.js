@@ -13,6 +13,25 @@ async function handleLogin(e) {
 	const password = e.target['password'].value
 	/** @type {String} */
 	const csrftoken = e.target['csrfmiddlewaretoken'].value
+	try {
+        const response = await fetch("/api/user/is_2fa_enabled/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username }),
+        });
+		if (response.ok) {
+			const data = await response.json();
+            if (data.is_2fa_enabled) {
+                const otp = prompt("Enter your 2FA code:");
+                console.log("2FA Code entered:", otp);
+            }
+		}
+	}
+	catch (e) {
+		console.error("Error quelque part");
+	}
 	await setJWT(csrftoken, username, password)
 	await getPage("/api/login", {
 		method: "POST",
