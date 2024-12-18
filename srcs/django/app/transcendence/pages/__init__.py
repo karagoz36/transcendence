@@ -12,3 +12,4 @@ from .api.friends import addFriend
 from .api.friends import acceptFriend
 from .api.friends import removeFriend
 from .api.friends import sendMessage
+# from .api.friends import openConv

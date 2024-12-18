@@ -1,1 +1,8 @@
-<p>{{message.sender}} : <br>  <b> {{message.text}} </b></p>
+<div class="d-flex {% if message.sender == user.username %}justify-content-end{% else %}justify-content-start{% endif %} mb-2">
+    <div class="message {% if message.sender == user.username %}bg-primary text-white{% else %}bg-light text-dark{% endif %} p-2 rounded">
+            <div class="text-break">
+            <small><b>{{ message.sender }}</b></small><br>
+            {{ message.text }}
+        </div>
+    </div>
+</div>

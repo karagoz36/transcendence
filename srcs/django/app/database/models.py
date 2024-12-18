@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.timezone import now
 
 class FriendList(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="friends")
@@ -24,3 +25,4 @@ class Messages(models.Model):
 	friendship = models.ForeignKey(FriendList, on_delete=models.CASCADE)
 	message = models.TextField()
 	sender = models.ForeignKey(User, on_delete=models.CASCADE)
+	created_at = models.DateTimeField(auto_now_add=True,)

@@ -11,9 +11,8 @@ from django.template.loader import render_to_string
 async def getMessages(friendship: FriendList):
 	arr = []
 
-	async for message in Messages.objects.select_related("sender").filter(friendship=friendship):
+	async for message in Messages.objects.select_related("sender").filter(friendship=friendship).order_by("created_at"):
 		arr.append({"text": message.message, "sender": message.sender.username})
-	arr.reverse()
 	return arr
 
 async def sendNewMessageToFriend(sender: User, receiver: User, message: str):
@@ -28,9 +27,12 @@ async def response(request: Request) -> HttpResponse:
 
 	if "friendID" not in request.data:
 		return Response({"message": "friend id missing in request body"}, status=401)
-	if "message" not in request.data:
+	if "message" not in request.data or request.data["message"].strip() == "":
 		return Response({"message": "message missing in request body"}, status=401)
-
+	if request.data["message"].strip() == "":
+		# return Response({"message": "message missing in request body"}, status=401)
+		return redirect(f"/friends/?error=This friendship already exists.")
+	print("Requête reçue :", request.data)
 	message: str = request.data["message"]
 	id: int = request.data["friendID"]
 
