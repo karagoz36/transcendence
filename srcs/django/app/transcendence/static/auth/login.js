@@ -13,34 +13,37 @@ async function handleLogin(e) {
 	const password = e.target['password'].value
 	/** @type {String} */
 	const csrftoken = e.target['csrfmiddlewaretoken'].value
+	await setJWT(csrftoken, username, password)
 	try {
-        const response = await fetch("/api/user/is_2fa_enabled/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ username }),
-        });
-		if (response.ok) {
-			const data = await response.json();
+		const res = await fetch("/api/login", {
+			method: "POST",
+			body: JSON.stringify({ username, password }),
+			headers: {
+				"content-type": "application/json",
+				"X-CSRFToken": csrftoken
+			}
+		});
+		if (res.ok) {
+            const data = await res.json();
             if (data.is_2fa_enabled) {
                 const otp = prompt("Enter your 2FA code:");
                 console.log("2FA Code entered:", otp);
+				if (otp && otp.trim() !== "")
+					await getPage("/");
+                // TODO: Ajouter la logique de validation avec email
+            } else {
+                console.log("Login successful without 2FA.");
+                await getPage("/");
             }
-		}
-	}
-	catch (e) {
-		console.error("Error quelque part");
-	}
-	await setJWT(csrftoken, username, password)
-	await getPage("/api/login", {
-		method: "POST",
-		body: {username, password},
-		headers: {
-			"content-type": "application/json",
-			"X-CSRFToken": csrftoken
-		}
-	})
+        } else {
+            const errorData = await res.json();
+            alert(errorData.error || "Login failed.");
+        }
+    } catch (e) {
+        console.error("Error during login:", e);
+        alert("An unexpected error occurred.");
+    }
+
 }
 
 function main() {
