@@ -6,6 +6,9 @@ from django.contrib.auth import authenticate, login
 from database.models import UserProfile
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import authentication_classes, permission_classes
+from django.core.mail import send_mail
+from transcendence.pages.auth import sendingEmail
+import pyotp
 
 # @authentication_classes([])
 # @permission_classes([AllowAny])
@@ -38,6 +41,9 @@ def response(request: Request) -> JsonResponse:
     try:
         user_profile = UserProfile.objects.get(user=user)
         if user_profile.is_2fa_enabled:
+            otp = pyotp.TOTP(user_profile.otp_secret).now()
+            if not sendingEmail(otp, user):
+                return JsonResponse({"error": "Failed to send OTP email"}, status=500)
             return JsonResponse({"is_2fa_enabled": True}, status=200)
     except UserProfile.DoesNotExist:
         pass

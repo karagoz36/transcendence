@@ -5,6 +5,7 @@ from django.contrib.auth.models import User, AnonymousUser
 from database.models import FriendList
 from channels.layers import get_channel_layer, BaseChannelLayer
 from rest_framework_simplejwt.tokens import AccessToken
+import pyotp
 
 def getInvitesReceived(request: Request):
     res = []

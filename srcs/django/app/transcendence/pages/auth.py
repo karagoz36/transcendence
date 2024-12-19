@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User, AnonymousUser
 from rest_framework.request import Request
 from rest_framework.response import Response
+from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from channels.layers import get_channel_layer, BaseChannelLayer
 from django.contrib.auth import logout
@@ -31,3 +32,15 @@ async def response(request: Request):
 		status = 401
 		error = request.query_params["error"]
 	return render(request, "auth.html", {"ERROR_MESSAGE": error}, status=status)
+
+def sendingEmail(otp, user):
+    sent = send_mail(
+        "Transcendence - Verification code",
+        f"Your verification code is {otp}",
+        "from@example.com",
+        [user.email],
+        fail_silently=False,
+    )
+    if sent == 0:
+        return False
+    return True
