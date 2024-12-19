@@ -26,11 +26,24 @@ async function handleLogin(e) {
 		if (res.ok) {
             const data = await res.json();
             if (data.is_2fa_enabled) {
-                const otp = prompt("Enter your 2FA code:");
-                console.log("2FA Code entered:", otp);
-				if (otp && otp.trim() !== "")
-					await getPage("/");
-                // TODO: Ajouter la logique de validation avec email
+                let otp = prompt("Enter your 2FA code:");
+                while (!otp || otp.trim() === "") {
+                    otp = prompt("2FA code cannot be empty. Enter your 2FA code:");
+                }
+				const otpResponse = await fetch("/api/verify_otp/", {
+                    method: "POST",
+                    body: JSON.stringify({ username, otp }),
+                    headers: {
+                        "content-type": "application/json",
+                        "X-CSRFToken": csrftoken
+                    }
+                });
+				if (otpResponse.status == 200) {
+                    console.log("2FA verified successfully.");
+                    await getPage("/");
+                } else {
+                    alert("Invalid 2FA code. Please try again.");
+                }
             } else {
                 console.log("Login successful without 2FA.");
                 await getPage("/");

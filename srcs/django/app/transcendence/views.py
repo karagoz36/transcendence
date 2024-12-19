@@ -8,6 +8,7 @@ from django.core.cache import cache
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from . import pages
 from database.models import UserProfile
+import pyotp
 
 @api_view(['GET'])
 async def auth(request: Request):
@@ -68,6 +69,27 @@ def is_2fa_enabled(request):
         return Response({"error": "User not found"}, status=404)
     except UserProfile.DoesNotExist:
         return Response({"is_2fa_enabled": False}, status=200)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def verify_otp(request):
+    username = request.data.get("username")
+    otp = request.data.get("otp")
+    if not username or not otp:
+        return Response({"error": "Missing username or OTP"}, status=400)
+    try:
+        user = User.objects.get(username=username)
+        user_profile = UserProfile.objects.get(user=user)
+        totp = pyotp.TOTP(user_profile.otp_secret)
+        if totp.verify(otp):
+            login(request, user)
+            return Response({"message": "OTP verified successfully"}, status=200)
+        else:
+            return Response({"error": "Invalid OTP"}, status=400)
+    except User.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+    except UserProfile.DoesNotExist:
+        return Response({"error": "User profile not found"}, status=404)
 
 @authentication_classes([])
 @permission_classes([AllowAny])
