@@ -13,7 +13,6 @@ async function handleLogin(e) {
 	const password = e.target['password'].value
 	/** @type {String} */
 	const csrftoken = e.target['csrfmiddlewaretoken'].value
-	await setJWT(csrftoken, username, password)
 	try {
 		const res = await fetch("/api/login", {
 			method: "POST",
@@ -38,11 +37,13 @@ async function handleLogin(e) {
                         "X-CSRFToken": csrftoken
                     }
                 });
-				if (otpResponse.status == 200) {
+				if (otpResponse.ok) {
                     console.log("2FA verified successfully.");
+					await setJWT(csrftoken, username, password);
                     await getPage("/");
                 } else {
-                    alert("Invalid 2FA code. Please try again.");
+					const errorData = await otpResponse.json();
+					alert(errorData.error || "Invalid 2FA code. Please try again.");
                 }
             } else {
                 console.log("Login successful without 2FA.");

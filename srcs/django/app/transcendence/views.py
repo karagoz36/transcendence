@@ -1,5 +1,6 @@
 from rest_framework.request import Request
 from django.contrib.auth.models import User
+from django.contrib.auth import login
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from adrf.decorators import api_view
@@ -82,7 +83,6 @@ def verify_otp(request):
         user_profile = UserProfile.objects.get(user=user)
         totp = pyotp.TOTP(user_profile.otp_secret)
         if totp.verify(otp):
-            login(request, user)
             return Response({"message": "OTP verified successfully"}, status=200)
         else:
             return Response({"error": "Invalid OTP"}, status=400)
