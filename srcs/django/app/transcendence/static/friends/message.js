@@ -17,11 +17,6 @@ function transferID(e) {
     modalButton.setAttribute("user-id", userId)
 }
 
-/** @param {HTMLButtonElement} button */
-function connectButton(button) {
-    button.onclick = transferID
-}
-
 /** @param {SubmitEvent} event */
 async function sendMessage(event) {
 	event.preventDefault();
@@ -43,13 +38,14 @@ async function sendMessage(event) {
 }
 
 function main() {
-	/** @type {HTMLFormElement|null} */
+	/** @type {NodeListOf<HTMLFormElement>|null} */
 	const forms = document.querySelectorAll("form#send-message-form")
 	if (forms == null)
 		return
-	// form.onsubmit = logSubmit
 	forms.forEach(form => form.onsubmit = sendMessage)
-	document.querySelectorAll("#open-chat-modal").forEach(connectButton)
+	/** @type {NodeListOf<HTMLButtonElement>|null} */
+	const buttons = document.querySelectorAll("button#open-chat-modal")
+	buttons.forEach(button => button.onclick = transferID)
 }
 
 main()
