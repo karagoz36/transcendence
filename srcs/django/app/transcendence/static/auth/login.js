@@ -47,6 +47,17 @@ async function handleLogin(e) {
                 }
             } else {
                 console.log("Login successful without 2FA.");
+                const csrfRes = await fetch("/api/csrf-token/", {
+                    method: "GET",
+                    credentials: "same-origin",
+                });
+                if (!csrfRes.ok) {
+                    alert("Failed to refresh CSRF token.");
+                    return;
+                }
+                const csrfData = await csrfRes.json();
+                const newCsrfToken = csrfData.csrfToken;
+                await setJWT(newCsrfToken, username, password);
                 await getPage("/");
             }
         } else {

@@ -14,7 +14,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 user = User.objects.get(username='$POSTGRES_USER')
 user.set_password('$POSTGRES_PASSWORD')
-user.set_email_password('$EMAIL_HOST_PASSWORD')
+user.email_password('$EMAIL_HOST_PASSWORD')
 user.save()"
 
 python /app/manage.py runserver 0.0.0.0:8000

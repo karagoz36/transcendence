@@ -38,4 +38,5 @@ urlpatterns = [
     path("settings/update/", settings_view, name="update_settings"),
     path("api/user/is_2fa_enabled/", views.is_2fa_enabled, name="is_2fa_enabled"),
     path("api/verify_otp/", views.verify_otp, name="verify_otp"),
+    path("api/csrf-token/", views.get_csrf_token, name="get_csrf_token"),
 ]
