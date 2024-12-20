@@ -5,6 +5,10 @@ from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from channels.layers import get_channel_layer, BaseChannelLayer
 from django.contrib.auth import logout
+from celery import shared_task
+from celery.utils.log import get_task_logger
+
+logger = get_task_logger(__name__)
 
 async def closeWebSockets(id: int):
 	layer: BaseChannelLayer = get_channel_layer()
@@ -33,14 +37,29 @@ async def response(request: Request):
 		error = request.query_params["error"]
 	return render(request, "auth.html", {"ERROR_MESSAGE": error}, status=status)
 
-def sendingEmail(otp, user):
-    sent = send_mail(
-        "Transcendence - Verification code",
-        f"Your verification code is {otp}",
-        "from@example.com",
-        [user.email],
-        fail_silently=False,
-    )
-    if sent == 0:
+# def sendingEmail(otp, user):
+#     sent = send_mail(
+#         "Transcendence - Verification code",
+#         f"Your verification code is {otp}",
+#         "from@example.com",
+#         [user.email],
+#         fail_silently=False,
+#     )
+#     if sent == 0:
+#         return False
+#     return True
+
+@shared_task
+def sendingEmail(otp, email):
+    try:
+        send_mail(
+            subject="Transcendence - Verification code",
+            message=f"Your verification code is {otp}",
+            from_email="noreply@example.com",
+            recipient_list=[email],
+            fail_silently=False,
+        )
+        return True
+    except Exception as e:
+        print(f"Error sending email: {e}")
         return False
-    return True

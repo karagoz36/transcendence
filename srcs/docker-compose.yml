@@ -50,6 +50,23 @@ services:
     networks:
       - app-network
     restart: always
+    
+  celery:
+    build:
+      context: ./django
+    container_name: celery
+    working_dir: /app
+    command: celery -A transcendence worker --loglevel=info
+    volumes:
+      - ./django/app:/app
+    depends_on:
+      - redis
+      - django
+    networks:
+      - app-network
+    env_file:
+      .env
+    restart: always
 
 networks:
   app-network:

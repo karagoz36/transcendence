@@ -14,7 +14,8 @@ async function handleLogin(e) {
 	/** @type {String} */
 	const csrftoken = e.target['csrfmiddlewaretoken'].value
 	try {
-		const res = await fetch("/api/login", {
+        console.time("Login API Response");
+        const res = await fetch("/api/login", {
 			method: "POST",
 			body: JSON.stringify({ username, password }),
 			headers: {
@@ -22,8 +23,10 @@ async function handleLogin(e) {
 				"X-CSRFToken": csrftoken
 			}
 		});
+        console.timeEnd("Login API Response");
 		if (res.ok) {
             const data = await res.json();
+            console.log("Response data:", data);
             if (data.is_2fa_enabled) {
                 let otp = prompt("Enter your 2FA code:");
                 while (!otp || otp.trim() === "") {

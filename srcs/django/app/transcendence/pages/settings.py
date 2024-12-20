@@ -23,7 +23,7 @@ def response(request):
             profile.generate_otp_secret()
 
         profile.save()
-        message = "Settings updated successfully!"  # Success message
+        message = "Settings updated successfully!"
 
     profile, _ = UserProfile.objects.get_or_create(user=user)
 
