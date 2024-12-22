@@ -24,9 +24,12 @@ async def response(request: Request):
 	if not type(user) is AnonymousUser:
 		return redirect("/")
 	error = ""
+	success = ""
 	status = 200
 
 	if "error" in request.query_params.keys():
 		status = 401
 		error = request.query_params["error"]
-	return render(request, "auth.html", {"ERROR_MESSAGE": error}, status=status)
+	if "success" in request.query_params.keys():
+		success = request.query_params["success"]
+	return render(request, "auth.html", {"ERROR_MESSAGE": error, "SUCCESS_MESSAGE": success}, status=status)

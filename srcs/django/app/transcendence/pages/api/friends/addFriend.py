@@ -6,7 +6,6 @@ from database.models import FriendList, getFriendship
 from websockets.consumers import sendMessageWS
 import json
 from django.contrib.auth.decorators import login_required
-    
 
 @login_required(login_url="/api/logout")
 async def response(request: Request) -> HttpResponse:
