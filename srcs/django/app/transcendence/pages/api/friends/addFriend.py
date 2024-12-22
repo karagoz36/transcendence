@@ -8,7 +8,7 @@ import json
 from django.contrib.auth.decorators import login_required
     
 
-@login_required(login_url="/auth")
+@login_required(login_url="/api/logout")
 async def response(request: Request) -> HttpResponse:
 	if "username" not in request.data:
 		return redirect("/friends/?error=Invalid body")

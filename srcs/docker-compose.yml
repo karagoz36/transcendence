@@ -12,6 +12,7 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]
       interval: 0.5s
+      retries: 10
 
   django:
     restart: always

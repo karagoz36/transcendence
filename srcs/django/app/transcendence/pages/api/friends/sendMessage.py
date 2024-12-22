@@ -21,7 +21,7 @@ async def sendNewMessageToFriend(sender: User, receiver: User, message: str):
 	html = render_to_string("friendlist/message.html", context=context)
 	await sendMessageWS(receiver, "messages", html)
 
-@login_required(login_url="/auth")
+@login_required(login_url="/api/logout")
 async def response(request: Request) -> HttpResponse:
 	user: User = request.user
 

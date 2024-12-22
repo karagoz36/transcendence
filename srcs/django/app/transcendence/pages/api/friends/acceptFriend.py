@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from websockets.consumers import sendMessageWS
 
-@login_required(login_url="/auth")
+@login_required(login_url="/api/logout")
 async def response(request: Request):
     friend: User
     user: User = request.user

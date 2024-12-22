@@ -14,7 +14,7 @@ async def getMessages(friendship: FriendList):
 		arr.append({"text": message.message, "sender": message.sender.username})
 	return arr
 
-@login_required(login_url="/auth")
+@login_required(login_url="/api/logout")
 async def response(request: Request) -> HttpResponse:
 	user: User = request.user
 	try:
