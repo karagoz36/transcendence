@@ -33,6 +33,7 @@ class NotificationHandler extends BaseWebSocket {
 	/** @param {MessageEvent} e */
 	receive(e) {
 		const data = JSON.parse(e.data)
+		console.log(data)
 		if (data.message)
 			addNotif(data.message)
 		if (data.refresh == window.location.pathname)

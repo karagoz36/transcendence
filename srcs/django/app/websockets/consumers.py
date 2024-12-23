@@ -5,6 +5,7 @@ from channels.layers import get_channel_layer, BaseChannelLayer
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.cache import cache
 from transcendence.pages.friends import getFriends
+import json
 
 def userIsLoggedIn(user: User) -> bool:
 	return cache.get(f"{user.id}_notifications") is not None
@@ -54,6 +55,13 @@ class Notification(BaseConsumer):
 		user: User = self.scope["user"]
 		if user.username == "":
 			return
+		friends = await getFriends(user)
+		for friend in friends:
+			receiver: User = await User.objects.aget(id=friend["id"])
+			message = json.dumps({"message": f"{user.username} just logged in."})
+			print(receiver, flush=True)
+			print(message, flush=True)
+			await sendMessageWS(receiver, "notifications", message)
 
 class Messages(BaseConsumer):
 	def __init__(self):

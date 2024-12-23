@@ -16,7 +16,7 @@ export default class BaseWebSocket {
     receive(e) {
         console.error("function not overloaded")
     }
-    
+
 	createSocket() {
 		removeEventListener("page-changed", this.createSocket)
 		this.socket = new WebSocket(`wss://${window.location.host}/websocket/${this.url}/`)
