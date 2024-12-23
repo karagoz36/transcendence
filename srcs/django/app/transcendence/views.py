@@ -40,12 +40,12 @@ async def friends(request: Request):
 	return await pages.friends.response(request)
 
 @api_view(['GET'])
-async def play(request: Request):
-	return await pages.play.response(request)
+async def pong(request: Request):
+	return await pages.pong.response(request)
 
 @api_view(['GET'])
-async def sendGameInvite(request: Request):
-	return await pages.sendGameInvite.response(request)
+async def lobby(request: Request):
+	return await pages.lobby.response(request)
 
 @api_view(['POST'])
 async def addFriend(request: Request):

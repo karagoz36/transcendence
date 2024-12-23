@@ -9,9 +9,8 @@
     <div class="card" style="width: 18rem;">
       <div class="card-body">
         <h5 class="card-title">{{friend.username}}</h5>
-        <button id="invite" friend-username={{friend.username}} class="btn btn-primary">Invite to play</button>
+        <a class="btn btn-primary" href="/pong/lobby/?opponent={{friend.username}}">Invite to play</a>
       </div>
     </div>
   {% endfor %}
-  <script type="module" src="/static/play/invite.js"></script>
 {% endblock %}

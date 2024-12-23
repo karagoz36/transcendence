@@ -63,7 +63,7 @@ class Notification(BaseConsumer):
 			receiver: User = await User.objects.aget(id=friend["id"])
 			message = json.dumps({
 				"message": f"{user.username} just logged in.",
-				"refresh": ["/friends/", "/play/"]
+				"refresh": ["/friends/", "/pong/"]
 			})
 			await sendMessageWS(receiver, "notifications", message)
 
@@ -83,3 +83,7 @@ class Notification(BaseConsumer):
 class Messages(BaseConsumer):
 	def __init__(self):
 		super().__init__("messages")
+
+class Pong(BaseConsumer):
+	def __init__(self):
+		super().__init__("pong")

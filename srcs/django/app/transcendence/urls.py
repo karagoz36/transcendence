@@ -25,7 +25,8 @@ urlpatterns = [
     path("auth/", views.auth, name="auth"),
     path("settings/", views.settings, name="settings"),
     path("friends/", views.friends, name="friends"),
-    path("play/", views.play, name="play"),
+    path("pong/", views.pong, name="pong"),
+    path("pong/lobby/", views.lobby, name="lobby"),
 
     path("api/login", views.login, name="login"),
     path("api/logout", views.logout, name="logout"),
@@ -38,6 +39,4 @@ urlpatterns = [
 
     path("api/token", views.getToken, name="createToken"),
     path("api/token/refresh", views.refreshToken, name="refreshToken"),
-
-    path("api/play/send-invite", views.sendGameInvite, name="sendGameInvite"),
 ]

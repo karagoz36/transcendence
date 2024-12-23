@@ -28,7 +28,6 @@ async def response(request: Request):
 	if "error" in request.query_params:
 		context["error"] = request.query_params["error"]
 		status = 401
-
 	if "success" in request.query_params:
 		context["success"] = request.query_params["success"]
-	return render(request, "play/play.html", status=status, context=context)
+	return render(request, "pong/index.html", status=status, context=context)
