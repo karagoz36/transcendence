@@ -57,6 +57,7 @@ class Notification(BaseConsumer):
 		user: User = self.scope["user"]
 		if user.username == "":
 			return
+
 		friends = await getFriends(user)
 		for friend in friends:
 			receiver: User = await User.objects.aget(id=friend["id"])

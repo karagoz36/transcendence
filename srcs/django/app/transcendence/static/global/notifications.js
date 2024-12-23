@@ -32,6 +32,15 @@ function addNotif(message) {
 }
 
 class NotificationHandler extends BaseWebSocket {
+	/** @param {string} url */
+	constructor(url) {
+		super(url)
+		this.socket.onclose = e => {
+			if (e.code == 4000)
+				addEventListener("page-changed", this.createSocket)
+		}
+	}
+
 	/** @param {MessageEvent} e */
 	receive(e) {
 		const data = JSON.parse(e.data)

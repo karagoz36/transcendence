@@ -1,7 +1,5 @@
 // @ts-check
 
-import { refreshJWT } from "./JWT.js"
-
 /** @param {MouseEvent} e */
 function preventAnchorReloading(e) {
 	e.preventDefault() // @ts-ignore
@@ -65,7 +63,7 @@ function convertOptionsToRequestInit(options) {
  * @returns 
  */
 async function getHTML(url, options, addToHistory) {
-	/** @type {Response|String} */
+	/** @type {Response} */
 	let res
 	res = await fetch(url, options)
 	if (res.status == 404 || res.status >= 500)
