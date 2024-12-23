@@ -38,7 +38,14 @@ def settings(request: Request):
 @api_view(['GET'])
 def friends(request: Request):
 	return pages.friends.response(request)
-from websockets.consumers import userIsLoggedIn
+
+@api_view(['GET'])
+def play(request: Request):
+	return pages.play.response(request)
+
+@api_view(['GET'])
+async def sendGameInvite(request: Request):
+	return await pages.sendGameInvite.response(request)
 
 @api_view(['POST'])
 async def addFriend(request: Request):

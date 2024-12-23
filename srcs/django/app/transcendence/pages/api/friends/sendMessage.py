@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from database.models import FriendList, getFriendship, Messages
 from websockets.consumers import sendMessageWS
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 
 async def getMessages(friendship: FriendList):

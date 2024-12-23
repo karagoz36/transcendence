@@ -37,7 +37,6 @@ def getFriends(request: Request):
             "id": friend.friend.id,
             "username": friend.friend.username
         })
-
     friends = FriendList.objects.filter(friend=request.user, invitePending=False)
     for friend in friends:
         res.append({

@@ -1,0 +1,17 @@
+{% extends 'modules/base.html' %}
+{% block title %}Play{% endblock %}
+{% block content %}
+  {% include 'modules/navbar.html' %}
+	<div class="alert alert-danger hide-empty">{{ error }}</div>
+	<div class="alert alert-success hide-empty">{{ success }}</div>
+  <h3 style="text-align: center">Friends</h3>
+  {% for friend in friends %}
+    <div class="card" style="width: 18rem;">
+      <div class="card-body">
+        <h5 class="card-title">{{friend.username}}</h5>
+        <button id="invite" friend-username={{friend.username}} class="btn btn-primary">Invite to play</button>
+      </div>
+    </div>
+  {% endfor %}
+  <script type="module" src="/static/play/invite.js"></script>
+{% endblock %}

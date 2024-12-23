@@ -33,7 +33,7 @@ async function sendMessage(event) {
 			"friendID": friendID,
 			"message": message
 		}
-	}, true, "#messages-container");
+	}, false, "#messages-container");
 	event.target["message"].value = "";
 }
 

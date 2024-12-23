@@ -25,13 +25,19 @@ urlpatterns = [
     path("auth/", views.auth, name="auth"),
     path("settings/", views.settings, name="settings"),
     path("friends/", views.friends, name="friends"),
+    path("play/", views.play, name="play"),
+
     path("api/login", views.login, name="login"),
     path("api/logout", views.logout, name="logout"),
     path("api/register", views.register, name="register"),
+
     path("api/friend/add", views.addFriend, name="addFriend"),
     path("api/friend/accept", views.acceptFriend, name="acceptFriend"),
     path("api/friend/remove", views.removeFriend, name="rejectFriend"),
     path("api/friend/send-message", views.sendMessage, name="sendMessage"),
+
     path("api/token", views.getToken, name="createToken"),
     path("api/token/refresh", views.refreshToken, name="refreshToken"),
+
+    path("api/play/send-invite", views.sendGameInvite, name="sendGameInvite"),
 ]
