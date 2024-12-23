@@ -14,8 +14,7 @@ res=json.load(sys.stdin);
 tunnel=res['tunnels'][0];
 print(tunnel['public_url']);")
 
-echo $NGROK _URL
+echo $NGROK_URL
 
 docker compose -f srcs/docker-compose.yml up
 kill $pid
-echo "DONE"
