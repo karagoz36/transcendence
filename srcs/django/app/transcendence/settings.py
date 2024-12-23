@@ -27,9 +27,12 @@ SECRET_KEY = 'django-insecure-471zhka30$t^r^g6n@5_@wuuf(m^&5(cgc@da70lt24d=wa_vh
 DEBUG = True
 
 DOMAIN_NAME = os.getenv("DOMAIN_NAME")
+NGROK_URL = os.getenv("NGROK_URL")
 CSRF_TRUSTED_ORIGINS = ["https://localhost:8000", f"https://{DOMAIN_NAME}:8000"]
+if NGROK_URL is not None and NGROK_URL != "":
+    CSRF_TRUSTED_ORIGINS.append(NGROK_URL)
 
-ALLOWED_HOSTS = ["*.ngrok-free.app", "localhost", DOMAIN_NAME, "django"]
+ALLOWED_HOSTS = [".ngrok-free.app", "localhost", DOMAIN_NAME, "django"]
 # Ensure you have this in your settings
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 TEST_RUNNER = "redgreenunittest.django.runner.RedGreenDiscoverRunner"

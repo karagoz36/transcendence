@@ -1,7 +1,3 @@
-if [ ! -e /app/manage.py ]; then
-	django-admin startproject transcendence app
-fi
-
 find /app -type d -name migrations -exec rm -rf {} \; 2>/dev/null
 
 python /app/manage.py makemigrations

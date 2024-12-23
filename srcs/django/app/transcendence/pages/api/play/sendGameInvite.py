@@ -14,7 +14,11 @@ async def response(req: Request):
     user: User = req.user
     if username == user.username:
         return redirect("/play/?error=You cannot invite yourself", status=401)
+
     friend: User = await User.objects.aget(username=username)
-    message = json.dumps({"message": f"<a href=/play/>{user.username} invites you to play.</a>"})
+    message = json.dumps({
+        "message": f"<a href=/play/>{user.username} invites you to play</a>",
+        "refresh": ["/play/"]
+    })
     await sendMessageWS(friend, "notifications", message)
     return redirect(f"/play/?success=Game invitation sent to {username}")

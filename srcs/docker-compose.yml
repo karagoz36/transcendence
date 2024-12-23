@@ -24,6 +24,8 @@ services:
       - app-network
     env_file:
       .env
+    environment:
+      - NGROK_URL=${NGROK_URL}
     depends_on:
       postgres:
         condition: service_healthy

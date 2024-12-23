@@ -1,14 +1,14 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
-from rest_framework_simplejwt.tokens import Token
-from rest_framework_simplejwt.authentication import JWTAuthentication
 from channels.layers import get_channel_layer, BaseChannelLayer
-from django.contrib.auth.models import User, AnonymousUser
-from django.core.cache import cache
-from transcendence.pages.friends import getFriends
+from django.contrib.auth.models import User
 import json
+from transcendence.pages.friends import getFriends
+
+onlineUsers = {}
 
 def userIsLoggedIn(user: User) -> bool:
-	return cache.get(f"{user.id}_notifications") is not None
+	return onlineUsers.get(user.id) is not None
+
 
 async def sendMessageWS(receiver: User, groupName: str, message: str) -> None:
 	layer: BaseChannelLayer = get_channel_layer()
@@ -29,12 +29,14 @@ class BaseConsumer(AsyncWebsocketConsumer):
 		if user.username == "":
 			await self.close(code=4000)
 			return
-		cache.set(self.group_name, "")
+		onlineUsers[user.id] = True
 		await self.channel_layer.group_add(self.group_name, self.channel_name)
 
 	async def disconnect(self, close_code):
+		user: User = self.scope["user"]
 		print(f"WebSocket: {self.group_name} closed", flush=True)
-		cache.delete(self.group_name)
+		if user.id in onlineUsers:
+			del onlineUsers[user.id]
 
 	async def receive(self, text_data: str):
 		pass
@@ -59,6 +61,19 @@ class Notification(BaseConsumer):
 		for friend in friends:
 			receiver: User = await User.objects.aget(id=friend["id"])
 			message = json.dumps({"message": f"{user.username} just logged in."})
+			await sendMessageWS(receiver, "notifications", message)
+
+	async def disconnect(self, close_code):
+		await super().disconnect(close_code)
+
+		user: User = self.scope["user"]
+		if user.username == "":
+			return
+
+		friends = await getFriends(user)
+		for friend in friends:
+			receiver: User = await User.objects.aget(id=friend["id"])
+			message = json.dumps({"message": f"{user.username} just logged out."})
 			await sendMessageWS(receiver, "notifications", message)
 
 class Messages(BaseConsumer):

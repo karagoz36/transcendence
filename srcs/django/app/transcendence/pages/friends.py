@@ -1,20 +1,22 @@
 from rest_framework.request import Request
 from django.http.response import HttpResponse
-from django.shortcuts import render, redirect
-from django.contrib.auth.models import User, AnonymousUser
+from django.shortcuts import render
+from django.contrib.auth.models import User
 from database.models import FriendList
-from channels.layers import get_channel_layer, BaseChannelLayer
-from rest_framework_simplejwt.tokens import AccessToken
+
+def userToDict(user: User) -> dict:
+    return {
+       "id": user.id,
+        "username": user.username,
+        "loggedIn": "online" if userIsLoggedIn(user) else "offline",
+        }
 
 async def getInvitesReceived(user: User):
     res = []
     invitesReceived = FriendList.objects.select_related("user").filter(friend=user, invitePending=True)
 
     async for invite in invitesReceived:
-        res.append({
-            "id": invite.user.id,
-            "username": invite.user.username
-        })
+        res.append(userToDict(invite.user))
     return res
 
 async def getInvitesSent(user: User):
@@ -22,10 +24,7 @@ async def getInvitesSent(user: User):
     invitesSent = FriendList.objects.select_related("friend").filter(user=user, invitePending=True)
 
     async for invite in invitesSent:
-        res.append({
-            "id": invite.friend.id,
-            "username": invite.friend.username
-        })
+        res.append(userToDict(invite.friend))
     return res
 
 async def getFriends(user: User):
@@ -33,16 +32,11 @@ async def getFriends(user: User):
 
     friends = FriendList.objects.select_related("friend").filter(user=user, invitePending=False)
     async for friend in friends:
-        res.append({
-            "id": friend.friend.id,
-            "username": friend.friend.username
-        })
+        res.append(userToDict(friend.friend))
+
     friends = FriendList.objects.select_related("user").filter(friend=user, invitePending=False)
     async for friend in friends:
-        res.append({
-            "id": friend.user.id,
-            "username": friend.user.username
-        })
+        res.append(userToDict(friend.user))
     return res
 
 async def getContext(user: User, err: str, success: str) -> dict:
@@ -67,3 +61,5 @@ async def response(request: Request) -> HttpResponse:
         success = request.query_params["success"]
     context = await getContext(request.user, err, success)
     return render(request, "friendlist/friendlist.html", status=status, context=context)
+
+from websockets.consumers import userIsLoggedIn
