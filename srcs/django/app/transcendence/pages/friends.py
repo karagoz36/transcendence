@@ -6,56 +6,56 @@ from database.models import FriendList
 from channels.layers import get_channel_layer, BaseChannelLayer
 from rest_framework_simplejwt.tokens import AccessToken
 
-def getInvitesReceived(request: Request):
+async def getInvitesReceived(request: Request):
     res = []
-    invitesReceived = FriendList.objects.filter(friend=request.user, invitePending=True)
+    invitesReceived = FriendList.objects.select_related("user").filter(friend=request.user, invitePending=True)
 
-    for invite in invitesReceived:
+    async for invite in invitesReceived:
         res.append({
             "id": invite.user.id,
             "username": invite.user.username
         })
     return res
 
-def getInvitesSent(request: Request):
+async def getInvitesSent(request: Request):
     res = []
-    invitesSent = FriendList.objects.filter(user=request.user, invitePending=True)
+    invitesSent = FriendList.objects.select_related("friend").filter(user=request.user, invitePending=True)
 
-    for invite in invitesSent:
+    async for invite in invitesSent:
         res.append({
             "id": invite.friend.id,
             "username": invite.friend.username
         })
     return res
 
-def getFriends(request: Request):
+async def getFriends(request: Request):
     res = []
 
-    friends = FriendList.objects.filter(user=request.user, invitePending=False)
-    for friend in friends:
+    friends = FriendList.objects.select_related("friend").filter(user=request.user, invitePending=False)
+    async for friend in friends:
         res.append({
             "id": friend.friend.id,
             "username": friend.friend.username
         })
-    friends = FriendList.objects.filter(friend=request.user, invitePending=False)
-    for friend in friends:
+    friends = FriendList.objects.select_related("user").filter(friend=request.user, invitePending=False)
+    async for friend in friends:
         res.append({
             "id": friend.user.id,
             "username": friend.user.username
         })
     return res
 
-def getContext(request: Request, err: str, success: str) -> dict:
+async def getContext(request: Request, err: str, success: str) -> dict:
     context = {}
-    context["friends"] = getFriends(request)
-    context["invitesReceived"] = getInvitesReceived(request)
-    context["invitesSent"] = getInvitesSent(request)
+    context["friends"] = await getFriends(request)
+    context["invitesReceived"] = await getInvitesReceived(request)
+    context["invitesSent"] = await getInvitesSent(request)
     context["ERROR_MESSAGE"] = err
     context["SUCCESS_MESSAGE"] = success
     context["showModal"] = "show"
     return context
 
-def response(request: Request) -> HttpResponse:
+async def response(request: Request) -> HttpResponse:
     status = 200
     err = ""
     success = ""
@@ -65,4 +65,5 @@ def response(request: Request) -> HttpResponse:
         err = request.query_params["error"]
     if "success" in request.query_params:
         success = request.query_params["success"]
-    return render(request, "friendlist/friendlist.html", status=status, context=getContext(request, err, success))
+    context = await getContext(request, err, success)
+    return render(request, "friendlist/friendlist.html", status=status, context=context)

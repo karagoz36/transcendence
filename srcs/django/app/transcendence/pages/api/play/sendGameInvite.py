@@ -13,5 +13,4 @@ async def response(req: Request):
     if username == user.username:
         return redirect("/play/?error=You cannot invite yourself", status=401)
     friend: User = await User.objects.aget(username=username)
-    print(friend, flush=True)
     return redirect(f"/play/?success=Game invitation sent to {username}")

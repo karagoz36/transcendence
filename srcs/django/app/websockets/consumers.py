@@ -4,6 +4,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from channels.layers import get_channel_layer, BaseChannelLayer
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.cache import cache
+from transcendence.pages.friends import getFriends
 
 def userIsLoggedIn(user: User) -> bool:
 	return cache.get(f"{user.id}_notifications") is not None
@@ -44,10 +45,15 @@ class BaseConsumer(AsyncWebsocketConsumer):
 	async def closeConnection(self, event):
 		await self.close()
 
-
 class Notification(BaseConsumer):
 	def __init__(self):
 		super().__init__("notifications")
+	
+	async def connect(self):
+		await super().connect()
+		user: User = self.scope["user"]
+		if user.username == "":
+			return
 
 class Messages(BaseConsumer):
 	def __init__(self):

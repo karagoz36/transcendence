@@ -36,12 +36,12 @@ def settings(request: Request):
 	return pages.settings.response(request)
 
 @api_view(['GET'])
-def friends(request: Request):
-	return pages.friends.response(request)
+async def friends(request: Request):
+	return await pages.friends.response(request)
 
 @api_view(['GET'])
-def play(request: Request):
-	return pages.play.response(request)
+async def play(request: Request):
+	return await pages.play.response(request)
 
 @api_view(['GET'])
 async def sendGameInvite(request: Request):

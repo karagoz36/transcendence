@@ -5,15 +5,15 @@ from django.shortcuts import render
 from transcendence.pages.friends import getFriends
 from websockets.consumers import sendMessageWS
 
-def getContext(request: Request):
+async def getContext(request: Request):
 	context = {}
 	context["error"] = ""
 	context["success"] = ""
-	context["friends"] = getFriends(request)
+	context["friends"] = await getFriends(request)
 	return context
 
-def response(request: Request):
-	context = getContext(request)
+async def response(request: Request):
+	context = await getContext(request)
 	status = 200
 
 	if "error" in request.query_params:
