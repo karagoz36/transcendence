@@ -1,10 +1,14 @@
 export default class BaseWebSocket {
     /** @type {string} */
     url
+    /** @type {WebSocket} */
+    socket
+
     /** @param {string} url */
 	constructor(url) {
+        this.url = url
         this.createSocket = this.createSocket.bind(this)
-		this.createSocket(url)
+		this.createSocket()
 	}
 
     /** @param {MessageEvent} e */
@@ -12,17 +16,17 @@ export default class BaseWebSocket {
         console.error("function not overloaded")
     }
 
-    /** @param {Event} e */
-    connect(e) {}
+    /** @param {CloseEvent} e */
+    onClose(e) {
+        if (e.code == 4000)
+            addEventListener("page-changed", this.createSocket)
+    }
     
-    /** @param {string} url */
-	createSocket(url) {
-        this.url = url
+	createSocket() {
 		removeEventListener("page-changed", this.createSocket)
-		this.socket = new WebSocket(`wss://${window.location.host}/websocket/${url}/`)
+		this.socket = new WebSocket(`wss://${window.location.host}/websocket/${this.url}/`)
 		this.socket.onmessage = this.receive
-        this.socket.onopen = this.connect
-        this.socket.onerror = () => {throw new Error("")}
-		this.socket.onclose = () => addEventListener("page-changed", () => this.createSocket(url))
+        this.socket.onerror = (ev) => console.error(ev)
+		this.socket.onclose = this.onClose
 	}
 }

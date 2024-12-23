@@ -25,7 +25,7 @@ class BaseConsumer(AsyncWebsocketConsumer):
 		await self.accept()
 		self.group_name = f"{user.id}_{self.consumerName}"
 		if user.username == "":
-			await self.close()
+			await self.close(code=4000)
 			return
 		cache.set(self.group_name, "")
 		await self.channel_layer.group_add(self.group_name, self.channel_name)

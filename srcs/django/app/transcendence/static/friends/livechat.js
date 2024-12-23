@@ -6,7 +6,7 @@ class MessagesHandler extends BaseWebSocket {
 	/** @param {string} url */
 	constructor(url) {
 		super(url)
-		addEventListener("page-changed", () => this.socket?.close())
+		addEventListener("page-changed", () => this.socket.close())
 	}
 
     /** @param {MessageEvent} e */
