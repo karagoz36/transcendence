@@ -59,8 +59,6 @@ class Notification(BaseConsumer):
 		for friend in friends:
 			receiver: User = await User.objects.aget(id=friend["id"])
 			message = json.dumps({"message": f"{user.username} just logged in."})
-			print(receiver, flush=True)
-			print(message, flush=True)
 			await sendMessageWS(receiver, "notifications", message)
 
 class Messages(BaseConsumer):

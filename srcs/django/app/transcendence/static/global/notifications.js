@@ -27,13 +27,13 @@ function addNotif(message) {
 	const toast = createToast(message)
 	const toastContainer = document.querySelector(".toast-container")
 	toastContainer?.append(toast)
+	setTimeout(() => toast.remove(), 10000)
 }
 
 class NotificationHandler extends BaseWebSocket {
 	/** @param {MessageEvent} e */
 	receive(e) {
 		const data = JSON.parse(e.data)
-		console.log(data)
 		if (data.message)
 			addNotif(data.message)
 		if (data.refresh == window.location.pathname)
