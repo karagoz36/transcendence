@@ -70,8 +70,8 @@ async function getHTML(url, options, addToHistory) {
 	res = await fetch(url, options)
 	if (res.status == 404 || res.status >= 500)
 		throw new Error(`SPA: failed to fetch ${url}`)
-	if (addToHistory && !url.includes("api"))
-		history.pushState({page: url}, "", res.url)
+	if (addToHistory && !res.url.includes("api"))
+		history.pushState({page: res.url}, "", res.url)
 	if (res.headers.get("content-type") == "application/json") {
 		console.error(await res.json())
 		throw new Error("got json instead of html")	

@@ -40,6 +40,7 @@ class NotificationHandler extends BaseWebSocket {
 
 		/** @type {string[]} */
 		const urls = data.refresh
+		if (!urls) return
 		urls.forEach(url => {
 			if (url == window.location.pathname)
 				getPage(url)

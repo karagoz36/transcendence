@@ -1,9 +1,9 @@
 from rest_framework.request import Request
 from django.shortcuts import redirect
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from websockets.consumers import sendMessageWS
 import json
+from django.contrib.auth.decorators import login_required
 
 @login_required(login_url="/api/logout")
 async def response(req: Request):

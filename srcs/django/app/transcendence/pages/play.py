@@ -1,17 +1,26 @@
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import User
 from rest_framework.request import Request
-from rest_framework.response import Response
 from django.shortcuts import render
 from transcendence.pages.friends import getFriends
-from websockets.consumers import sendMessageWS
+from django.contrib.auth.decorators import login_required
+
+async def getOnlineFriends(user: User):
+	loggedInFriends = []
+	friends = await getFriends(user)
+
+	for friend in friends:
+		if friend["status"] == "online":
+			loggedInFriends.append(friend)
+	return loggedInFriends
 
 async def getContext(user: User):
 	context = {}
 	context["error"] = ""
 	context["success"] = ""
-	context["friends"] = await getFriends(user)
+	context["friends"] = await getOnlineFriends(user)
 	return context
 
+@login_required(login_url="/api/logout")
 async def response(request: Request):
 	context = await getContext(request.user)
 	status = 200

@@ -3,12 +3,13 @@ from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from database.models import FriendList
+from django.contrib.auth.decorators import login_required
 
 def userToDict(user: User) -> dict:
     return {
        "id": user.id,
         "username": user.username,
-        "loggedIn": "online" if userIsLoggedIn(user) else "offline",
+        "status": "online" if userIsLoggedIn(user) else "offline",
         }
 
 async def getInvitesReceived(user: User):
@@ -49,6 +50,7 @@ async def getContext(user: User, err: str, success: str) -> dict:
     context["showModal"] = "show"
     return context
 
+@login_required(login_url="/api/logout")
 async def response(request: Request) -> HttpResponse:
     status = 200
     err = ""
