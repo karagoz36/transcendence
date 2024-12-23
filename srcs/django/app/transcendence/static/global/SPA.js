@@ -2,8 +2,6 @@
 
 import { refreshJWT } from "./JWT.js"
 
-const event = new Event("page-changed")
-
 /** @param {MouseEvent} e */
 /** @this HTMLAnchorElement */
 function preventAnchorReloading(e) {
@@ -106,6 +104,7 @@ export async function getPage(url, options = {}, addToHistory = true, toUpdate =
 
 	setAnchorEvent()
 	refreshScripts(newMainContainer, oldMainContainer)
+	const event = new CustomEvent("page-changed", {"detail": toUpdate})
 	dispatchEvent(event)
 }
 
@@ -115,4 +114,4 @@ window.addEventListener("popstate", (e) => {
 
 setAnchorEvent()
 
-window.onload = () => getPage(window.location.pathname)
+// window.onload = () => getPage(window.location.pathname)
