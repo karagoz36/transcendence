@@ -3,16 +3,15 @@
 import { refreshJWT } from "./JWT.js"
 
 /** @param {MouseEvent} e */
-/** @this HTMLAnchorElement */
 function preventAnchorReloading(e) {
-	e.preventDefault()
+	e.preventDefault() // @ts-ignore
 	getPage(e.target.href)
 }
 
-function setAnchorEvent() {
+export function setAnchorEvent() {
 	/** @type {NodeListOf<HTMLAnchorElement>} */
 	const links = document.querySelectorAll("a")
-	links.forEach(curr => curr.addEventListener("click", preventAnchorReloading))
+	links.forEach(curr => curr.onclick = preventAnchorReloading)
 }
 
 /** 

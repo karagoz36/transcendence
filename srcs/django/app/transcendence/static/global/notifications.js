@@ -1,5 +1,5 @@
 // @ts-check
-import {getPage} from "./SPA.js"
+import {getPage, setAnchorEvent} from "./SPA.js"
 import BaseWebSocket from "./websockets.js";
 
 /**
@@ -9,7 +9,7 @@ import BaseWebSocket from "./websockets.js";
 function createToast(text) {
 	const toast = document.createElement("div")
 	toast.id = "liveToast";
-	toast.className = "toast show"; // Add multiple classes
+	toast.className = "toast show";
 	toast.setAttribute("role", "alert");
 	toast.setAttribute("aria-live", "assertive");
 	toast.setAttribute("aria-atomic", "true");
@@ -27,6 +27,7 @@ function addNotif(message) {
 	const toast = createToast(message)
 	const toastContainer = document.querySelector(".toast-container")
 	toastContainer?.append(toast)
+	setAnchorEvent()
 	setTimeout(() => toast.remove(), 10000)
 }
 
