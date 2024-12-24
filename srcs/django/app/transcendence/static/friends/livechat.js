@@ -2,18 +2,13 @@
 import BaseWebSocket from "../global/websockets.js";
 
 class MessagesHandler extends BaseWebSocket {
-	/** @param {CustomEvent} e */
-	onPageChange(e) {
-		if (e.detail != ".main-container")
-			return
-		this.socket.onmessage = null
-		this.socket.close()
-	}
-
 	/** @param {string} url */
 	constructor(url) {
 		super(url)
-		addEventListener("page-changed", this.onPageChange.bind(this))
+		addEventListener("page-changed", () => {
+			this.socket.onmessage = null
+			this.socket.close()
+		})
 	}
 
     /** @param {MessageEvent} e */

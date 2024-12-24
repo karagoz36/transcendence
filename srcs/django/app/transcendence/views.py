@@ -40,10 +40,6 @@ async def friends(request: Request):
 	return await pages.friends.response(request)
 
 @api_view(['GET'])
-async def pong(request: Request):
-	return await pages.pong.response(request)
-
-@api_view(['GET'])
 async def lobby(request: Request):
 	return await pages.lobby.response(request)
 

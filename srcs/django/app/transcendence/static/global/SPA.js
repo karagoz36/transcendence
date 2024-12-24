@@ -1,9 +1,9 @@
 // @ts-check
 
 /** @param {MouseEvent} e */
-function preventAnchorReloading(e) {
+async function preventAnchorReloading(e) {
 	e.preventDefault() // @ts-ignore
-	getPage(e.target.href)
+	await getPage(e.target.href)
 }
 
 export function setAnchorEvent() {
@@ -13,13 +13,13 @@ export function setAnchorEvent() {
 }
 
 /** 
- * @param {Element} newMainContainer
- * @param {Element} oldMainContainer
+ * @param {Element} newContainer
+ * @param {Element} oldContainer
 */
-function refreshScripts(newMainContainer, oldMainContainer) {
+function refreshScripts(newContainer, oldContainer) {
 	/** @type {NodeListOf<HTMLScriptElement>} */
-	const oldScripts = oldMainContainer.querySelectorAll("script")
-	const newScripts = newMainContainer.querySelectorAll("script")
+	const oldScripts = oldContainer.querySelectorAll("script")
+	const newScripts = newContainer.querySelectorAll("script")
 
 	oldScripts.forEach(script => {
 		script.type = "application/json"
@@ -90,23 +90,23 @@ export async function getPage(url, options = {}, addToHistory = true, toUpdate =
 	const newPage = parser.parseFromString(res, "text/html")
 	document.title = newPage.title
 
-	const oldMainContainer = document.querySelector(toUpdate)
-	if (!oldMainContainer)
+	const oldContainer = document.querySelector(toUpdate)
+	if (!oldContainer)
 		throw new Error(`failed to find ${toUpdate} in current body`)
 
-	const newMainContainer = newPage.querySelector(toUpdate)
-	if (!newMainContainer)
+	const newContainer = newPage.querySelector(toUpdate)
+	if (!newContainer)
 		throw new Error(`failed to find ${toUpdate} in fetched body at ${url}`)
-	oldMainContainer.innerHTML = newMainContainer.innerHTML
+	oldContainer.innerHTML = newContainer.innerHTML
 
 	setAnchorEvent()
-	refreshScripts(newMainContainer, oldMainContainer)
+	refreshScripts(newContainer, oldContainer)
 	const event = new CustomEvent("page-changed", {"detail": toUpdate})
 	dispatchEvent(event)
 }
 
-window.addEventListener("popstate", (e) => {
-	getPage(window.location.href, {}, false)
+window.addEventListener("popstate", async (e) => {
+	await getPage(window.location.href, {}, false)
 })
 
 setAnchorEvent()

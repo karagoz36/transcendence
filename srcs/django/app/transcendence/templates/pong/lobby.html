@@ -1,6 +1,9 @@
 {% extends 'modules/base.html' %}
-{% block title %}Play{% endblock %}
+{% block title %}Pong Lobby{% endblock %}
 {% block content %}
   {% include 'modules/navbar.html' %}
-  <h1>Waiting for {{opponent.username}}...</h1>
+  <div id="pong-container">
+    <h1>Waiting for {{opponent.username}}...</h1>
+  </div>
+  <script type="module" src="/static/pong/PongSocket.js"></script>
 {% endblock %}

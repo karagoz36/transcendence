@@ -5,18 +5,23 @@
 	align-items: center;
 }
 
-.friend-button {
-	margin: 0.2rem;
+.friend-button-container>button {
+	width: 10rem;
 }
 </style>
-<div style="width: 30rem;" class="card">
+<div style="width: 15rem;" class="card">
 	<div class="card-header">
 		{{friend.username}}
 		{{friend.status}}
 	</div>
-	<div class="card-body friend-button-container">
-		<button data-bs-toggle="modal" data-bs-target="#exampleModal" 
+	<div class="d-flex flex-wrap md-nowrap gap-2 card-body friend-button-container">
+		<button data-bs-toggle="modal" data-bs-target="#exampleModal"
 		id="open-chat-modal" user-id={{friend.id}} class="btn friend-button btn-primary">Send message</button>
+		{% if friend.status == "online" %}
+        <a class="btn btn-primary" href="/pong/lobby/?opponent={{friend.username}}">Play pong</a>
+		{% else %}
+        <a class="btn btn-primary disabled" aria-disabled="true">Play pong</a>
+		{% endif %}
 		<button id="remove-friend" user-id={{friend.id}} class="btn friend-button btn-danger">Remove friend</button>
 	</div>
 </div>

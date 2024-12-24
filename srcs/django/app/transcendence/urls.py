@@ -25,7 +25,6 @@ urlpatterns = [
     path("auth/", views.auth, name="auth"),
     path("settings/", views.settings, name="settings"),
     path("friends/", views.friends, name="friends"),
-    path("pong/", views.pong, name="pong"),
     path("pong/lobby/", views.lobby, name="lobby"),
 
     path("api/login", views.login, name="login"),

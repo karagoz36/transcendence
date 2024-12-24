@@ -22,13 +22,18 @@ function createToast(text) {
 	return toast
 }
 
-/** @param {string} message */
-function addNotif(message) {	
+/** 
+ * @param {string} message
+ * @param {number} duration 
+*/
+function addNotif(message, duration) {	
 	const toast = createToast(message)
 	const toastContainer = document.querySelector(".toast-container")
 	toastContainer?.append(toast)
 	setAnchorEvent()
-	setTimeout(() => toast.remove(), 10000)
+	duration = typeof(duration) == "number" ? duration : 10000
+	if (duration > 0)
+		setTimeout(() => toast.remove(), duration)
 }
 
 class NotificationHandler extends BaseWebSocket {
@@ -36,23 +41,26 @@ class NotificationHandler extends BaseWebSocket {
 	constructor(url) {
 		super(url)
 		this.socket.onclose = e => {
+			removeEventListener("page-changed", this.createSocket)
 			if (e.code == 4000)
 				addEventListener("page-changed", this.createSocket)
 		}
 	}
 
 	/** @param {MessageEvent} e */
-	receive(e) {
+	async receive(e) {
 		const data = JSON.parse(e.data)
 		if (data.message)
-			addNotif(data.message)
+			addNotif(data.message, data.duration)
+		if (data.redirect)
+			await getPage(data.redirect)
 
 		/** @type {string[]} */
 		const urls = data.refresh
 		if (!urls) return
-		urls.forEach(url => {
+		urls.forEach(async (url) => {
 			if (url == window.location.pathname)
-				getPage(url)
+				await getPage(url)
 		})
 	}
 }
