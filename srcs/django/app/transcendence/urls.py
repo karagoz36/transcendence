@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from . import views
 from .pages.settings import response as settings_view
+from .pages.settings import handle_update_settings
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
@@ -34,8 +35,8 @@ urlpatterns = [
     path("api/friend/remove", views.removeFriend, name="rejectFriend"),
     path("api/token", views.getToken, name="createToken"),
     path("api/token/refresh", views.refreshToken, name="refreshToken"),
-    path("settings/", settings_view, name="settings"),
-    path("settings/update/", settings_view, name="update_settings"),
+    # path("api/settings/", settings_view, name="settings"),
+    path("settings/update/", views.update_settings, name="update_settings"),
     path("api/user/is_2fa_enabled/", views.is_2fa_enabled, name="is_2fa_enabled"),
     path("api/verify_otp/", views.verify_otp, name="verify_otp"),
     path("api/csrf-token/", views.get_csrf_token, name="get_csrf_token"),

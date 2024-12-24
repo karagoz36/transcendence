@@ -36,7 +36,6 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"
 TEST_RUNNER = "redgreenunittest.django.runner.RedGreenDiscoverRunner"
 
 # Application definition
-
 INSTALLED_APPS = [
 	'daphne',
     'django.contrib.admin',
@@ -51,7 +50,7 @@ INSTALLED_APPS = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ['transcendence.middleware.CustomAuthentication']
+    'DEFAULT_AUTHENTICATION_CLASSES': ['transcendence.middleware.CustomAuthentication'],
 }
 
 

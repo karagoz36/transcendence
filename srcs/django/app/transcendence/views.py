@@ -39,7 +39,11 @@ def index(request: Request):
 
 @api_view(['GET'])
 def settings(request: Request):
-	return pages.settings.response(request)
+    return pages.settings.response(request)
+
+@api_view(['POST'])
+def update_settings(request: Request):
+    return pages.settings.handle_update_settings(request)
 
 @api_view(['GET'])
 def friends(request: Request):
@@ -84,7 +88,7 @@ def verify_otp(request):
         user = User.objects.get(username=username)
         user_profile = UserProfile.objects.get(user=user)
         totp = pyotp.TOTP(user_profile.otp_secret)
-        if totp.verify(otp):
+        if totp.verify(otp, valid_window=2):
             return Response({"message": "OTP verified successfully"}, status=200)
         else:
             return Response({"error": "Invalid OTP"}, status=400)

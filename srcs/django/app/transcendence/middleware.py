@@ -23,9 +23,9 @@ class RequiredLoginMiddleware:
 	def __call__(self, request: Request):
 		user, _ = CustomAuthentication().authenticate(request=request)
 		path: str = request.path
-
 		if path.startswith("/api"):
 			return self.get_response(request)
 		if not path.startswith("/auth") and type(user) is AnonymousUser:
+			print("user: {user}")
 			return redirect("/auth")
 		return self.get_response(request)
