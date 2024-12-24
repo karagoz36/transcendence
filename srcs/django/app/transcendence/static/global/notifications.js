@@ -40,11 +40,15 @@ class NotificationHandler extends BaseWebSocket {
 	/** @param {string} url */
 	constructor(url) {
 		super(url)
+		console.log("test")
 		this.socket.onclose = e => {
-			removeEventListener("page-changed", this.createSocket)
 			if (e.code == 4000)
 				addEventListener("page-changed", this.createSocket)
 		}
+	}
+	
+	open(e) {
+		removeEventListener("page-changed", this.createSocket)
 	}
 
 	/** @param {MessageEvent} e */

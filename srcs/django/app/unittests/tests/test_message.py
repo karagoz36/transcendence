@@ -19,7 +19,7 @@ def testGetFriendship(user: User, friend: User) -> FriendList|None:
 		pass
 	return None
 
-class FriendTest(APITestCase):
+class MessageTest(APITestCase):
     def login(self, username: str, password: str) -> APIClient:
         client = APIClient()
         response = client.post("/api/token", data={"username": username, "password": password})
