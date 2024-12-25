@@ -36,9 +36,12 @@ def settings(request: Request):
 	return pages.settings.response(request)
 
 @api_view(['GET'])
-def friends(request: Request):
-	return pages.friends.response(request)
-from websockets.consumers import userIsLoggedIn
+async def friends(request: Request):
+	return await pages.friends.response(request)
+
+@api_view(['GET'])
+async def lobby(request: Request):
+	return await pages.lobby.response(request)
 
 @api_view(['POST'])
 async def addFriend(request: Request):
@@ -51,6 +54,10 @@ async def acceptFriend(request: Request):
 @api_view(['POST'])
 async def removeFriend(request: Request):
 	return await pages.removeFriend.response(request)
+
+@api_view(['POST'])
+async def sendMessage(request: Request):
+	return await pages.sendMessage.response(request)
 
 @authentication_classes([])
 @permission_classes([AllowAny])

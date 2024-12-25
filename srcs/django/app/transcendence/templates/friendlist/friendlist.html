@@ -22,7 +22,9 @@
 	</div>
 </div>
   {%endfor%}
-  {% include 'friendlist/message-modal.html' %}
-  <script src="/static/friends/message.js"></script>
+  {% include 'friendlist/message-modal.html' with show=showModal %}
+  <script type="module" src="/static/friends/message.js"></script>
   <script type="module" src="/static/friends/add-friend.js"></script>
+  <script type="module" src="/static/friends/remove-friend.js"></script>
+  <script type="module" src="/static/friends/livechat.js"></script>
 {% endblock %}

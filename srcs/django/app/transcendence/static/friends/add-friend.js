@@ -6,8 +6,10 @@ async function addFriend(e) {
 	e.preventDefault()
 	if (!e.target)
 		throw new Error("addFriend: e.target null")
+
 	/** @type {string} */
 	const username = e.target['username'].value
+
 	await getPage("/api/friend/add", {
 		method: "POST",
 		headers: {

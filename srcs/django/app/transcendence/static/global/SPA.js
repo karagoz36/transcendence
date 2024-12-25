@@ -1,30 +1,25 @@
 // @ts-check
 
-import { getJWT } from "./JWT.js"
-
-const event = new Event("page-changed")
-
 /** @param {MouseEvent} e */
-/** @this HTMLAnchorElement */
-function preventAnchorReloading(e) {
-	e.preventDefault()
-	getPage(e.target.href)
+async function preventAnchorReloading(e) {
+	e.preventDefault() // @ts-ignore
+	await getPage(e.target.href)
 }
 
-function setAnchorEvent() {
+export function setAnchorEvent() {
 	/** @type {NodeListOf<HTMLAnchorElement>} */
 	const links = document.querySelectorAll("a")
-	links.forEach(curr => curr.addEventListener("click", preventAnchorReloading))
+	links.forEach(curr => curr.onclick = preventAnchorReloading)
 }
 
 /** 
- * @param {Element} newMainContainer
- * @param {Element} oldMainContainer
+ * @param {Element} newContainer
+ * @param {Element} oldContainer
 */
-function refreshScripts(newMainContainer, oldMainContainer) {
+function refreshScripts(newContainer, oldContainer) {
 	/** @type {NodeListOf<HTMLScriptElement>} */
-	const oldScripts = oldMainContainer.querySelectorAll("script")
-	const newScripts = newMainContainer.querySelectorAll("script")
+	const oldScripts = oldContainer.querySelectorAll("script")
+	const newScripts = newContainer.querySelectorAll("script")
 
 	oldScripts.forEach(script => {
 		script.type = "application/json"
@@ -68,13 +63,13 @@ function convertOptionsToRequestInit(options) {
  * @returns 
  */
 async function getHTML(url, options, addToHistory) {
-	/** @type {Response|String} */
+	/** @type {Response} */
 	let res
 	res = await fetch(url, options)
 	if (res.status == 404 || res.status >= 500)
 		throw new Error(`SPA: failed to fetch ${url}`)
-	if (addToHistory)
-		history.pushState({page: url}, "", res.url)
+	if (addToHistory && !res.url.includes("api"))
+		history.pushState({page: res.url}, "", res.url)
 	if (res.headers.get("content-type") == "application/json") {
 		console.error(await res.json())
 		throw new Error("got json instead of html")	
@@ -85,32 +80,35 @@ async function getHTML(url, options, addToHistory) {
 /** 
  * @param {string} url
  * @param {PageOptions} options
- * @param {boolean} addToHistory */
-export async function getPage(url, options = {}, addToHistory = true) {
+ * @param {boolean} addToHistory 
+ * @param {string} toUpdate
+ **/
+export async function getPage(url, options = {}, addToHistory = true, toUpdate = ".main-container") {
 	const requestInit = convertOptionsToRequestInit(options)
 	const res = await getHTML(url, requestInit, addToHistory)
 	const parser = new DOMParser()
 	const newPage = parser.parseFromString(res, "text/html")
 	document.title = newPage.title
-	
-	const oldMainContainer = document.querySelector(".main-container")
-	if (!oldMainContainer)
-		throw new Error("failed to find main-container in current body")
-	
-	const newMainContainer = newPage.querySelector(".main-container")
-	if (!newMainContainer)
-		throw new Error(`failed to find main-container in fetched body at ${url}`)
-	oldMainContainer.innerHTML = newMainContainer.innerHTML
+
+	const oldContainer = document.querySelector(toUpdate)
+	if (!oldContainer)
+		throw new Error(`failed to find ${toUpdate} in current body`)
+
+	const newContainer = newPage.querySelector(toUpdate)
+	if (!newContainer)
+		throw new Error(`failed to find ${toUpdate} in fetched body at ${url}`)
+	oldContainer.innerHTML = newContainer.innerHTML
 
 	setAnchorEvent()
-	refreshScripts(newMainContainer, oldMainContainer)
+	refreshScripts(newContainer, oldContainer)
+	const event = new CustomEvent("page-changed", {"detail": toUpdate})
 	dispatchEvent(event)
 }
 
-window.addEventListener("popstate", (e) => {
-	getPage(window.location.href, {}, false)
+window.addEventListener("popstate", async (e) => {
+	await getPage(window.location.href, {}, false)
 })
 
 setAnchorEvent()
 
-window.onload = () => getPage(window.location.pathname)
+// window.onload = () => getPage(window.location.pathname)

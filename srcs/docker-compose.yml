@@ -12,6 +12,7 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]
       interval: 0.5s
+      retries: 10
 
   django:
     restart: always
@@ -23,6 +24,8 @@ services:
       - app-network
     env_file:
       .env
+    environment:
+      - NGROK_URL=${NGROK_URL}
     depends_on:
       postgres:
         condition: service_healthy
