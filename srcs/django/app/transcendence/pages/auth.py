@@ -10,18 +10,16 @@ async def closeWebSockets(id: int):
 		"type": "closeConnection"
 	})
 
-async def logoutUser(request: Request) -> Response:
-	response = render(request, "auth.html")
+async def logoutUser(request: Request, success: str, err: str, status: int) -> Response:
+	response = render(request, "auth.html", {"ERROR_MESSAGE": err, "SUCCESS_MESSAGE": success}, status=status)
 	response.delete_cookie("access_token")
 	response.delete_cookie("sessionid")
-	await closeWebSockets(request.user.id)
+	if "already logged in" not in err:
+		await closeWebSockets(request.user.id)
 	return response
 
 async def response(request: Request):
-	if "logout" in request.query_params:
-		return await logoutUser(request)
-	user: User = request.user
-	if not type(user) is AnonymousUser:
+	if "logout" not in request.query_params.keys() and request.user.username != "":
 		return redirect("/")
 	error = ""
 	success = ""
@@ -32,4 +30,6 @@ async def response(request: Request):
 		error = request.query_params["error"]
 	if "success" in request.query_params.keys():
 		success = request.query_params["success"]
+	if "logout" in request.query_params.keys():
+		return await logoutUser(request, success, error, status)
 	return render(request, "auth.html", {"ERROR_MESSAGE": error, "SUCCESS_MESSAGE": success}, status=status)

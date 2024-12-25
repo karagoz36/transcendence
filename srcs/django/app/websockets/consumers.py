@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 import json
 from utils.friends import getFriends
-from utils.users import onlineUsers
+from utils.users import onlineUsers, userIsLoggedIn
 from database.models import getFriendship
 
 async def sendMessageWS(receiver: User, groupName: str, message: str) -> None:
@@ -41,7 +41,7 @@ class BaseConsumer(AsyncWebsocketConsumer):
 		await self.send(message)
 	
 	async def closeConnection(self, event):
-		await self.close()
+		await self.close(code=4000)
 
 class Notification(BaseConsumer):
 	def __init__(self):
