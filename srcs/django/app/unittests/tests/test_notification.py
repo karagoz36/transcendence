@@ -1,9 +1,9 @@
 import json
 from channels.testing import WebsocketCommunicator
-from rest_framework.test import APITestCase, APIClient
-from transcendence.asgi import application
+from rest_framework.test import APIClient, APITestCase
+from websockets.consumers import Notification
 from django.contrib.auth.models import User
-    
+
 class NotificationTest(APITestCase):
     def login(self, username: str, password: str) -> APIClient:
         client = APIClient()
@@ -16,26 +16,45 @@ class NotificationTest(APITestCase):
         return client
 
     def addFriend(self):
-        response = self.client.post("/api/friend/add", follow=True, data={"username": self.testUser.username})
+        response = self.user["api"].post("/api/friend/add", follow=True, data={"username": self.test["user"]})
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(self.testUser.username in str(response.content))
+        self.assertTrue(self.test["user"].username in str(response.content))
 
-        response = self.testClient.post("/api/friend/accept", follow=True, data={"friendID": self.user.id})
+        response = self.test["api"].post("/api/friend/accept", follow=True, data={"friendID": self.user["user"].id})
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(self.user.username in str(response.content))
+        self.assertTrue(self.user["user"].username in str(response.content))
 
     def setUp(self):
-        self.user: User = User.objects.create_user(username="ketrevis", password="ketrevis")
-        self.testUser: User = User.objects.create_user(username="test", password="test")
+        self.user = {}
+        User.objects.create_user(username="user", password="user")
+        self.user["user"] = User.objects.get(username="user")
+        self.user["api"] = self.login("user", "user")
 
-        self.client = self.login(self.user.username, self.user.username)
-        self.testClient = self.login(self.testUser.username, self.testUser.username)
-    
-        self.clientSocket = WebsocketCommunicator(application, "/websocket/notifications/")
-        self.clientSocket.scope["user"] = self.user
-        connected, _ = self.clientSocket.connect()
-        print(connected, flush=True)
+        self.test = {}    
+        User.objects.create_user(username="test", password="test")
+        self.test["user"] = User.objects.get(username="test")
+        self.test["api"] = self.login("test", "test")
         self.addFriend()
-    
-    def testOui(self):
-        print("test")
+
+    async def connectWebSocket(self, user: User) -> WebsocketCommunicator:
+        websocket = WebsocketCommunicator(Notification.as_asgi(), "websocket/notifications/")
+        websocket.scope["user"] = user
+        connected, _ = await websocket.connect()
+        self.assertTrue(connected)
+        return websocket
+
+    async def testWithoutUser(self):
+        websocket = WebsocketCommunicator(Notification.as_asgi(), "websocket/notifications/")
+        connected, _ = await websocket.connect()
+        self.assertFalse(connected)
+
+    async def testWithUser(self):
+        websocket = await self.connectWebSocket(self.user["user"])
+
+    async def testBasicNotif(self):
+        websockets = {
+            "user": await self.connectWebSocket(self.user["user"]),
+            "test": await self.connectWebSocket(self.test["user"])
+        }
+        message = await websockets["user"].receive_json_from()
+        self.assertEqual(message["message"], "test just logged in.")
