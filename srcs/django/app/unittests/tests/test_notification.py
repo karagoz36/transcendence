@@ -3,7 +3,7 @@ from channels.testing import WebsocketCommunicator
 from rest_framework.test import APITestCase, APIClient
 from transcendence.asgi import application
 from django.contrib.auth.models import User
-
+    
 class NotificationTest(APITestCase):
     def login(self, username: str, password: str) -> APIClient:
         client = APIClient()
@@ -24,7 +24,7 @@ class NotificationTest(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(self.user.username in str(response.content))
 
-    async def setUp(self):
+    def setUp(self):
         self.user: User = User.objects.create_user(username="ketrevis", password="ketrevis")
         self.testUser: User = User.objects.create_user(username="test", password="test")
 
@@ -33,6 +33,9 @@ class NotificationTest(APITestCase):
     
         self.clientSocket = WebsocketCommunicator(application, "/websocket/notifications/")
         self.clientSocket.scope["user"] = self.user
-        connected, _ = await self.clientSocket.connect()
-        print(connected)
+        connected, _ = self.clientSocket.connect()
+        print(connected, flush=True)
         self.addFriend()
+    
+    def testOui(self):
+        print("test")

@@ -5,7 +5,7 @@ from websockets.consumers import sendMessageWS
 import json
 from django.contrib.auth.decorators import login_required
 from database.models import getFriendship
-from websockets.consumers import userIsLoggedIn
+from utils.users import userIsLoggedIn
 
 @login_required(login_url="/api/logout")
 async def response(req: Request):

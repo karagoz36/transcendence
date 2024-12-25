@@ -3,13 +3,9 @@ from channels.layers import get_channel_layer, BaseChannelLayer
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 import json
-from transcendence.pages.friends import getFriends
+from utils.friends import getFriends
+from utils.users import onlineUsers
 from database.models import getFriendship
-
-onlineUsers = {}
-
-def userIsLoggedIn(user: User) -> bool:
-	return onlineUsers.get(user.id) is not None
 
 async def sendMessageWS(receiver: User, groupName: str, message: str) -> None:
 	layer: BaseChannelLayer = get_channel_layer()
