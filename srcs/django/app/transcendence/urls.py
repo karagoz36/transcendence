@@ -35,7 +35,6 @@ urlpatterns = [
     path("api/friend/remove", views.removeFriend, name="rejectFriend"),
     path("api/token", views.getToken, name="createToken"),
     path("api/token/refresh", views.refreshToken, name="refreshToken"),
-    # path("api/settings/", settings_view, name="settings"),
     path("settings/update/", views.update_settings, name="update_settings"),
     path("api/user/is_2fa_enabled/", views.is_2fa_enabled, name="is_2fa_enabled"),
     path("api/verify_otp/", views.verify_otp, name="verify_otp"),

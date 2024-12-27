@@ -10,24 +10,6 @@ from django.core.mail import send_mail
 from transcendence.pages.auth import sendingEmail
 import pyotp
 
-# @authentication_classes([])
-# @permission_classes([AllowAny])
-# def response(request: Request) -> HttpResponse:
-# 	if "username" not in request.data or "password" not in request.data:
-# 		return redirect(f"/auth?error=Missing password or username")
-
-# 	user = authenticate(username=request.data['username'], password=request.data['password'])
-# 	if user is None:
-# 		return redirect(f"/auth?error=Invalid credentials")
-
-# 	user = User.objects.get(username=username)
-# 	user_profile = UserProfile.objects.get(user=user)
-# 	if (user_profile.is_2fa_enabled) {
-		
-# 	}
-# 	login(request, user)
-# 	return redirect("/")
-
 @authentication_classes([])
 @permission_classes([AllowAny])
 def response(request: Request) -> JsonResponse:
@@ -49,5 +31,5 @@ def response(request: Request) -> JsonResponse:
     except UserProfile.DoesNotExist:
         pass
 
-    # login(request, user)
     return JsonResponse({"is_2fa_enabled": False}, status=200)
+

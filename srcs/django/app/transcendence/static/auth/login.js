@@ -13,7 +13,6 @@ async function handleLogin(e) {
 	const password = e.target['password'].value
 	/** @type {String} */
 	const csrftoken = e.target['csrfmiddlewaretoken'].value
-    // await setJWT(csrftoken, username, password);
 	try {
         console.time("Login API Response");
         const res = await fetch("/api/login", {
@@ -75,12 +74,32 @@ async function handleLogin(e) {
 
 }
 
+/** @param {SubmitEvent} e */
+async function handleLogin42(e) {
+    e.preventDefault(); 
+    if (!e.target)
+		throw new Error("handleLogin: e.target null")
+	/** @type {String} */
+	const csrftoken = e.target['csrfmiddlewaretoken'].value
+
+    // Configuration pour l'API de 42
+    const apiUrl = "https://api.intra.42.fr/oauth/token";
+    const clientId = "VOTRE_CLIENT_ID";
+    const clientSecret = "VOTRE_CLIENT_SECRET";
+    const redirectUri = "VOTRE_REDIRECT_URI"; 
+}
+
 function main() {
 	/** @type {HTMLFormElement|null} */
 	const form = document.querySelector("#login")
 	if (form == null)
 		throw new Error("querySelector: could not find login form")
 	form.onsubmit = handleLogin
+	/** @type {HTMLFormElement|null} */
+    const form42 = document.querySelector('#login42')
+    if (form42 == null)
+        throw new Error("querySelector: could not find login42 form")
+    form42.onsubmit = handleLogin42
 }
 
 main()
