@@ -13,7 +13,7 @@ async function handleLogin(e) {
 	const password = e.target['password'].value
 	/** @type {String} */
 	const csrftoken = e.target['csrfmiddlewaretoken'].value
-    await setJWT(csrftoken, username, password);
+    // await setJWT(csrftoken, username, password);
 	try {
         console.time("Login API Response");
         const res = await fetch("/api/login", {
@@ -43,7 +43,7 @@ async function handleLogin(e) {
                 });
 				if (otpResponse.ok) {
                     console.log("2FA verified successfully.");
-					// await setJWT(csrftoken, username, password);
+					await setJWT(csrftoken, username, password);
                     await getPage("/");
                 } else {
 					const errorData = await otpResponse.json();
@@ -51,17 +51,17 @@ async function handleLogin(e) {
                 }
             } else {
                 console.log("Login successful without 2FA.");
-                // const csrfRes = await fetch("/api/csrf-token/", {
-                //     method: "GET",
-                //     credentials: "same-origin",
-                // });
-                // if (!csrfRes.ok) {
-                //     alert("Failed to refresh CSRF token.");
-                //     return;
-                // }
-                // const csrfData = await csrfRes.json();
-                // const newCsrfToken = csrfData.csrfToken;
-                // await setJWT(newCsrfToken, username, password);
+                const csrfRes = await fetch("/api/csrf-token/", {
+                    method: "GET",
+                    credentials: "same-origin",
+                });
+                if (!csrfRes.ok) {
+                    alert("Failed to refresh CSRF token.");
+                    return;
+                }
+                const csrfData = await csrfRes.json();
+                const newCsrfToken = csrfData.csrfToken;
+                await setJWT(newCsrfToken, username, password);
                 await getPage("/");
             }
         } else {
