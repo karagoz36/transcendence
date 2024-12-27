@@ -39,4 +39,5 @@ urlpatterns = [
     path("api/user/is_2fa_enabled/", views.is_2fa_enabled, name="is_2fa_enabled"),
     path("api/verify_otp/", views.verify_otp, name="verify_otp"),
     path("api/csrf-token/", views.get_csrf_token, name="get_csrf_token"),
+    path('auth/login42/', views.auth_with_42, name='login42'),
 ]

@@ -7,6 +7,7 @@ from channels.layers import get_channel_layer, BaseChannelLayer
 from django.contrib.auth import logout
 from celery import shared_task
 from celery.utils.log import get_task_logger
+from django.conf import settings
 
 logger = get_task_logger(__name__)
 
@@ -37,17 +38,22 @@ async def response(request: Request):
 		error = request.query_params["error"]
 	return render(request, "auth.html", {"ERROR_MESSAGE": error}, status=status)
 
-# def sendingEmail(otp, user):
-#     sent = send_mail(
-#         "Transcendence - Verification code",
-#         f"Your verification code is {otp}",
-#         "from@example.com",
-#         [user.email],
-#         fail_silently=False,
-#     )
-#     if sent == 0:
-#         return False
-#     return True
+async def response42(request: Request):
+	client_id = settings.OAUTH2_PROVIDER.get('CLIENT_ID')
+	client_secret = settings.OAUTH2_PROVIDER.get('CLIENT_SECRET')
+	redirect_uri = settings.OAUTH2_PROVIDER.get('REDIRECT_URI')
+	scope = "public"
+	state = "random_state_string"
+
+	authorize_url = (
+		f"https://api.intra.42.fr/oauth/authorize"
+		f"?client_id={client_id}"
+		f"&redirect_uri={redirect_uri}"
+		f"&response_type=code"
+		f"&scope={scope}"
+		f"&state={state}"
+	)
+	return redirect(authorize_url)
 
 @shared_task
 def sendingEmail(otp, email):

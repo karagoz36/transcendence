@@ -18,6 +18,10 @@ async def auth(request: Request):
 	return await pages.auth.response(request)
 
 @api_view(['GET'])
+async def auth_with_42(request: Request):
+    return await pages.auth.response42(request)
+
+@api_view(['GET'])
 def logout(request: Request):
 	return pages.logout.response(request)
 

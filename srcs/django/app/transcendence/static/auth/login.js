@@ -77,16 +77,18 @@ async function handleLogin(e) {
 /** @param {SubmitEvent} e */
 async function handleLogin42(e) {
     e.preventDefault(); 
-    if (!e.target)
-		throw new Error("handleLogin: e.target null")
-	/** @type {String} */
-	const csrftoken = e.target['csrfmiddlewaretoken'].value
+    
+    // Vérification que l'événement a bien une cible
+    if (!e.target) {
+        throw new Error("handleLogin: e.target null");
+    }
 
-    // Configuration pour l'API de 42
-    const apiUrl = "https://api.intra.42.fr/oauth/token";
-    const clientId = "VOTRE_CLIENT_ID";
-    const clientSecret = "VOTRE_CLIENT_SECRET";
-    const redirectUri = "VOTRE_REDIRECT_URI"; 
+    // Redirige l'utilisateur vers le backend pour l'autorisation
+    try {
+        window.location.href = "/auth/login42/";
+    } catch (error) {
+        console.error("Error redirecting to 42 login:", error);
+    }
 }
 
 function main() {
