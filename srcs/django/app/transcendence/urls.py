@@ -40,4 +40,5 @@ urlpatterns = [
     path("api/verify_otp/", views.verify_otp, name="verify_otp"),
     path("api/csrf-token/", views.get_csrf_token, name="get_csrf_token"),
     path('auth/login42/', views.auth_with_42, name='login42'),
+    path('auth/callback42/', views.callback_from_42, name='callback42'),
 ]

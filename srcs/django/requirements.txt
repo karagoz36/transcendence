@@ -10,3 +10,4 @@ redgreenunittest
 pyotp
 python-decouple
 celery
+requests

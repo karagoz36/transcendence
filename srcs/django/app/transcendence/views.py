@@ -11,6 +11,7 @@ from . import pages
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from database.models import UserProfile
+from django.shortcuts import render
 import pyotp
 
 @api_view(['GET'])
@@ -20,6 +21,10 @@ async def auth(request: Request):
 @api_view(['GET'])
 async def auth_with_42(request: Request):
     return await pages.auth.response42(request)
+
+@api_view(['GET'])
+def callback_from_42(request: Request):
+    return pages.auth.callback_from_42(request)
 
 @api_view(['GET'])
 def logout(request: Request):
