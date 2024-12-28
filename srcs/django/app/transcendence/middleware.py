@@ -26,6 +26,5 @@ class RequiredLoginMiddleware:
 		if path.startswith("/api"):
 			return self.get_response(request)
 		if not path.startswith("/auth") and type(user) is AnonymousUser:
-			print(f"user: {user}")
 			return redirect("/auth")
 		return self.get_response(request)

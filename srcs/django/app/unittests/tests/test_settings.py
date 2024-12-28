@@ -8,16 +8,13 @@ class SettingsTest(APITestCase):
     def login(self, username: str, password: str) -> APIClient:
         """Connecte un utilisateur et retourne un client API authentifié."""
         client = APIClient()
-        # Obtenir le token JWT
         response = client.post("/api/token", data={"username": username, "password": password})
         self.assertEqual(response.status_code, 200) 
         cookies = json.loads(response.content)
 
-        # Effectuer la connexion
         response = client.post("/api/login", data={"username": username, "password": password}, follow=True)
         self.assertEqual(response.status_code, 200)
 
-        # Ajouter le token d'accès aux cookies du client
         client.cookies['access_token'] = cookies['access']
         return client
 
@@ -34,7 +31,7 @@ class SettingsTest(APITestCase):
         """Test si une méthode non-POST retourne une erreur 405."""
         response = self.client.get('/api/settings/update/')
         self.assertEqual(response.status_code, 405)
-        self.assertJSONEqual(response.content, {"error": "Invalid HTTP method"})
+        self.assertJSONEqual(response.content, {'detail': 'Method "GET" not allowed.'})
 
     def test_update_settings_missing_email(self):
         """Test si l'email manquant retourne une erreur 400."""
@@ -44,7 +41,7 @@ class SettingsTest(APITestCase):
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 400)
-        self.assertJSONEqual(response.content, {"detail": "Method "GET" not allowed."})
+        self.assertJSONEqual(response.content, {'error': 'Email is required'})
 
     def test_update_settings_invalid_email_format(self):
         """Test si un email avec un format incorrect retourne une erreur 400."""
@@ -67,21 +64,19 @@ class SettingsTest(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(response.content, {"message": "Settings updated successfully"})
 
-        # Vérifier si les données de l'utilisateur ont bien été mises à jour
         self.user.refresh_from_db()
         self.assertEqual(self.user.email, new_email)
 
-        # Vérifier si le profil utilisateur a été mis à jour
         profile = UserProfile.objects.get(user=self.user)
         self.assertTrue(profile.is_2fa_enabled)
 
     def test_update_settings_unauthenticated(self):
         """Test si un utilisateur non authentifié retourne une erreur 401."""
-        unauth_client = APIClient()  # Client sans authentification
+        unauth_client = APIClient()
         response = unauth_client.post(
             '/api/settings/update/',
             data=json.dumps({'email': 'unauth@example.com', 'is_2fa_enabled': True}),
             content_type='application/json',
         )
         self.assertEqual(response.status_code, 401)
-        self.assertJSONEqual(response.content, {"detail": "Authentication credentials were not provided."})
+        self.assertJSONEqual(response.content, {'error': 'Authentication required'})
