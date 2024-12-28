@@ -8,8 +8,11 @@ async function handleLogin(e) {
     if (!e.target) throw new Error("handleLogin: e.target is null");
 
     const form = e.target;
+    /** @type {String} */
     const username = form['username'].value;
+    /** @type {String} */
     const password = form['password'].value;
+    /** @type {String} */
     const csrftoken = form['csrfmiddlewaretoken'].value;
     try {
         const res = await fetch("/api/login", {
@@ -24,7 +27,7 @@ async function handleLogin(e) {
         if (res.ok) {
             const data = await res.json();
             if (data.is_2fa_enabled) {
-                showOtpPopup(username, csrftoken);
+                showOtpPopup(username, password, csrftoken);
             } else {
                 await completeLogin(username, password, csrftoken);
             }
@@ -53,7 +56,7 @@ async function completeLogin(username, password, csrftoken) {
     await getPage("/");
 }
 
-function showOtpPopup(username, csrftoken) {
+function showOtpPopup(username, password, csrftoken) {
     const otpPopup = document.getElementById("otpPopup");
     if (!otpPopup) throw new Error("OTP popup not found");
 
@@ -91,7 +94,7 @@ function showOtpPopup(username, csrftoken) {
 
             if (otpResponse.ok) {
                 otpPopup.classList.remove("show");
-                await completeLogin(username, null, csrftoken);
+                await completeLogin(username, password, csrftoken);
             } else {
                 const errorData = await otpResponse.json();
                 alert(errorData.error || "Invalid 2FA code. Please try again.");

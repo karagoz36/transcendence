@@ -59,7 +59,6 @@ async def response42(request: Request):
 	return redirect(authorize_url)
 
 def get_tokens_for_user(user):
-    """Génère un JWT pour l'utilisateur donné."""
     refresh = RefreshToken.for_user(user)
     return {
         'refresh': str(refresh),
@@ -73,7 +72,6 @@ def callback_from_42(request):
     if state != "random_state_string":
         return JsonResponse({'error': 'Invalid state'}, status=400)
 
-    # Échanger le code contre un access_token
     token_url = "https://api.intra.42.fr/oauth/token"
     token_data = {
         'grant_type': 'authorization_code',
@@ -92,7 +90,6 @@ def callback_from_42(request):
     if not access_token:
         return JsonResponse({'error': 'Access token is missing'}, status=400)
 
-    # Utiliser l'access_token pour récupérer les infos utilisateur
     user_info_url = "https://api.intra.42.fr/v2/me"
     headers = {'Authorization': f'Bearer {access_token}'}
     user_info_response = requests.get(user_info_url, headers=headers)
@@ -109,56 +106,12 @@ def callback_from_42(request):
         user.email = user_info.get('email', '')
         user.save()
 
-    # Connecter l'utilisateur
     login(request, user)
     tokens = get_tokens_for_user(user)
     response = redirect('/')
     response.set_cookie('access_token', tokens['access'], httponly=True, samesite='Lax', max_age=86400)
     response.set_cookie('refresh_token', tokens['refresh'], httponly=True, samesite='Lax', max_age=86400)
     return response
-
-# def callback_from_42(request: Request):
-#     code = request.GET.get('code')
-#     state = request.GET.get('state')
-
-#     if state != "random_state_string":
-#         return JsonResponse({'error': 'Invalid state'}, status=400)
-
-#     # Échanger le code contre un access_token
-#     token_url = "https://api.intra.42.fr/oauth/token"
-#     client_id = settings.OAUTH2_PROVIDER.get('CLIENT_ID')
-#     client_secret = settings.OAUTH2_PROVIDER.get('CLIENT_SECRET')
-#     redirect_uri = settings.OAUTH2_PROVIDER.get('REDIRECT_URI')
-
-#     # Paramètres de l'échange
-#     token_data = {
-#         'grant_type': 'authorization_code',
-#         'client_id': client_id,
-#         'client_secret': client_secret,
-#         'redirect_uri': redirect_uri,
-#         'code': code,
-#     }
-
-#     # Faire la requête pour obtenir le token
-#     response = requests.post(token_url, data=token_data)
-#     response_data = response.json()
-#     access_token = response_data.get('access_token')
-#     if not access_token:
-#         return JsonResponse({'error': 'Failed to obtain access token'}, status=400)
-
-#     # access_token pour récup les infos user
-#     user_info_url = "https://api.intra.42.fr/v2/me"
-#     headers = {
-#         'Authorization': f'Bearer {access_token}',
-#     }
-#     user_info_response = requests.get(user_info_url, headers=headers)
-#     user_info = user_info_response.json()
-#     user, created = User.objects.get_or_create(username=user_info['login'])
-#     # Pour plus tard: utiliser l'api pour récup nom, prénom, email.
-#     # user.first_name = user_info.get('first_name', '')
-    
-#     login(request, user)
-#     return redirect('/')
 
 @shared_task
 def sendingEmail(otp, email):
