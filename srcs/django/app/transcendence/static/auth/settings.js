@@ -16,7 +16,7 @@ async function handleSettingsUpdate(e) {
     console.log("Collected Data:", { email, is_2fa_enabled });
 
     try {
-        const response = await fetch("/settings/update/", {
+        const response = await fetch("/api/settings/update/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -29,7 +29,7 @@ async function handleSettingsUpdate(e) {
             const data = await response.json();
             console.log("Settings update response:", data);
             alert("Settings updated successfully!");
-            location.reload(); // Optionally reload the page to reflect changes
+            location.reload();
         } else {
             const errorData = await response.json();
             alert("Error updating settings: " + (errorData.error || "Unknown error"));

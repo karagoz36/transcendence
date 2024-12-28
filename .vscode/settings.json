@@ -1,0 +1,6 @@
+{
+    "typescript.format.enable": false,
+    "typescript.tsserver.enableRegionDiagnostics": false,
+    "typescript.tsserver.useSyntaxServer": "never",
+    "typescript.suggestionActions.enabled": false
+}
