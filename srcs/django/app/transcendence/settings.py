@@ -155,7 +155,6 @@ OAUTH2_PROVIDER = {
     'CLIENT_ID': os.environ.get('OAUTH_CLIENT_ID'),
     'CLIENT_SECRET': os.environ.get('OAUTH_SECRET_KEY'),
     'REDIRECT_URI': "https://localhost:8000/auth/callback42",
-    # 'REDIRECT_URI': os.environ.get('OAUTH_REDIRECT_URI'),
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
