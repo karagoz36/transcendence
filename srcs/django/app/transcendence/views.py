@@ -16,7 +16,7 @@ import pyotp
 
 @api_view(['GET'])
 async def auth(request: Request):
-	return await pages.auth.response(request)
+    return await pages.auth.response(request)
 
 @api_view(['GET'])
 async def auth_with_42(request: Request):
@@ -28,23 +28,23 @@ def callback_from_42(request: Request):
 
 @api_view(['GET'])
 def logout(request: Request):
-	return pages.logout.response(request)
+    return pages.logout.response(request)
 
 @api_view(['POST'])
 @authentication_classes([])
 @permission_classes([AllowAny])
 def login(request: Request):
-	return pages.login.response(request)
-	
+    return pages.login.response(request)
+    
 @api_view(['POST'])
 @authentication_classes([])
 @permission_classes([AllowAny])
 def register(request: Request):
-	return pages.register.response(request)
+    return pages.register.response(request)
 
 @api_view(['GET'])
 def index(request: Request):
-	return pages.index.response(request)
+    return pages.index.response(request)
 
 @api_view(['GET'])
 def settings(request: Request):
@@ -56,23 +56,23 @@ def update_settings(request: Request):
 
 @api_view(['GET'])
 async def friends(request: Request):
-	return await pages.friends.response(request)
+    return await pages.friends.response(request)
 
 @api_view(['GET'])
 async def lobby(request: Request):
-	return await pages.lobby.response(request)
+    return await pages.lobby.response(request)
 
 @api_view(['POST'])
 async def addFriend(request: Request):
-	return await pages.addFriend.response(request)
+    return await pages.addFriend.response(request)
 
 @api_view(['POST'])
 async def acceptFriend(request: Request):
-	return await pages.acceptFriend.response(request)
+    return await pages.acceptFriend.response(request)
 
 @api_view(['POST'])
 async def removeFriend(request: Request):
-	return await pages.removeFriend.response(request)
+    return await pages.removeFriend.response(request)
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -108,14 +108,17 @@ def verify_otp(request):
         return Response({"error": "User not found"}, status=404)
     except UserProfile.DoesNotExist:
         return Response({"error": "User profile not found"}, status=404)
+
+@api_view(['POST'])
 async def sendMessage(request: Request):
-	return await pages.sendMessage.response(request)
+    print(request.user)
+    return await pages.sendMessage.response(request)
 
 @authentication_classes([])
 @permission_classes([AllowAny])
 def getToken(request: Request):
-	view = TokenObtainPairView.as_view()
-	return view(request)
+    view = TokenObtainPairView.as_view()
+    return view(request)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -126,5 +129,5 @@ def get_csrf_token(request):
 @authentication_classes([])
 @permission_classes([AllowAny])
 def refreshToken(request: Request):
-	view = TokenRefreshView.as_view()
-	return view(request)
+    view = TokenRefreshView.as_view()
+    return view(request)

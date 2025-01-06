@@ -22,7 +22,6 @@ async def sendNewMessageToFriend(sender: User, receiver: User, message: str):
 
 async def response(request: Request) -> HttpResponse:
 	user: User = request.user
-	print(request.user)
 
 	if user.is_anonymous:
 		return redirect("/api/logout")

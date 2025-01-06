@@ -22,6 +22,8 @@ class RequiredLoginMiddleware:
 		self.get_response = get_response
 
 	def __call__(self, request: Request):
+		if not request.user.is_anonymous:
+			return self.get_response(request)
 		user, _ = CustomAuthentication().authenticate(request=request)
 		path: str = request.path
 	
