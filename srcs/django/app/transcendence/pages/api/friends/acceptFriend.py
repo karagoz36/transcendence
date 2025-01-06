@@ -3,14 +3,14 @@ from django.contrib.auth.models import User
 from rest_framework.request import Request
 from database.models import getFriendship
 from django.shortcuts import redirect
-from django.contrib.auth.decorators import login_required
 from websockets.consumers import sendMessageWS
 
-@login_required(login_url="/api/logout")
 async def response(request: Request):
     friend: User
     user: User = request.user
 
+    if user.is_anonymous:
+        return redirect("/api/logout")
     if "friendID" not in request.data:
         return redirect("/friends?error=Missing friend ID in request")
 

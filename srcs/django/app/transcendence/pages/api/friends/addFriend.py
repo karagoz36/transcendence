@@ -5,14 +5,16 @@ from django.contrib.auth.models import User
 from database.models import FriendList, getFriendship
 from websockets.consumers import sendMessageWS
 import json
-from django.contrib.auth.decorators import login_required
 
-@login_required(login_url="/api/logout")
 async def response(request: Request) -> HttpResponse:
+	user: User = request.user
+
+	if user.is_anonymous:
+		return redirect("/api/logout")
+
 	if "username" not in request.data:
 		return redirect("/friends/?error=Invalid body")
 	username: str = request.data['username']
-	user: User = request.user
 	friend: User = None
 
 	try:

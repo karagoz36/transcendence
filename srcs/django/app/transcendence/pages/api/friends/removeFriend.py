@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from database.models import FriendList, getFriendship
 from rest_framework.request import Request
 from django.shortcuts import redirect
-from django.contrib.auth.decorators import login_required
 from websockets.consumers import sendMessageWS
 
 async def response(request: Request):

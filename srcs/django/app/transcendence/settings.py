@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -38,7 +39,6 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"
 TEST_RUNNER = "redgreenunittest.django.runner.RedGreenDiscoverRunner"
 
 # Application definition
-
 INSTALLED_APPS = [
 	'daphne',
     'django.contrib.admin',
@@ -53,7 +53,7 @@ INSTALLED_APPS = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ['transcendence.middleware.CustomAuthentication']
+    'DEFAULT_AUTHENTICATION_CLASSES': ['transcendence.middleware.CustomAuthentication'],
 }
 
 
@@ -155,6 +155,28 @@ CHANNEL_LAYERS = {
     },
 }
 
+OAUTH2_PROVIDER = {
+    'CLIENT_ID': os.environ.get('OAUTH_CLIENT_ID'),
+    'CLIENT_SECRET': os.environ.get('OAUTH_SECRET_KEY'),
+    'REDIRECT_URI': "https://localhost:8000/auth/callback42",
+}
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'transcendence2442@gmail.com'
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = 'transcendence2442@gmail.com'
+
+CELERY_BROKER_URL = "redis://redis:6379/0"
+CELERY_RESULT_BACKEND = "redis://redis:6379/0"
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TIMEZONE = 'UTC'
+CELERY_TASK_ALWAYS_EAGER = False
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
 from datetime import timedelta
 
 SIMPLE_JWT = {

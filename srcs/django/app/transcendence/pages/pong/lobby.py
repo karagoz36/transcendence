@@ -3,17 +3,20 @@ from django.shortcuts import redirect, render, render
 from django.contrib.auth.models import User
 from websockets.consumers import sendMessageWS
 import json
-from django.contrib.auth.decorators import login_required
 from database.models import getFriendship
 from utils.users import userIsLoggedIn
 
-@login_required(login_url="/api/logout")
 async def response(req: Request):
+    user: User = req.user
+
+    if user.is_anonymous:
+        return redirect("/api/logout")
+
     username = req.query_params.get("opponent")
+
     if username is None:
         return redirect("/friends/?error=No username passed in parameter", status=401)
     
-    user: User = req.user
     if username == user.username:
         return redirect("/friends/?error=You cannot invite yourself", status=401)
 
