@@ -55,9 +55,12 @@ def update_settings(request: Request):
     return pages.settings.handle_update_settings(request)
 
 @api_view(['GET'])
-def friends(request: Request):
-	return pages.friends.response(request)
-from websockets.consumers import userIsLoggedIn
+async def friends(request: Request):
+	return await pages.friends.response(request)
+
+@api_view(['GET'])
+async def lobby(request: Request):
+	return await pages.lobby.response(request)
 
 @api_view(['POST'])
 async def addFriend(request: Request):
@@ -105,6 +108,8 @@ def verify_otp(request):
         return Response({"error": "User not found"}, status=404)
     except UserProfile.DoesNotExist:
         return Response({"error": "User profile not found"}, status=404)
+async def sendMessage(request: Request):
+	return await pages.sendMessage.response(request)
 
 @authentication_classes([])
 @permission_classes([AllowAny])

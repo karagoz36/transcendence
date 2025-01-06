@@ -3,12 +3,11 @@ from rest_framework.request import Request
 from django.http.response import HttpResponse
 from django.contrib.auth.models import User
 from database.models import FriendList, getFriendship
-from websockets.consumers import sendNotification
+from websockets.consumers import sendMessageWS
 import json
 from django.contrib.auth.decorators import login_required
-    
 
-@login_required(login_url="/auth")
+@login_required(login_url="/api/logout")
 async def response(request: Request) -> HttpResponse:
 	if "username" not in request.data:
 		return redirect("/friends/?error=Invalid body")
@@ -29,6 +28,6 @@ async def response(request: Request) -> HttpResponse:
 
 	await FriendList.objects.acreate(user=user, friend=friend)
 
-	message = json.dumps({"message": f"Friend invitation received from {user.username}.", "refresh": "/friends/"})
-	await sendNotification(friend, message)
+	message = {"message": f"Friend invitation received from {user.username}.", "refresh": ["/friends/"]}
+	await sendMessageWS(friend, "notifications", json.dumps(message))
 	return redirect("/friends/?success=Friend invitation successfully sent!")

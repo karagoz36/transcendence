@@ -1,12 +1,10 @@
-if [ ! -e /app/manage.py ]; then
-	django-admin startproject transcendence app
-fi
-
-python /app/manage.py makemigrations database
-python /app/manage.py migrate database
+find /app -type d -name migrations -exec rm -rf {} \; 2>/dev/null
 
 python /app/manage.py makemigrations
 python /app/manage.py migrate
+
+python /app/manage.py makemigrations database
+python /app/manage.py migrate database
 
 python /app/manage.py createsuperuser --email '' --username $POSTGRES_USER --noinput
 python /app/manage.py shell -c "

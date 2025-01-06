@@ -1,5 +1,6 @@
 // @ts-check
-import {getPage} from "./SPA.js"
+import {getPage, setAnchorEvent} from "./SPA.js"
+import BaseWebSocket from "./websockets.js";
 
 /**
  * @param {string} text 
@@ -8,7 +9,7 @@ import {getPage} from "./SPA.js"
 function createToast(text) {
 	const toast = document.createElement("div")
 	toast.id = "liveToast";
-	toast.className = "toast show"; // Add multiple classes
+	toast.className = "toast show";
 	toast.setAttribute("role", "alert");
 	toast.setAttribute("aria-live", "assertive");
 	toast.setAttribute("aria-atomic", "true");
@@ -21,37 +22,52 @@ function createToast(text) {
 	return toast
 }
 
-/** @param {string} message */
-function addNotif(message) {	
+/** 
+ * @param {string} message
+ * @param {number} duration 
+*/
+function addNotif(message, duration) {	
 	const toast = createToast(message)
 	const toastContainer = document.querySelector(".toast-container")
 	toastContainer?.append(toast)
-}
-/** @param {MessageEvent} e */
-function receiveMessage(e) {
-	const data = JSON.parse(e.data)
-	if (data.message)
-		addNotif(data.message)
-	if (data.refresh == window.location.pathname)
-		getPage(data.refresh)
+	setAnchorEvent()
+	duration = typeof(duration) == "number" ? duration : 10000
+	if (duration > 0)
+		setTimeout(() => toast.remove(), duration)
 }
 
-class NotificationHandler {
-	constructor() {
-		this.createSocket = this.createSocket.bind(this)
-		this.createSocket()
+class NotificationHandler extends BaseWebSocket {
+	/** @param {CloseEvent} e */
+	close(e) {
+		if (e.code == 4000)
+			addEventListener("page-changed", this.createSocket)
+	}
+	
+	/** @param {Event} e */
+	open(e) {
+		removeEventListener("page-changed", this.createSocket)
 	}
 
-	createSocket() {
-		removeEventListener("page-changed", this.createSocket)
-		this.socket = new WebSocket(`wss://${window.location.host}/websocket/notifications/`)
-		this.socket.onmessage = receiveMessage
-		this.socket.onclose = () => addEventListener("page-changed", this.createSocket)
+	/** @param {MessageEvent} e */
+	async receive(e) {
+		const data = JSON.parse(e.data)
+		if (data.message)
+			addNotif(data.message, data.duration)
+		if (data.redirect)
+			await getPage(data.redirect)
+
+		/** @type {string[]} */
+		const urls = data.refresh
+		if (!urls) return
+		urls.forEach(async (url) => {
+			if (url == window.location.pathname)
+				await getPage(url)
+		})
 	}
 }
 
 function main() {
-	const notif = new NotificationHandler()
+	const notif = new NotificationHandler("notifications")
 }
 
 main()

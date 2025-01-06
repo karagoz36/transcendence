@@ -3,6 +3,7 @@ from rest_framework_simplejwt.tokens import Token
 from django.contrib.auth.models import User, AnonymousUser
 from rest_framework.request import Request
 from django.shortcuts import redirect
+from utils.users import userIsLoggedIn
 
 class CustomAuthentication(JWTAuthentication):
 	def authenticate(self, request):
@@ -25,6 +26,7 @@ class RequiredLoginMiddleware:
 		path: str = request.path
 		if path.startswith("/api"):
 			return self.get_response(request)
-		if not path.startswith("/auth") and type(user) is AnonymousUser:
-			return redirect("/auth")
+		if not path.startswith("/auth"):
+			if type(user) is AnonymousUser:
+				return redirect("/auth")
 		return self.get_response(request)

@@ -10,12 +10,12 @@ class FriendList(models.Model):
 async def getFriendship(user: User, friend: User) -> FriendList|None:
 	friendship: FriendList
 	try:
-		friendship = await FriendList.objects.aget(user=user, friend=friend)
+		friendship = await FriendList.objects.select_related("user", "friend").aget(user=user, friend=friend)
 		return friendship
 	except:
 		pass
 	try:
-		friendship = await FriendList.objects.aget(user=friend, friend=user)
+		friendship = await FriendList.objects.select_related("user", "friend").aget(user=friend, friend=user)
 		return friendship
 	except:
 		pass
@@ -34,3 +34,8 @@ class UserProfile(models.Model):
     def get_otp(self):
         totp = pyotp.TOTP(self.otp_secret)
         return totp.now()
+class Messages(models.Model):
+	friendship = models.ForeignKey(FriendList, on_delete=models.CASCADE)
+	message = models.TextField()
+	sender = models.ForeignKey(User, on_delete=models.CASCADE)
+	created_at = models.DateTimeField(auto_now_add=True,)

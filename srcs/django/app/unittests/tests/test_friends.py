@@ -32,7 +32,7 @@ class FriendTest(APITestCase):
     def testAddNonExistingFriend(self):
         response = self.client.post("/api/friend/add", follow=True, data={"username": "asdflkaj"})
         self.assertEqual(response.status_code, 401)
-    
+
     def sendFriendInvite(self, client: APIClient, username: str, expectedCode: int):
         response = client.post("/api/friend/add", follow=True, data={"username": username})
         self.assertEqual(response.status_code, expectedCode)

@@ -43,5 +43,4 @@ def response(request: Request) -> HttpResponse:
 		return redirect("/auth/?register&error=Username already taken")
 
 	user = User.objects.create_user(username, '', password)
-	login(request, user)
-	return redirect("/")
+	return redirect("/auth/?success=Account successfully created")
