@@ -17,13 +17,15 @@ async def getMessages(friendship: FriendList):
 @login_required(login_url="/api/logout")
 async def response(request: Request) -> HttpResponse:
 	user: User = request.user
+	id: int = request.data["friendID"]
+
 	try:
 		friend = await User.objects.aget(id=id)
 	except:
 		return Response({"message": "invalid friend id in request body"}, status=401)
 	friendship: FriendList = await getFriendship(user, friend)
-		if friendship is None:
-			return Response({"message": "friendship not found"}, status=401)
+	if friendship is None:
+		return Response({"message": "friendship not found"}, status=401)
 
 	messageList = await getMessages(friendship)
 	return render(request, "friendlist/message-list.html", context={"messages": messageList })

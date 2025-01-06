@@ -2,7 +2,7 @@
 import {getPage} from "../global/SPA.js"
 
 /** @param {MouseEvent} e */
-function transferID(e) {
+async function openChat(e) {
    	/** @type {HTMLButtonElement|EventTarget|null} */
 	const button = e.target
 	if (!button) return
@@ -15,6 +15,13 @@ function transferID(e) {
 	if (userId == null)
 			return
     modalButton.setAttribute("user-id", userId)
+	await getPage("/api/friend/open-message", {
+		method: "POST",
+		headers: {"content-type": "application/json"},
+		body: {			
+			"friendID": Number(userId),
+		}
+	}, false, "#messages-container");
 }
 
 /** @param {SubmitEvent} event */
@@ -45,7 +52,7 @@ function main() {
 	forms.forEach(form => form.onsubmit = sendMessage)
 	/** @type {NodeListOf<HTMLButtonElement>|null} */
 	const buttons = document.querySelectorAll("button#open-chat-modal")
-	buttons.forEach(button => button.onclick = transferID)
+	buttons.forEach(button => button.onclick = openChat)
 }
 
 main()

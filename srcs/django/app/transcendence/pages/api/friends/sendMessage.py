@@ -10,7 +10,6 @@ from django.template.loader import render_to_string
 
 async def getMessages(friendship: FriendList):
 	arr = []
-
 	async for message in Messages.objects.select_related("sender").filter(friendship=friendship).order_by("created_at"):
 		arr.append({"text": message.message, "sender": message.sender.username})
 	return arr

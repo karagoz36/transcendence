@@ -14,4 +14,4 @@ user = User.objects.get(username='$POSTGRES_USER')
 user.set_password('$POSTGRES_PASSWORD')
 user.save()"
 
-python /app/manage.py runserver 0.0.0.0:8000
+exec python /app/manage.py runserver 0.0.0.0:8000
