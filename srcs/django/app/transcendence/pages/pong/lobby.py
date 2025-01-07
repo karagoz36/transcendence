@@ -1,7 +1,7 @@
 from rest_framework.request import Request
 from django.shortcuts import redirect, render, render
 from django.contrib.auth.models import User
-from websockets.consumers import sendMessageWS
+from utils.websocket import sendMessageWS
 import json
 from database.models import getFriendship
 from utils.users import userIsLoggedIn

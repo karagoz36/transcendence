@@ -1,18 +1,13 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
-from channels.layers import get_channel_layer, BaseChannelLayer
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 import json
+import asyncio
+from .pong import gameLoop, redisClient
 from utils.friends import getFriends
 from utils.users import onlineUsers, userIsLoggedIn
 from database.models import getFriendship
-
-async def sendMessageWS(receiver: User, groupName: str, message: str) -> None:
-    layer: BaseChannelLayer = get_channel_layer()
-    await layer.group_send(f"{receiver.id}_{groupName}", {
-        "type": "sendMessage",
-        "message": message
-        })
+from utils.websocket import sendMessageWS
 
 class BaseConsumer(AsyncWebsocketConsumer):
     def __init__(self, consumerName: str):
@@ -67,7 +62,7 @@ class Notification(BaseConsumer):
         for friend in friends:
             receiver: User = await User.objects.aget(id=friend["id"])
             message = json.dumps({
-                "message": f"{user.username} just logged in.",
+                "message": f"{user.username} logged in.",
                 "refresh": ["/friends/", "/pong/"]
                 })
             await sendMessageWS(receiver, "notifications", message)
@@ -87,7 +82,7 @@ class Notification(BaseConsumer):
         for friend in friends:
             receiver: User = await User.objects.aget(id=friend["id"])
             message = json.dumps({
-                "message": f"{user.username} just logged out.",
+                "message": f"{user.username} logged out.",
                 "refresh": ["/friends/", "/pong/"]
                 })
             await sendMessageWS(receiver, "notifications", message)
@@ -125,14 +120,13 @@ class Pong(BaseConsumer):
             return sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "not logged in"}))
 
         try:
-            data = json.loads(text_data)
+            self.data = json.loads(text_data)
         except:
             return sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "invalid message"}))
 
-        if type(data) is not dict:
+        if type(self.data) is not dict:
             return sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "invalid message"}))
-        print(data)
-        match data.get("type"):
+        match self.data.get("type"):
             case "accept_invite":
                 await self.acceptInvite()
             case "launch_game":
@@ -140,6 +134,19 @@ class Pong(BaseConsumer):
                     err = {"type": "error", "error": "trying to launch a game without an opponent"}
                     return sendMessageWS(self.user, "pong", json.dumps(err))
                 htmlSTR = render_to_string("pong/play.html")
-                print("test")
-                await sendMessageWS(self.user, "pong", json.dumps({"type": "launch_game", "html": htmlSTR}))
                 await sendMessageWS(self.opponent, "pong", json.dumps({"type": "launch_game", "html": htmlSTR}))
+                await sendMessageWS(self.user, "pong", json.dumps({"type": "launch_game", "html": htmlSTR}))
+                asyncio.create_task(gameLoop(self.user, self.opponent))
+            case "join_game":
+                htmlSTR = render_to_string("pong/play.html")
+                await sendMessageWS(self.opponent, "pong", json.dumps({"type": "launch_game", "html": htmlSTR}))
+            case "move":
+                key = f"pong_direction:{self.user.id}"
+
+                match self.data.get("direction"):
+                    case "up":
+                        redisClient.hmset(key, {"direction": "up"})
+                    case "down":
+                        redisClient.hmset(key, {"direction": "down"})
+                    case _:
+                        redisClient.delete(key)

@@ -16,6 +16,7 @@ const e_states = {
     INVITE_SENT: 0,
     INVITE_ACCEPTED: 1,
     LAUNCH_GAME: 2,
+    IN_GAME: 3,
 }
 
 class PongSocket extends BaseWebSocket {
@@ -45,12 +46,16 @@ class PongSocket extends BaseWebSocket {
         const container = document.querySelector("#pong-container")
         if (!container) return
         container.innerHTML = html
+        this.state = e_states.IN_GAME
     }
-    
+
     /** @param {MessageEvent} e */
     receive(e) {
         /** @type {PongSocketData} */
         const json = JSON.parse(e.data)
+    
+        if (json.type == "invite_accepted" && this.state == e_states.IN_GAME)
+            return this.socket.send(JSON.stringify({"type": "join_game"}))
 
         if (json.type == "invite_accepted" && this.opponent == json.friend)
             this.state = e_states.INVITE_ACCEPTED
