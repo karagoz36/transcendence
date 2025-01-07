@@ -100,7 +100,7 @@ class Pong(BaseConsumer):
     def __init__(self):
         super().__init__("pong")
         self.opponent: User|None = None
-        self.user: User = self.scope["user"]
+        self.user: User|None = None
 
     async def acceptInvite(self):
         try:
@@ -131,7 +131,7 @@ class Pong(BaseConsumer):
 
         if type(data) is not dict:
             return sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "invalid message"}))
-
+        print(data)
         match data.get("type"):
             case "accept_invite":
                 await self.acceptInvite()
