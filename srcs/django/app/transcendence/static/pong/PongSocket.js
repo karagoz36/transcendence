@@ -22,9 +22,8 @@ class PongSocket extends BaseWebSocket {
     /** @type {string} */
     opponent
 
-	/** @param {string} url */
-	constructor(url) {
-		super(url)
+	constructor() {
+		super("pong")
 		addEventListener("page-changed", () => {
 			this.socket.onmessage = null
 			this.socket.close()
@@ -74,7 +73,7 @@ class PongSocket extends BaseWebSocket {
 }
 
 function main() {
-    const websocket = new PongSocket("pong")
+    const websocket = new PongSocket()
 }
 
 main()
