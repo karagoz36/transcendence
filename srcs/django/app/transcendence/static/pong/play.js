@@ -38,7 +38,6 @@ function animate() {
 renderer.setAnimationLoop(animate);
 
 function onWindowResize() {
-    camera.aspect = ASPECT_RATIO;
     camera.updateProjectionMatrix();
     const height = window.innerWidth / ASPECT_RATIO
     if (window.innerHeight > window.innerWidth) {
