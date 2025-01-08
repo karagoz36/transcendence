@@ -1,4 +1,5 @@
 // @ts-check
+import { getPage, refreshScripts } from "../global/SPA.js"
 import BaseWebSocket from "../global/websockets.js"
 
 /**
@@ -42,15 +43,17 @@ class PongSocket extends BaseWebSocket {
     }
 
     /** @param {string} html */
-    launchGame(html) {
+    async launchGame(html) {
         const container = document.querySelector("#pong-container")
         if (!container) return
         container.innerHTML = html
+        await refreshScripts(container, container, "#pong-container")
         this.state = e_states.IN_GAME
     }
 
     /** @param {MessageEvent} e */
-    receive(e) {
+    async receive(e) {
+        console.log(e.data)
         /** @type {PongSocketData} */
         const json = JSON.parse(e.data)
     
@@ -71,7 +74,7 @@ class PongSocket extends BaseWebSocket {
                     console.error(json)
                     throw new Error("expected html")
                 }
-                this.launchGame(json.html)
+                await this.launchGame(json.html)
                 break
         }
     }

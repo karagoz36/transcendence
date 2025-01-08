@@ -17,8 +17,6 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from . import views
-from .pages.settings import response as settings_view
-from .pages.settings import handle_update_settings
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
@@ -28,6 +26,7 @@ urlpatterns = [
     path("settings/", views.settings, name="settings"),
     path("friends/", views.friends, name="friends"),
     path("pong/lobby/", views.lobby, name="lobby"),
+    path("pong/play/", views.play, name="play"),
 
     path("api/login", views.login, name="login"),
     path("api/logout", views.logout, name="logout"),

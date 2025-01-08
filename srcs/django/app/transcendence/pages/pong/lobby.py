@@ -34,7 +34,7 @@ async def response(req: Request):
         return redirect(f"/friends/?error={friend.username} is not online", status=401)
 
     message = json.dumps({
-        "message": f"<a href=/pong/lobby/?opponent={user.username}>{user.username} invites you to play pong</a>",
+        "message": f"<a href=/pong/lobby/?opponent={user.username}>{user.username} invites you to play pong.</a>",
         "refresh": ["/pong/"]
     })
     await sendMessageWS(friend, "notifications", message)

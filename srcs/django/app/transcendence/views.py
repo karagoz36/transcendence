@@ -1,6 +1,5 @@
 from rest_framework.request import Request
 from django.contrib.auth.models import User
-from django.contrib.auth import login
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from adrf.decorators import api_view
@@ -11,8 +10,6 @@ from . import pages
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from database.models import UserProfile
-from django.shortcuts import render
-import pyotp
 
 @api_view(['GET'])
 async def auth(request: Request):
@@ -61,6 +58,10 @@ async def friends(request: Request):
 @api_view(['GET'])
 async def lobby(request: Request):
     return await pages.lobby.response(request)
+
+@api_view(['GET'])
+def play(request: Request):
+    return pages.play.response(request)
 
 @api_view(['POST'])
 async def addFriend(request: Request):

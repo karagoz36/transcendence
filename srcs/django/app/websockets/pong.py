@@ -1,7 +1,6 @@
 import asyncio
 import redis
 from django.contrib.auth.models import User
-from utils.websocket import sendMessageWS
 
 redisClient = redis.StrictRedis(host="redis", port=6379, decode_responses=True)
 
@@ -20,11 +19,11 @@ class PongPlayer:
             case "up":
                 self.position += 1
             case "down":
-                self.position += 1
+                self.position -= 1
             case None:
                 return        
         redisClient.delete(key)
-        print(self.position)
+        print(self.position, flush=True)
 
 async def gameLoop(user1: User, user2: User):
     p1 = PongPlayer(user1)

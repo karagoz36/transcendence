@@ -126,9 +126,11 @@ class Pong(BaseConsumer):
 
         if type(self.data) is not dict:
             return sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "invalid message"}))
+
         match self.data.get("type"):
             case "accept_invite":
                 await self.acceptInvite()
+
             case "launch_game":
                 if self.opponent is None:
                     err = {"type": "error", "error": "trying to launch a game without an opponent"}
@@ -137,9 +139,11 @@ class Pong(BaseConsumer):
                 await sendMessageWS(self.opponent, "pong", json.dumps({"type": "launch_game", "html": htmlSTR}))
                 await sendMessageWS(self.user, "pong", json.dumps({"type": "launch_game", "html": htmlSTR}))
                 asyncio.create_task(gameLoop(self.user, self.opponent))
+
             case "join_game":
                 htmlSTR = render_to_string("pong/play.html")
                 await sendMessageWS(self.opponent, "pong", json.dumps({"type": "launch_game", "html": htmlSTR}))
+
             case "move":
                 key = f"pong_direction:{self.user.id}"
 
