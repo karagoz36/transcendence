@@ -22,7 +22,6 @@ export function refreshScripts(newContainer, oldContainer, toUpdate) {
 	const newScripts = newContainer.querySelectorAll("script")
 	/** @type {NodeListOf<HTMLScriptElement>} */
 	const oldScripts = oldContainer.querySelectorAll("script")
-	console.log(newScripts)
 
 	oldScripts.forEach(script => {
 		script.type = "application/json"
