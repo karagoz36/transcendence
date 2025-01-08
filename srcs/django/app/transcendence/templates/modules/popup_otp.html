@@ -3,13 +3,12 @@
     .otp-popup {
         position: fixed;
         top: 50%;
-        background: #031633;
         left: 50%;
         transform: translate(-50%, -50%);
+        z-index: 1050; 
         padding: 20px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         border-radius: 10px;
-        z-index: 1000;
         display: none;
     }
     .otp-popup.show {
@@ -21,35 +20,38 @@
         gap: 10px;
     }
     .otp-input {
-        width: 40px;
-        height: 40px;
         text-align: center;
-        font-size: 18px;
-        border: 1px solid #ccc;
+        font-size: 1.5rem;
+        width: 3rem;
+        height: 3rem;
         border-radius: 5px;
-    }
-    .otp-buttons {
-        margin-top: 20px;
-        display: flex;
-        justify-content: space-between;
     }
 </style>
 
-<div class="otp-popup" id="otpPopup">
-    <h2>Enter OTP</h2>
-    <div class="otp-input-container">
-        <input type="text" maxlength="1" class="otp-input" />
-        <input type="text" maxlength="1" class="otp-input" />
-        <input type="text" maxlength="1" class="otp-input" />
-        <input type="text" maxlength="1" class="otp-input" />
-        <input type="text" maxlength="1" class="otp-input" />
-        <input type="text" maxlength="1" class="otp-input" />
-    </div>
-    <div class="otp-buttons">
-        <button id="cancelOtp">Cancel</button>
-        <button id="submitOtp" disabled>Submit</button>
+<div class="modal otp-popup" id="otpPopup" tabindex="-1" aria-labelledby="otpPopupLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" id="otpForm">
+            <div class="modal-header">
+                <h5 class="modal-title text-light" id="otpPopupLabel">Enter OTP</h5>
+                <button type="button" class="btn-close btn-close-white" id="cancelOtp" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="otp-input-container">
+                    <input type="text" maxlength="1" class="otp-input form-control" />
+                    <input type="text" maxlength="1" class="otp-input form-control" />
+                    <input type="text" maxlength="1" class="otp-input form-control" />
+                    <input type="text" maxlength="1" class="otp-input form-control" />
+                    <input type="text" maxlength="1" class="otp-input form-control" />
+                    <input type="text" maxlength="1" class="otp-input form-control" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelOtp">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="submitOtp" disabled>Submit</button>
+            </div>
+        </form>
     </div>
 </div>
+
 <script type="module" src="/static/auth/login.js"></script>
 {% endblock %}
-

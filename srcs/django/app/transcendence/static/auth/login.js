@@ -58,15 +58,13 @@ async function completeLogin(username, password, csrftoken) {
 
 function showOtpPopup(username, password, csrftoken) {
     const otpPopup = document.getElementById("otpPopup");
-    if (!otpPopup) throw new Error("OTP popup not found");
-
+    const otpForm = document.getElementById("otpForm");
     const otpInputs = document.querySelectorAll(".otp-input");
-    if (!otpInputs) throw new Error("OTP input fields not found");
-
-    const submitButton = document.getElementById("submitOtp");
     const cancelButton = document.getElementById("cancelOtp");
 
-    if (!submitButton || !cancelButton) throw new Error("OTP buttons not found");
+    if (!otpPopup || !otpForm || !otpInputs || !cancelButton) {
+        throw new Error("OTP popup elements not found");
+    }
 
     otpPopup.classList.add("show");
 
@@ -78,9 +76,23 @@ function showOtpPopup(username, password, csrftoken) {
             }
             validateOtpInputs();
         };
+
+        input.onpaste = (e) => {
+            e.preventDefault();
+            const pasteData = (e.clipboardData || window.clipboardData).getData("text");
+            if (/^\d{6}$/.test(pasteData)) {
+                otpInputs.forEach((field, idx) => {
+                    field.value = pasteData[idx] || "";
+                });
+                validateOtpInputs();
+            } else {
+                alert("Please paste a valid 6-digit OTP code.");
+            }
+        };
     });
 
-    submitButton.onclick = async () => {
+    otpForm.onsubmit = async (e) => {
+        e.preventDefault();
         const otp = Array.from(otpInputs).map(input => input.value).join("");
         try {
             const otpResponse = await fetch("/api/verify_otp/", {
@@ -88,8 +100,8 @@ function showOtpPopup(username, password, csrftoken) {
                 body: JSON.stringify({ username, otp }),
                 headers: {
                     "content-type": "application/json",
-                    "X-CSRFToken": csrftoken
-                }
+                    "X-CSRFToken": csrftoken,
+                },
             });
 
             if (otpResponse.ok) {

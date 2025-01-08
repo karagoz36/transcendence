@@ -29,7 +29,6 @@ async function handleSettingsUpdate(e) {
             const data = await response.json();
             console.log("Settings update response:", data);
             alert("Settings updated successfully!");
-            location.reload();
         } else {
             const errorData = await response.json();
             alert("Error updating settings: " + (errorData.error || "Unknown error"));
