@@ -2,10 +2,12 @@ from rest_framework.request import Request
 from django.shortcuts import redirect, render, render
 from django.contrib.auth.models import User
 from utils.websocket import sendMessageWS
+from django.contrib.auth.decorators import login_required
 import json
 from database.models import getFriendship
 from utils.users import userIsLoggedIn
 
+@login_required(login_url="/api/logout")
 async def response(req: Request):
     user: User = req.user
 

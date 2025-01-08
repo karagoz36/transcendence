@@ -6,9 +6,11 @@ from django.shortcuts import render
 from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.permissions import AllowAny
 from database.models import UserProfile
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 import json
 
+@login_required(login_url="/api/logout")
 def response(request):
     user = request.user
 
