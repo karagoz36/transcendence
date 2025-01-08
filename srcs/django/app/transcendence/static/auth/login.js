@@ -67,9 +67,11 @@ function showOtpPopup(username, password, csrftoken) {
     }
 
     otpPopup.classList.add("show");
+	let isPasting = false;
 
     otpInputs.forEach((input, index) => {
         input.value = "";
+
         input.oninput = () => {
             if (input.value.length === 1 && index < otpInputs.length - 1) {
                 otpInputs[index + 1].focus();
@@ -77,8 +79,23 @@ function showOtpPopup(username, password, csrftoken) {
             validateOtpInputs();
         };
 
+		input.onkeydown = (e) => {
+			if (isPasting) return;
+            if (e.key === "Backspace" && input.value === "" && index > 0) {
+                otpInputs[index - 1].focus();
+                otpInputs[index - 1].value = "";
+            } else if (e.key === "Enter") {
+                e.preventDefault();
+                const submitButton = document.getElementById("submitOtp");
+                if (!submitButton.disabled) {
+                    submitButton.click();
+                }
+            }
+        };
+
         input.onpaste = (e) => {
             e.preventDefault();
+			isPasting = true;
             const pasteData = (e.clipboardData || window.clipboardData).getData("text");
             if (/^\d{6}$/.test(pasteData)) {
                 otpInputs.forEach((field, idx) => {
@@ -88,6 +105,9 @@ function showOtpPopup(username, password, csrftoken) {
             } else {
                 alert("Please paste a valid 6-digit OTP code.");
             }
+			setTimeout(() => {
+				isPasting = false;
+			}, 0);
         };
     });
 
