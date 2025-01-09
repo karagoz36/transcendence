@@ -100,7 +100,7 @@ class PongSocket extends BaseWebSocket {
             this.direction = ""
         })
         
-        setInterval(this.sendDirection.bind(this), 1_000 / 30_000)
+        setInterval(this.sendDirection.bind(this), 1_000 / 60_000)
     }
 
     /** @param {string} html */
@@ -121,8 +121,14 @@ class PongSocket extends BaseWebSocket {
         if (json.type == "update_pong" && this.state == e_states.IN_GAME) {
             if (!this.game)
                 return
+            this.game.paddle1.position.x = json.p1.x
             this.game.paddle1.position.y = json.p1.y
+
+            this.game.paddle2.position.x = json.p2.x
             this.game.paddle2.position.y = json.p2.y
+
+            this.game.ball.position.x = json.ball.x
+            this.game.ball.position.y = json.ball.y
         }
         if (json.type == "invite_accepted" && this.state == e_states.IN_GAME)
             return this.socket.send(JSON.stringify({"type": "join_game"}))

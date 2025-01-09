@@ -13,13 +13,22 @@ export class PongGame {
     renderer = new THREE.WebGLRenderer();
     paddle1 = this.addPaddle(10, 0xff0000);
     paddle2 = this.addPaddle(-10, 0x0000ff);
+    ball = this.addBall()
+
+    addBall() {
+        const geometry = new THREE.SphereGeometry(0.5);
+        const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+        const ball = new THREE.Mesh(geometry, material);
+        this.scene.add(ball);
+        return ball;
+    }
 
     /**
      * @param {number} position
      * @param {number} color
      */
     addPaddle(position, color) {
-        const geometry = new THREE.BoxGeometry(0.5, 3, 1);
+        const geometry = new THREE.BoxGeometry(-0.5, 3, 1);
         const material = new THREE.MeshBasicMaterial({ color });
         const paddle = new THREE.Mesh(geometry, material);
         paddle.position.x = position;
