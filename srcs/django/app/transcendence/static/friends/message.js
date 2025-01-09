@@ -1,6 +1,18 @@
 // @ts-check
 import {getPage} from "../global/SPA.js"
 
+// function scrollToBottom() {
+//     const messagesContainer = document.getElementById('messages-container');
+// 	if (messagesContainer) {
+// 		console.log(messagesContainer)
+// 		console.log(messagesContainer.scrollWidth)
+// 		console.log(messagesContainer.scrollHeight)
+// 		messagesContainer.scrollTop = 97;
+// 		console.log("end of scrolltobottom 97")
+// 		console.log(messagesContainer.scrollTop)
+//     }
+// }
+
 /** @param {MouseEvent} e */
 async function openChat(e) {
    	/** @type {HTMLButtonElement|EventTarget|null} */
@@ -22,6 +34,18 @@ async function openChat(e) {
 			"friendID": Number(userId),
 		}
 	}, false, "#messages-container");
+
+	const modal = document.getElementById("chatModal");
+	if (modal)
+		modal.addEventListener("shown.bs.modal", () => {
+			const messagesContainer = document.querySelector("#chatModal .modal-body");
+			if (messagesContainer) {
+				messagesContainer.scrollTo({
+					top: messagesContainer.scrollHeight,
+					behavior: "smooth",
+				});
+			}
+		});
 }
 
 /** @param {SubmitEvent} event */
@@ -42,6 +66,16 @@ async function sendMessage(event) {
 		}
 	}, false, "#messages-container");
 	event.target["message"].value = "";
+	const modal = document.getElementById("chatModal");
+	if (modal)
+		console.log("ici")
+		const messagesContainer = document.querySelector("#chatModal .modal-body");
+		if (messagesContainer) {
+			messagesContainer.scrollTo({
+				top: messagesContainer.scrollHeight,
+				behavior: "smooth",
+			});
+		};
 }
 
 function main() {

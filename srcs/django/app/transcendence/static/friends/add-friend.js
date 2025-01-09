@@ -22,7 +22,6 @@ async function addFriend(e) {
 function main() {
 	/** @type {HTMLFormElement} */ // @ts-ignore
 	const inputMessage = document.querySelector("#add-friend-form")
-	// inputMessage.onsubmit = addFriend
 	inputMessage.onsubmit = addFriend
 }
 
