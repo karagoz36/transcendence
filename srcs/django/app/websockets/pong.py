@@ -20,6 +20,12 @@ class Vector2:
     def abs(self) -> Vector2:
         return Vector2(abs(self.x), abs(self.y))
 
+e_direction = {
+    "NONE": 0,
+    "TOP": 1,
+    "BOTTOM": 2,
+}
+
 class PongPlayer:
     user: User
     width: float = 3
@@ -41,13 +47,29 @@ class PongPlayer:
             case None:
                 return        
         redisClient.delete(key)
-
-    def collided(self, pos: Vector2) -> bool:
+    
+    def collidedTop(self, pos: Vector2) -> bool:
         playerPos = self.pos.abs()
         ballPos = pos.abs()
+        return ballPos.y >= playerPos.y - self.width / 2 and ballPos.y <= playerPos.y
+    
+    def collidedBottom(self, pos: Vector2) -> bool:
+        playerPos = self.pos.abs()
+        ballPos = pos.abs()
+        return ballPos.y <= playerPos.y + self.width / 2 and ballPos.y >= playerPos.y
+
+    def collided(self, pos: Vector2) -> int:
+        playerPos = self.pos.abs()
+        ballPos = pos.abs()
+
         if playerPos.x >= ballPos.x:
             return False
-        return ballPos.y >= playerPos.y - self.width / 2 and ballPos.y <= playerPos.y + self.width / 2
+
+        if self.collidedBottom(pos):
+            return e_direction["BOTTOM"]
+        if self.collidedTop(pos):
+            return e_direction["TOP"]
+        return e_direction["NONE"]
 
 class Ball:
     velocity = Vector2(0.2)
@@ -71,10 +93,10 @@ class Ball:
             self.pos.x = 0
             self.pos.y = 0
 
-        if self.pos.x > 0 and self.p1.collided(self.pos):
+        if self.pos.x > 0 and self.p1.collided(self.pos) != 0:
             self.velocity.x *= -1
             self.velocity.y *= -1
-        elif self.pos.x < 0 and self.p2.collided(self.pos):
+        elif self.pos.x < 0 and self.p2.collided(self.pos) != 0:
             self.velocity.x *= -1
             self.velocity.y *= -1
 
