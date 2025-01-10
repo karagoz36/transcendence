@@ -1,13 +1,11 @@
 import json
 import asyncio
+import math
 import redis
 from django.contrib.auth.models import User
 from utils.websocket import sendMessageWS
 
 redisClient = redis.StrictRedis(host="redis", port=6379, decode_responses=True)
-
-class Vector2:
-    pass
 
 class Vector2:
     x: float
@@ -17,8 +15,9 @@ class Vector2:
         self.x = x
         self.y = y
     
-    def abs(self) -> Vector2:
+    def abs(self) -> "Vector2":
         return Vector2(abs(self.x), abs(self.y))
+
 
 e_direction = {
     "NONE": 0,
@@ -71,11 +70,17 @@ class PongPlayer:
             return e_direction["TOP"]
         return e_direction["NONE"]
 
+    def get_relative_impact(self, ball_y: float) -> float:
+        #normalise la taille du pad et trouver la valeur pour le calcul de l'angle
+        relative_impact = (ball_y - self.pos.y) / (self.width / 2)
+        return max(-1.0, min(1.0, relative_impact))
+
 class Ball:
-    velocity = Vector2(0.2)
+    velocity = Vector2(0.2, 0)
     pos: Vector2 = Vector2()
     p1: PongPlayer
     p2: PongPlayer
+    field_height: float = 15.0
 
     def __init__(self, p1: PongPlayer, p2: PongPlayer):
         self.p1 = p1
@@ -88,21 +93,41 @@ class Ball:
             return True
         return False
 
+    def check_walls(self):
+        if self.pos.y >= self.field_height / 2:  # Mur du haut
+            self.velocity.y *= -1
+            self.pos.y = self.field_height / 2
+        elif self.pos.y <= -self.field_height / 2:  # Mur du bas
+            self.velocity.y *= -1
+            self.pos.y = -self.field_height / 2
+
+    def reset_ball(self):
+        self.pos = Vector2(0, 0)
+        self.velocity = Vector2(0.2, 0)
+
     def move(self):
         if self.scored():
-            self.pos.x = 0
-            self.pos.y = 0
+            self.reset_ball()
+            return
+
+        self.check_walls()
 
         if self.pos.x > 0 and self.p1.collided(self.pos) != 0:
-            self.velocity.x *= -1
-            self.velocity.y *= -1
+            relative_impact = self.p1.get_relative_impact(self.pos.y)
+            angle = relative_impact * (math.pi / 3)
+            speed = math.sqrt(self.velocity.x**2 + self.velocity.y**2)
+            self.velocity.x = -speed * math.cos(angle)
+            self.velocity.y = speed * math.sin(angle)
+
         elif self.pos.x < 0 and self.p2.collided(self.pos) != 0:
-            self.velocity.x *= -1
-            self.velocity.y *= -1
+            relative_impact = self.p2.get_relative_impact(self.pos.y)
+            angle = relative_impact * (math.pi / 3)
+            speed = math.sqrt(self.velocity.x**2 + self.velocity.y**2)
+            self.velocity.x = speed * math.cos(angle)
+            self.velocity.y = speed * math.sin(angle)
 
-        self.pos.y += self.velocity.y
         self.pos.x += self.velocity.x
-
+        self.pos.y += self.velocity.y
 
 async def gameLoop(user1: User, user2: User):
     p1 = PongPlayer(user1, 10)
