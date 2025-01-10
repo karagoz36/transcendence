@@ -1,7 +1,7 @@
 // @ts-check
 import { getPage, refreshScripts } from "../global/SPA.js"
 import BaseWebSocket from "../global/websockets.js"
-import { PongGame } from "./play.js"
+import { PongScene } from "./PongScene.js"
 
 /**
  * @typedef {Object} PongSocketData
@@ -24,7 +24,7 @@ const e_states = {
 class PongSocket extends BaseWebSocket {
     /** @type {string} */
     opponent
-    /** @type {PongGame|null} */
+    /** @type {PongScene|null} */
     game = null
     direction = ""
     clickPressed = false
@@ -67,11 +67,12 @@ class PongSocket extends BaseWebSocket {
     }
 
     initGame() {
-        this.game = new PongGame()
+        this.game = new PongScene()
         /** @type {HTMLCanvasElement} */
         const canvas = this.game.renderer.domElement
         
         canvas.addEventListener("mousedown", (e) => {
+            if (e.buttons != 1) return
             this.clickPressed = true
             this.sendDirection(e.y)
         })
@@ -82,6 +83,7 @@ class PongSocket extends BaseWebSocket {
         })
         
         canvas.addEventListener("mousemove", (e) => {
+            if (e.buttons != 1) return
             this.sendDirection(e.y)
         })
         
@@ -118,6 +120,9 @@ class PongSocket extends BaseWebSocket {
         /** @type {PongSocketData} */
         const json = JSON.parse(e.data)
         
+        if (json.type == "game_over")
+            return await getPage("/friends")
+
         if (json.type == "update_pong" && this.state == e_states.IN_GAME) {
             if (!this.game)
                 return

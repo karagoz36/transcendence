@@ -34,8 +34,15 @@ class UserProfile(models.Model):
     def get_otp(self):
         totp = pyotp.TOTP(self.otp_secret)
         return totp.now()
+
 class Messages(models.Model):
 	friendship = models.ForeignKey(FriendList, on_delete=models.CASCADE)
 	message = models.TextField()
 	sender = models.ForeignKey(User, on_delete=models.CASCADE)
 	created_at = models.DateTimeField(auto_now_add=True,)
+
+class PongHistory(models.Model):
+	player1 = models.ForeignKey(User, on_delete=models.CASCADE)
+	player1score = models.IntegerField()
+	player2 = models.ForeignKey(User, on_delete=models.CASCADE)
+	player2score = models.IntegerField()

@@ -29,6 +29,7 @@ class PongPlayer:
     user: User
     width: float = 3
     pos: Vector2
+    score: int = 0
 
     def __init__(self, user: User, x: float):
         self.user = user
@@ -71,7 +72,6 @@ class PongPlayer:
         return e_direction["NONE"]
 
     def get_relative_impact(self, ball_y: float) -> float:
-        #normalise la taille du pad et trouver la valeur pour le calcul de l'angle
         relative_impact = (ball_y - self.pos.y) / (self.width / 2)
         return max(-1.0, min(1.0, relative_impact))
 
@@ -86,10 +86,12 @@ class Ball:
         self.p1 = p1
         self.p2 = p2
 
-    def scored(self) -> bool:
+    def scored(self) -> int:
         if self.pos.x >= self.p1.pos.x + 1:
+            self.p1.score += 1
             return True
         if self.pos.x <= self.p2.pos.x - 1:
+            self.p2.score += 1
             return True
         return False
 
@@ -138,7 +140,11 @@ async def gameLoop(user1: User, user2: User):
         p1.move()
         p2.move()
         ball.move()
-
+        if p1.score == 3 or p2.score == 3:
+            data = {"type": "game_over"}
+            await sendMessageWS(p1.user, "pong", json.dumps(data))
+            await sendMessageWS(p2.user, "pong", json.dumps(data))
+            return
         data = {
             "type": "update_pong",
             "p1": {"x": p1.pos.x, "y": p1.pos.y},
