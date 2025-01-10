@@ -1,18 +1,6 @@
 // @ts-check
 import {getPage} from "../global/SPA.js"
 
-// function scrollToBottom() {
-//     const messagesContainer = document.getElementById('messages-container');
-// 	if (messagesContainer) {
-// 		console.log(messagesContainer)
-// 		console.log(messagesContainer.scrollWidth)
-// 		console.log(messagesContainer.scrollHeight)
-// 		messagesContainer.scrollTop = 97;
-// 		console.log("end of scrolltobottom 97")
-// 		console.log(messagesContainer.scrollTop)
-//     }
-// }
-
 /** @param {MouseEvent} e */
 async function openChat(e) {
    	/** @type {HTMLButtonElement|EventTarget|null} */
@@ -25,7 +13,25 @@ async function openChat(e) {
 	/** @type {string|null} */ // @ts-ignore
 	const userId = button.getAttribute("user-id")
 	if (userId == null)
-			return
+		return
+	
+	/** Mettre à jour le titre du modal */
+	/** @type {string|null} */ // @ts-ignore
+	const username = button.getAttribute("user-name")
+	if (username == null)
+		return
+	const modalLabel = document.getElementById("chatModalLabel");
+	if (modalLabel) {
+		modalLabel.textContent = `${username}`;
+	}
+
+	// /** Mettre à jour le lien et le texte */
+    // const userLink = document.getElementById("chatModalUserLink");
+	// if (userLink instanceof HTMLAnchorElement) {
+    //     userLink.textContent = username;
+    //     userLink.href = `/profile/${userId}`; // URL vers la page de profil de l'utilisateur
+    // }
+	
     modalButton.setAttribute("user-id", userId)
 	await getPage("/api/friend/open-message", {
 		method: "POST",
@@ -42,7 +48,6 @@ async function openChat(e) {
 			if (messagesContainer) {
 				messagesContainer.scrollTo({
 					top: messagesContainer.scrollHeight,
-					behavior: "smooth",
 				});
 			}
 		});
@@ -67,15 +72,14 @@ async function sendMessage(event) {
 	}, false, "#messages-container");
 	event.target["message"].value = "";
 	const modal = document.getElementById("chatModal");
-	if (modal)
-		console.log("ici")
+	if (modal){
 		const messagesContainer = document.querySelector("#chatModal .modal-body");
 		if (messagesContainer) {
 			messagesContainer.scrollTo({
 				top: messagesContainer.scrollHeight,
-				behavior: "smooth",
 			});
 		};
+	}
 }
 
 function main() {

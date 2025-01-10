@@ -6,18 +6,29 @@ class MessagesHandler extends BaseWebSocket {
 	constructor(url) {
 		super(url)
 		addEventListener("page-changed", () => {
-			this.socket.onmessage = null
-			this.socket.close()
-		})
+			if (this.socket.readyState === WebSocket.OPEN) {
+				this.socket.onmessage = this.receive.bind(this);
+			}
+		});
+		
 	}
 
     /** @param {MessageEvent} e */
 	receive(e) {
 		/** @type {HTMLDivElement} */ // @ts-ignore
 		const messageContainer = document.querySelector("#messages-container")
-		const div = document.createElement("div")
-		div.innerHTML = e.data
-		messageContainer.appendChild(div)
+		
+		// Vérifier si le message existe déjà pour éviter la duplication
+		const existingMessage = Array.from(messageContainer.children).some(child => child.innerHTML === e.data);
+		if (!existingMessage) {
+			const div = document.createElement("div")
+			div.innerHTML = e.data
+			messageContainer.appendChild(div)
+		}
+		// Scrolling automatique à chaque nouveau message
+		messageContainer.scrollTo({
+			top: messageContainer.scrollHeight,
+		});
 	}
 }
 
