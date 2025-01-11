@@ -42,7 +42,7 @@ class Messages(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True,)
 
 class PongHistory(models.Model):
-	player1 = models.ForeignKey(User, on_delete=models.CASCADE)
-	player1score = models.IntegerField()
-	player2 = models.ForeignKey(User, on_delete=models.CASCADE)
-	player2score = models.IntegerField()
+	player1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="player1")
+	player1_score = models.IntegerField()
+	player2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="player2")
+	player2_score = models.IntegerField()
