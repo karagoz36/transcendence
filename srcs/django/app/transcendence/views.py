@@ -63,6 +63,10 @@ async def lobby(request: Request):
 def play(request: Request):
     return pages.play.response(request)
 
+@api_view(['GET'])
+async def profile(request: Request):
+    return await pages.profile.response(request)
+
 @api_view(['POST'])
 async def addFriend(request: Request):
     return await pages.addFriend.response(request)

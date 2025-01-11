@@ -1,0 +1,8 @@
+{% extends "modules/base.html" %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+{% include "modules/navbar.html" %}
+{% for game in history %}
+    <p>{{game.user.username}}</p>
+{% endfor %}
+{% endblock %}

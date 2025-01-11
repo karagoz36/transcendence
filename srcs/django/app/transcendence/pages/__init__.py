@@ -3,6 +3,8 @@ from . import index
 from . import settings
 from . import friends
 from . import play
+from . import profile
+
 from .pong import lobby
 
 from .api.auth import login, logout, register
