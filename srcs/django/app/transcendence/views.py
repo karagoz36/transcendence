@@ -7,6 +7,7 @@ from rest_framework.decorators import authentication_classes, permission_classes
 from django.core.cache import cache
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from . import pages
+import pyotp
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from database.models import UserProfile
