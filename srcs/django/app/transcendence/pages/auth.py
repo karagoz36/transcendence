@@ -11,6 +11,7 @@ from celery.utils.log import get_task_logger
 from django.http import JsonResponse
 from django.conf import settings
 import requests
+import re
 
 logger = get_task_logger(__name__)
 
@@ -101,7 +102,20 @@ def callback_from_42(request):
 		return JsonResponse({'error': 'Failed to fetch user info'}, status=400)
 
 	user_info = user_info_response.json()
-	user, created = User.objects.get_or_create(username=user_info['login'])
+	base_username = user_info['login']
+	username = base_username
+
+	username_pattern = r'^(.*?)(\d+)?$'
+	match = re.match(username_pattern, username)
+
+	base_username = match.group(1)
+	counter = int(match.group(2)) if match.group(2) else 1
+
+	while User.objects.filter(username=username).exists():
+		username = f"{base_username}{counter}"
+		counter += 1
+
+	user, created = User.objects.get_or_create(username=username)
 
 	if created:
 		user.first_name = user_info.get('first_name', '')
