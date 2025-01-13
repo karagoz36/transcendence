@@ -9,17 +9,22 @@ from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 import json
 from django.http import JsonResponse
-
+from database.models import Messages
+from asgiref.sync import sync_to_async
 
 async def getMessages(friendship: FriendList):
 	arr = []
 	async for message in Messages.objects.select_related("sender").filter(friendship=friendship).order_by("created_at"):
-		arr.append({"text": message.message, "sender": message.sender.username})
+		arr.append({\
+			"text": message.message, 
+			"sender": message.sender.username, 
+			"created_at": message.created_at,})
 	return arr
 
 async def sendNewMessageToFriend(sender: User, receiver: User, message: str):
+	latest_message = await sync_to_async(Messages.objects.order_by('-created_at').first)()
 	context = {}
-	context["message"] = {"sender": sender.username, "text": message}
+	context["message"] = {"sender": sender.username, "text": message, "created_at":latest_message.created_at}
 	html = render_to_string("friendlist/message.html", context=context)
 	await sendMessageWS(receiver, "messages", html)
 

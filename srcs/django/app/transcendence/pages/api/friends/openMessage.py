@@ -7,11 +7,16 @@ from websockets.consumers import sendMessageWS
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.template.loader import render_to_string
+from database.models import Messages
+
 
 async def getMessages(friendship: FriendList):
 	arr = []
 	async for message in Messages.objects.select_related("sender").filter(friendship=friendship).order_by("created_at"):
-		arr.append({"text": message.message, "sender": message.sender.username})
+		arr.append({\
+			"text": message.message, 
+			"sender": message.sender.username, 
+			"created_at": message.created_at,})
 	return arr
 
 @login_required(login_url="/api/logout")
