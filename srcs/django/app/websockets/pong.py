@@ -27,6 +27,7 @@ e_direction = {
 }
 
 class PongPlayer:
+    field_height: float = 15.0
     user: User
     width: float = 3
     pos: Vector2
@@ -35,7 +36,13 @@ class PongPlayer:
     def __init__(self, user: User, x: float):
         self.user = user
         self.pos = Vector2(x)
-        
+    
+    def check_walls(self):
+        if self.pos.y >= self.field_height / 2:
+            self.pos.y = self.field_height / 2
+        if self.pos.y <= -self.field_height / 2:
+            self.pos.y = -self.field_height / 2
+
     def move(self):
         key = f"pong_direction:{self.user.id}"
         direction = redisClient.hgetall(key)
@@ -43,8 +50,10 @@ class PongPlayer:
         match direction:
             case "up":
                 self.pos.y += 0.25
+                self.check_walls()
             case "down":
                 self.pos.y -= 0.25
+                self.check_walls()
             case None:
                 return        
         redisClient.delete(key)
@@ -77,11 +86,11 @@ class PongPlayer:
         return max(-1.0, min(1.0, relative_impact))
 
 class Ball:
+    field_height: float = 15.0
     velocity = Vector2(0.2, 0)
     pos: Vector2 = Vector2()
     p1: PongPlayer
     p2: PongPlayer
-    field_height: float = 15.0
 
     def __init__(self, p1: PongPlayer, p2: PongPlayer):
         self.p1 = p1
