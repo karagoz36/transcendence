@@ -6,18 +6,21 @@ from database.models import FriendList, getFriendship, Messages
 from websockets.consumers import sendMessageWS
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
+from database.models import Messages
+
 
 async def getMessages(friendship: FriendList):
 	arr = []
 	async for message in Messages.objects.select_related("sender").filter(friendship=friendship).order_by("created_at"):
-		arr.append({"text": message.message, "sender": message.sender.username})
+		arr.append({\
+			"text": message.message, 
+			"sender": message.sender.username, 
+			"created_at": message.created_at,})
 	return arr
 
 async def response(request: Request) -> HttpResponse:
 	user: User = request.user
-
-	if user.is_anonymous:
-		return redirect("/api/logout")
+	id: int = request.data["friendID"]
 
 	try:
 		friend = await User.objects.aget(id=id)
