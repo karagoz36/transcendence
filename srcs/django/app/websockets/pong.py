@@ -30,6 +30,7 @@ class PongPlayer:
     field_height: float = 15.0
     user: User
     width: float = 3
+    thickness: float = 0.5
     pos: Vector2
     score: int = 0
 
@@ -38,10 +39,10 @@ class PongPlayer:
         self.pos = Vector2(x)
     
     def check_walls(self):
-        if self.pos.y >= self.field_height / 2:
-            self.pos.y = self.field_height / 2
-        if self.pos.y <= -self.field_height / 2:
-            self.pos.y = -self.field_height / 2
+        if self.pos.y >= self.field_height / 2 - 1.5:
+            self.pos.y = self.field_height / 2 - 1.5
+        if self.pos.y <= -self.field_height / 2 + 1.5:
+            self.pos.y = -self.field_height / 2 + 1.5
 
     def move(self):
         key = f"pong_direction:{self.user.id}"
@@ -72,7 +73,7 @@ class PongPlayer:
         playerPos = self.pos.abs()
         ballPos = pos.abs()
 
-        if playerPos.x >= ballPos.x:
+        if playerPos.x >= (ballPos.x + self.thickness):
             return False
 
         if self.collidedBottom(pos):
