@@ -7,3 +7,7 @@ channels-redis
 djangorestframework-simplejwt
 adrf
 redgreenunittest
+pyotp
+python-decouple
+celery
+requests

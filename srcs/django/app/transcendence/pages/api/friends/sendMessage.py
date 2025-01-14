@@ -4,7 +4,6 @@ from django.http.response import HttpResponse
 from django.contrib.auth.models import User
 from database.models import FriendList, getFriendship, Messages
 from websockets.consumers import sendMessageWS
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 import json
@@ -28,10 +27,11 @@ async def sendNewMessageToFriend(sender: User, receiver: User, message: str):
 	html = render_to_string("friendlist/message.html", context=context)
 	await sendMessageWS(receiver, "messages", html)
 
-@login_required(login_url="/api/logout")
 async def response(request: Request) -> HttpResponse:
 	user: User = request.user
 
+	if user.is_anonymous:
+		return redirect("/api/logout")
 	if "friendID" not in request.data:
 		return Response({"message": "friend id missing in request body"}, status=401)
 	if "message" not in request.data or not request.data["message"].strip():

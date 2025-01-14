@@ -1,4 +1,5 @@
 {% extends "modules/base.html" %}
+{% load static %}
 {% block title %}Authentication{% endblock %}
 {% block content %}
 <div class="d-flex flex-column align-items-center justify-content-center login-registration-form"
@@ -29,6 +30,13 @@
 						</div>
 						<button type="submit" class="btn btn-primary">Login</button>
 					</form>
+					<form class="accordion-body" id="login42">
+						{% csrf_token %}
+						<button type="Log42" class="btn btn-primary">
+							Log with 
+							<img src="{% static 'assets/42.svg' %}" style="width: 25px; height: auto;">
+						</button>
+					</form>
 				</div>
 			</div>
 		</div>
@@ -58,6 +66,7 @@
 		</div>
 	</div>
 </div>
+{% include "modules/popup_otp.html" %}
 <script type="module" src="/static/auth/login.js"></script>
 <script type="module" src="/static/auth/register.js"></script>
 <script type="module" src="/static/auth/accordion.js"></script>

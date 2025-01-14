@@ -4,8 +4,7 @@ from django.http.response import HttpResponse
 from django.contrib.auth.models import User
 from database.models import FriendList, getFriendship, Messages
 from websockets.consumers import sendMessageWS
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from database.models import Messages
 
@@ -19,7 +18,6 @@ async def getMessages(friendship: FriendList):
 			"created_at": message.created_at,})
 	return arr
 
-@login_required(login_url="/api/logout")
 async def response(request: Request) -> HttpResponse:
 	user: User = request.user
 	id: int = request.data["friendID"]

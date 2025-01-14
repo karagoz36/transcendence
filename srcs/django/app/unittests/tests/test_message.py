@@ -1,9 +1,7 @@
 import json
-from django.http.response import HttpResponse
 from rest_framework.test import APITestCase, APIClient
 from django.contrib.auth.models import User
-from database.models import Messages, FriendList, getFriendship
-from http.cookies import SimpleCookie
+from database.models import Messages, FriendList
 
 def testGetFriendship(user: User, friend: User) -> FriendList|None:
 	friendship: FriendList
@@ -52,7 +50,7 @@ class MessageTest(APITestCase):
         str = "coucou ca va?"
         response = self.client.post("/api/friend/send-message", follow=True, data={"friendID": self.testUser.id, "message": str})
         self.assertEqual(response.status_code, 200)
-    
+
         friendship = testGetFriendship(self.user, self.testUser)
         self.assertNotEqual(friendship, None)
 
@@ -88,7 +86,7 @@ class MessageTest(APITestCase):
         str = ""
         response = self.client.post("/api/friend/send-message", follow=True, data={"friendID": self.testUser.id, "message": str})
         self.assertEqual(response.status_code, 401)
-    
+
         friendship = testGetFriendship(self.user, self.testUser)
         self.assertNotEqual(friendship, None)
     
