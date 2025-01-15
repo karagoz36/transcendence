@@ -25,7 +25,11 @@ urlpatterns = [
     path("auth/", views.auth, name="auth"),
     path("settings/", views.settings, name="settings"),
     path("friends/", views.friends, name="friends"),
-    path("profile/", views.profile, name="profile"),
+    # path("profile/", views.profile, name="profile"),
+    path("profile_list/", views.profile_list, name="profile_list"),
+    path("profile/<int:id>/", views.profile_detail, name="profile_detail"),
+    # path("prometheus/", views.prometheus, name="profile"),
+
     path("pong/lobby/", views.lobby, name="lobby"),
     path("pong/play/", views.play, name="play"),
 

@@ -1,0 +1,13 @@
+{% extends "modules/base.html" %}
+{% block title %}Profile List{% endblock %}
+{% block content %}
+{% include "modules/navbar.html" %}
+HELLO
+
+<ul>
+    {% for profile in profiles %}
+    <li><a href="{% url 'profile_detail' profile.user.id %}">{{ profile.user }}</a></li>
+    {% endfor %}
+   </ul>
+   
+{% endblock %}

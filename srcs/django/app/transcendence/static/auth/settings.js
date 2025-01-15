@@ -9,11 +9,12 @@ async function handleSettingsUpdate(e) {
     const form = e.target;
 
     /** Collect form data */
+    const username = form['username'].value;
     const email = form['email'].value;
     const is_2fa_enabled = form['is_2fa_enabled'].checked;
     const csrftoken = form['csrfmiddlewaretoken'].value;
     console.log("CSRF Token:", csrftoken);
-    console.log("Collected Data:", { email, is_2fa_enabled });
+    console.log("Collected Data:", { username, email, is_2fa_enabled });
 
     try {
         const response = await fetch("/api/settings/update/", {
@@ -22,7 +23,7 @@ async function handleSettingsUpdate(e) {
                 "Content-Type": "application/json",
                 "X-CSRFToken": csrftoken,
             },
-            body: JSON.stringify({ email, is_2fa_enabled }),
+            body: JSON.stringify({ username, email, is_2fa_enabled }),
         });
 
         if (response.ok) {
