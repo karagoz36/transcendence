@@ -2,14 +2,19 @@ from django.contrib.auth.models import User
 from database.models import FriendList
 from .users import userIsLoggedIn
 
-def userToDict(user: User) -> dict:
-    return {
-       "id": user.id,
-        "username": user.username,
-        "status": "online" if userIsLoggedIn(user) else "offline",
-        }
+class FriendData:
+    id: int
+    username: str
+    status: str
 
-async def getFriends(user: User):
+def userToDict(user: User) -> FriendData:
+    data = FriendData()
+    data.id = user.id
+    data.username = user.username
+    data.status = "online" if userIsLoggedIn(user) else "offline"
+    return data
+
+async def getFriends(user: User) -> list[FriendData]:
     res = []
 
     friends = FriendList.objects.select_related("friend").filter(user=user, invitePending=False)

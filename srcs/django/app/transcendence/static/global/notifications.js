@@ -58,11 +58,15 @@ class NotificationHandler extends BaseWebSocket {
 
 		/** @type {string[]} */
 		const urls = data.refresh
-		if (!urls) return
-		urls.forEach(async (url) => {
-			if (url == window.location.pathname)
+		if (!urls)
+			return
+
+		for (let url of urls) {
+			if (url == window.location.pathname) {
 				await getPage(url)
-		})
+				break
+			}
+		}
 	}
 }
 

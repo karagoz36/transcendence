@@ -137,3 +137,15 @@ def get_csrf_token(request):
 def refreshToken(request: Request):
     view = TokenRefreshView.as_view()
     return view(request)
+
+@api_view(["GET"])
+async def tournament(request: Request):
+    return await pages.tournamentCreate.response(request)
+
+@api_view(["GET"])
+async def tournamentInvite(request: Request):
+    return await pages.tournamentInvite.response(request)
+
+@api_view(["GET"])
+async def tournamentJoin(request: Request):
+    return await pages.tournamentJoin.response(request)

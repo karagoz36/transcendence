@@ -27,7 +27,10 @@ urlpatterns = [
     path("friends/", views.friends, name="friends"),
     path("profile/", views.profile, name="profile"),
     path("pong/lobby/", views.lobby, name="lobby"),
-    path("pong/play/", views.play, name="play"),
+    path("pong/play/", views.play, name="playPong"),
+    path("tournament/create/", views.tournament, name="tournament"),
+    path("tournament/invite/", views.tournamentInvite, name="tournamentInnvite"),
+    path("tournament/join/", views.tournamentJoin, name="tournamentJoin"),
 
     path("api/login", views.login, name="login"),
     path("api/logout", views.logout, name="logout"),

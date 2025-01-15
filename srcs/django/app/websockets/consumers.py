@@ -60,10 +60,10 @@ class Notification(BaseConsumer):
 
         friends = await getFriends(user)
         for friend in friends:
-            receiver: User = await User.objects.aget(id=friend["id"])
+            receiver: User = await User.objects.aget(id=friend.id)
             message = json.dumps({
                 "message": f"{user.username} logged in.",
-                "refresh": ["/friends/", "/pong/"]
+                "refresh": ["/friends/", "/pong/", "/tournament/create/"]
                 })
             await sendMessageWS(receiver, "notifications", message)
 
@@ -80,7 +80,7 @@ class Notification(BaseConsumer):
 
         friends = await getFriends(user)
         for friend in friends:
-            receiver: User = await User.objects.aget(id=friend["id"])
+            receiver: User = await User.objects.aget(id=friend.id)
             message = json.dumps({
                 "message": f"{user.username} logged out.",
                 "refresh": ["/friends/", "/pong/"]
