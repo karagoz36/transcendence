@@ -57,9 +57,13 @@ async function completeLogin(username, password, csrftoken) {
 }
 
 function showOtpPopup(username, password, csrftoken) {
+    /** @type {HTMLElement | null} */
     const otpPopup = document.getElementById("otpPopup");
-    const otpForm = document.getElementById("otpForm");
+    /** @type {HTMLFormElement|null} */
+    const otpForm = document.querySelector("#otpForm");
+    /** @type {NodeListOf<HTMLInputElement>} */
     const otpInputs = document.querySelectorAll(".otp-input");
+    /** @type {HTMLElement | null} */
     const cancelButton = document.getElementById("cancelOtp");
 
     if (!otpPopup || !otpForm || !otpInputs || !cancelButton) {
@@ -86,6 +90,7 @@ function showOtpPopup(username, password, csrftoken) {
                 otpInputs[index - 1].value = "";
             } else if (e.key === "Enter") {
                 e.preventDefault();
+                /** @type {object}} */
                 const submitButton = document.getElementById("submitOtp");
                 if (!submitButton.disabled) {
                     submitButton.click();
@@ -96,7 +101,7 @@ function showOtpPopup(username, password, csrftoken) {
         input.onpaste = (e) => {
             e.preventDefault();
 			isPasting = true;
-            const pasteData = (e.clipboardData || window.clipboardData).getData("text");
+            const pasteData = (e.clipboardData)?.getData("text") || "";
             if (/^\d{6}$/.test(pasteData)) {
                 otpInputs.forEach((field, idx) => {
                     field.value = pasteData[idx] || "";
@@ -143,10 +148,12 @@ function showOtpPopup(username, password, csrftoken) {
 }
 
 function validateOtpInputs() {
+     /** @type {NodeListOf<HTMLInputElement>} */
     const otpInputs = document.querySelectorAll(".otp-input");
+    /** @type {HTMLElement|null} */
     const submitButton = document.getElementById("submitOtp");
 
-    if (!submitButton) return;
+    if (!(submitButton instanceof HTMLButtonElement)) return;
 
     const allFilled = Array.from(otpInputs).every(input => input.value.trim() !== "");
     submitButton.disabled = !allFilled;
