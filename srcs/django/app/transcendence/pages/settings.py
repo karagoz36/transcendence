@@ -29,8 +29,26 @@ def handle_update_settings(request):
 
     try:
         data = json.loads(request.body)
+        username = data.get("username")
         email = data.get("email")
         is_2fa_enabled = data.get("is_2fa_enabled", False)
+
+        if not username:
+            return JsonResponse({"error": "Username is required"}, status=400)
+        
+        # revoir les exigences du username
+        if len(username) < 3:
+            return JsonResponse({"error": "Username must be at least 3 characters long"}, status=400)
+        
+        user = request.user
+        if user.is_anonymous:
+            return JsonResponse({"error": "Authentication required"}, status=401)
+        
+        print("COUCOU", flush=True)
+        # Vérification de l'unicité du username
+        if User.objects.filter(username=username).exclude(id=user.id).exists():
+            return JsonResponse({"error": "Username already taken"}, status=400)
+
 
         if not email:
             return JsonResponse({"error": "Email is required"}, status=400)
@@ -40,10 +58,8 @@ def handle_update_settings(request):
         except ValidationError:
             return JsonResponse({"error": "Wrong Email format"}, status=400)
 
-        user = request.user
-        if user.is_anonymous:
-            return JsonResponse({"error": "Authentication required"}, status=401)
 
+        user.username = username
         user.email = email
         user.save()
 
