@@ -9,20 +9,30 @@ import json
 
 class Tournament:
     organizer: User
-    players: list[User] = []
-    invited: list[User] = []
-    
+    public: bool = False
+    players: dict[int, User] = {}
+    invited: dict[int, User] = {}
+
     def __init__(self, organizer: User):
         self.organizer = organizer
     
     async def inviteUser(self, invited: User):
-        self.invited.append(invited)
+        self.invited[invited.id] = invited
         msg = json.dumps({"message": f"<a href='/tournament/join/?id={self.organizer.id}'>{self.organizer.username} invited you to its tournament</a>"})
         await sendMessageWS(invited, "notifications", msg)
     
     def addPlayer(self, player: User):
-        self.invited.remove(player)
-        self.players.append(player)
+        print(self.invited, flush=True)
+        del self.invited[player.id]
+        self.players[player.id] = player
+        msg = {"message": f"{player.username} accepted your invitation to your tournament", "refresh": ["/tournament/create/"]}
+        sendMessageWS(self.organizer, "notifications", json.dumps(msg))
+    
+    def userInvited(self, user: User) -> bool:
+        return self.invited.get(user.id) != None
+    
+    def userJoined(self, user: User) -> bool:
+        return self.players.get(user.id) != None
 
 tournaments: dict[int, Tournament] = {}
 
@@ -41,11 +51,15 @@ async def response(request: Request) -> Response:
 
     tournament = tournaments.get(user.id)
     if tournament == None:
-        tournaments[user.id] = Tournament(user)
+        tournament = Tournament(user)
+        tournaments[user.id] = tournament
     
     if tournament:
         for friend in friends:
-            if friend in tournament.invited or friend.status == "offline":
-                friends.remove(friend)
+            if friend.status != "offline":
+                continue
+            if not tournament.userInvited(user) and not tournament.userJoined(user):
+                continue
+            friends.remove(friend)
     return render(request, "tournament/create.html",
-        {"friends": friends, "ERROR": error, "SUCCESS": success})
+        {"friends": friends, "ERROR": error, "SUCCESS": success, "players": tournament.players})

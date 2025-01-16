@@ -3,4 +3,7 @@
 {% block content %}
 {% include "modules/navbar.html" %}
 <a href="/tournament/create/" class="btn btn-primary">Create Tournament</a>
+{% for tournament in tournaments %}
+{{tournament.state.value}}
+{% endfor %}
 {% endblock %}

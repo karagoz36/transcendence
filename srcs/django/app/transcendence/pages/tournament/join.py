@@ -18,7 +18,7 @@ async def response(request: Request) -> Response:
     if tournament is None:
         return redirect("/")
 
-    if user not in tournament.invited:
+    if not tournament.userInvited(user):
         return redirect("/")
     tournament.addPlayer(user)
     return render(request, "tournament/join.html")
