@@ -28,6 +28,7 @@ class PongSocket extends BaseWebSocket {
     game = null
     direction = ""
     clickPressed = false
+    playerUsername = null
 
 	constructor() {
 		super("pong")
@@ -114,13 +115,25 @@ class PongSocket extends BaseWebSocket {
         this.state = e_states.IN_GAME
         this.initGame()
         //IN WORK
-        // const playerName = document.querySelector("#player-name");
-        // const opponentName = document.querySelector("#opponent-name").textContent = this.opponent || "Opponent";
-        // if (!playerName || !opponentName) return;
-        // playerName.style.position = "absolute";
-        // playerName.style.position.left = this.game.paddle1.position.x + "px"; 
-        // opponent.style.position = "absolute";
-        // opponent.style.position.left = this.game.paddle2.position.x + "px"; 
+        /** @type {HTMLElement|null} */
+        const playerName = document.querySelector("#player-name");
+        const opponentName = document.querySelector("#opponent-name").textContent = this.opponent || "Opponent";
+        /** @type {HTMLElement|null} */
+        const opponentPos = document.querySelector("#opponent-name");
+        if (!playerName || !opponentName || !opponentPos) return;
+        if (!this.game)
+            return;
+        console.log(this.game.paddle1.position.x);
+        console.log(this.game.paddle2.position.x);
+        console.log(opponentName);
+        console.log(" this.game.you :", this.playerUsername);
+        if (opponentName != this.playerUsername) {
+            playerName.style.left = this.game.paddle1.position.x + "px"; 
+            opponentPos.style.left = this.game.paddle2.position.x + "px"; 
+        } else {
+            opponentPos.style.left = this.game.paddle1.position.x + "px"; 
+            playerName.style.left = this.game.paddle2.position.x + "px"; 
+        }
     }
 
     /** @param {MessageEvent} e */
@@ -130,7 +143,7 @@ class PongSocket extends BaseWebSocket {
         
         if (json.type == "game_over")
             return await getPage("/friends")
-
+        
         if (json.type == "update_pong" && this.state == e_states.IN_GAME) {
             if (!this.game)
                 return
@@ -142,6 +155,11 @@ class PongSocket extends BaseWebSocket {
 
             this.game.ball.position.x = json.ball.x
             this.game.ball.position.y = json.ball.y
+            this.playerUsername = json.p1.user
+            // if (json.p1.user) {
+                this.playerUsername = json.p1.user;
+                console.log("Joueur défini :", this.playerUsername);
+            // }
         }
         if (json.type == "invite_accepted" && this.state == e_states.IN_GAME)
             return this.socket.send(JSON.stringify({"type": "join_game"}))
