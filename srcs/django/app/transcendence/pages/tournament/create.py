@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from utils.friends import getFriends
 from utils.websocket import sendMessageWS
+from typing import Tuple
+import math
 import json
 
 class Tournament:
@@ -12,6 +14,7 @@ class Tournament:
     public: bool = False
     players: dict[int, User] = {}
     invited: dict[int, User] = {}
+    games: list[Tuple[User, User]] = []
 
     def __init__(self, organizer: User):
         self.organizer = organizer
@@ -24,12 +27,22 @@ class Tournament:
             "refresh": ["/"]
             }
         await sendMessageWS(invited, "notifications", json.dumps(msg))
+
+    async def removePlayer(self, player: User):
+        if player.id == self.organizer.id:
+            return await self.deleteTournament()
+
+        try: self.invited.pop(player.id)
+        except: pass
+
+        try: self.players.pop(player.id)
+        except: pass
     
-    def addPlayer(self, player: User):
+    async def addPlayer(self, player: User):
         del self.invited[player.id]
         self.players[player.id] = player
         msg = {"message": f"{player.username} accepted your invitation to your tournament", "refresh": ["/tournament/create/"]}
-        sendMessageWS(self.organizer, "notifications", json.dumps(msg))
+        await sendMessageWS(self.organizer, "notifications", json.dumps(msg))
     
     async def deleteTournament(self):
         tournaments.pop(self.organizer.id)
@@ -42,21 +55,32 @@ class Tournament:
         for player in self.invited.values():
             await sendMessageWS(player, "notifications", msg)
 
-    async def removePlayer(self, player: User):
-        try: self.invited.pop(player.id)
-        except: pass
-
-        try: self.players.pop(player.id)
-        except: pass
-
-        if player.id == self.organizer.id:
-            await self.deleteTournament()
-
     def userInvited(self, user: User) -> bool:
         return self.invited.get(user.id) != None
     
     def userJoined(self, user: User) -> bool:
         return self.players.get(user.id) != None
+
+    # In a single-elimination tournament where the number of players is not even,
+    # some players will receive a bye in the first round.
+    # A bye allows a player to advance to the next round without competing in that round.
+    def getNumberOfByes(self) -> int:
+        nextPowerOf2 = 2 ** math.ceil(math.log2(len(self.players)))
+        byes = nextPowerOf2 - len(self.players)
+        return byes
+
+    def createGames(self):
+        i = self.getNumberOfByes()
+
+        while i < len(self.players):
+            if i + 1 == len(self.players):
+                break
+            self.games.append((self.players[i], self.players[i + 1]))
+            i += 2
+    
+    def launchGame(self):
+        pass
+
 
 tournaments: dict[int, Tournament] = {}
 
@@ -79,9 +103,9 @@ async def response(request: Request) -> Response:
         tournaments[user.id] = tournament
 
     for friend in friends:
-        if friend.status == "offline":
+        if tournament.userInvited(friend) or tournament.userJoined(friend):
             friends.remove(friend)
-        elif tournament.userInvited(friend) or tournament.userJoined(friend):
-            friends.remove(friend)
-    return render(request, "tournament/create.html",
-        {"friends": friends, "ERROR": error, "SUCCESS": success, "players": tournament.players, "organizer": tournament.organizer})
+    return render(request, "tournament/create.html", {
+        "friends": friends, "ERROR": error, "SUCCESS": success,
+        "players": tournament.players.values(), "organizer": tournament.organizer
+        })

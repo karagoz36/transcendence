@@ -21,5 +21,5 @@ async def response(request: Request) -> Response:
     if not tournament.userJoined(user) and not tournament.userInvited(user):
         return redirect("/")
     if tournament.userInvited(user):
-        tournament.addPlayer(user)
-    return render(request, "tournament/lobby.html", context={"tournament": tournament})
+        await tournament.addPlayer(user)
+    return render(request, "tournament/lobby.html", context={"players": tournament.players})

@@ -3,6 +3,6 @@
 {% block content %}
 {% include "modules/navbar.html" %}
 {% for game in history %}
-    <p>{{game.user.username}}</p>
+    <p>{{game.user.username}} vs {{game.opponent.username}}</p>
 {% endfor %}
 {% endblock %}

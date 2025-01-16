@@ -14,7 +14,7 @@ async def response(request: Request) -> HttpResponse:
         return redirect("/tournament/create/")
     
     if username == user.username:
-        return redirect("/tournament/create/?error=You cannot invite yourself to you tournament")
+        return redirect("/tournament/create/?error=You cannot invite yourself to your tournament")
     try:
         invited: User = await User.objects.aget(username=username)
     except:
