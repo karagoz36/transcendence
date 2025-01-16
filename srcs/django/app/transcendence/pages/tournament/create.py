@@ -15,6 +15,7 @@ class Tournament:
     players: dict[int, User] = {}
     invited: dict[int, User] = {}
     games: list[Tuple[User, User]] = []
+    started: bool = False
 
     def __init__(self, organizer: User):
         self.organizer = organizer
@@ -79,8 +80,8 @@ class Tournament:
             i += 2
     
     def launchGame(self):
-        pass
-
+        self.started = True
+        self.createGames()
 
 tournaments: dict[int, Tournament] = {}
 

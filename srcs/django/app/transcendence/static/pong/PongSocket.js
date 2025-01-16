@@ -8,6 +8,9 @@ import { PongScene } from "./PongScene.js"
  * @property {string} [type]
  * @property {string} [friend]
  * @property {string} [html]
+ * @property {Object} [p1]
+ * @property {Object} [p2]
+ * @property {Object} [ball]
 */
 
 /**
@@ -106,13 +109,26 @@ class PongSocket extends BaseWebSocket {
     }
 
     /** @param {string} html */
-    async launchGame(html) {
+    launchGame(html) {
         const container = document.querySelector("#pong-container")
         if (!container) return
         container.innerHTML = html
-        await refreshScripts(container, container, "#pong-container")
         this.state = e_states.IN_GAME
         this.initGame()
+    }
+
+    /** @param {PongSocketData} json */
+    updatePong(json) {
+        if (!this.game)
+            return
+        this.game.paddle1.position.x = json.p1.x
+        this.game.paddle1.position.y = json.p1.y
+    
+        this.game.paddle2.position.x = json.p2.x
+        this.game.paddle2.position.y = json.p2.y
+    
+        this.game.ball.position.x = json.ball.x
+        this.game.ball.position.y = json.ball.y
     }
 
     /** @param {MessageEvent} e */
@@ -123,18 +139,9 @@ class PongSocket extends BaseWebSocket {
         if (json.type == "game_over")
             return await getPage("/friends")
 
-        if (json.type == "update_pong" && this.state == e_states.IN_GAME) {
-            if (!this.game)
-                return
-            this.game.paddle1.position.x = json.p1.x
-            this.game.paddle1.position.y = json.p1.y
+        if (json.type == "update_pong" && this.state == e_states.IN_GAME)
+            return this.updatePong(json)
 
-            this.game.paddle2.position.x = json.p2.x
-            this.game.paddle2.position.y = json.p2.y
-
-            this.game.ball.position.x = json.ball.x
-            this.game.ball.position.y = json.ball.y
-        }
         if (json.type == "invite_accepted" && this.state == e_states.IN_GAME)
             return this.socket.send(JSON.stringify({"type": "join_game"}))
 
@@ -152,7 +159,7 @@ class PongSocket extends BaseWebSocket {
                     console.error(json)
                     throw new Error("expected html")
                 }
-                await this.launchGame(json.html)
+                this.launchGame(json.html)
                 break
         }
     }

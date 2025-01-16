@@ -2,9 +2,12 @@
 {% block title %}Tournament{% endblock %}
 {% block content %}
 {% include "modules/navbar.html" %}
-{% for player in players %}
-<div style="text-align: center">
-  <a href="/profile/?id={{player.id}}">{{player.username}}</a>
+<div id="pong-container">
+    {% for player in players %}
+    <div style="text-align: center">
+      <a href="/profile/?id={{player.id}}">{{player.username}}</a>
+    </div>
+    {% endfor %}
 </div>
-{% endfor %}
+<script type="module" src="/static/pong/PongSocket.js"></script>
 {% endblock %}

@@ -9,6 +9,7 @@ from .tournament import create as tournamentCreate
 from .tournament import invite as tournamentInvite
 from .tournament import lobby as tournamentLobby
 from .tournament import leave as tournamentLeave
+from .tournament import start as tournamentStart
 
 from .pong import lobby
 

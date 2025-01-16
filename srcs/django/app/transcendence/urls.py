@@ -32,6 +32,7 @@ urlpatterns = [
     path("tournament/invite/", views.tournamentInvite, name="tournamentInnvite"),
     path("tournament/lobby/", views.tournamentLobby, name="tournamentLobby"),
     path("tournament/leave/", views.tournamentLeave, name="tournamentLeave"),
+    path("tournament/start/", views.tournamentStart, name="tournamentStart"),
 
     path("api/login", views.login, name="login"),
     path("api/logout", views.logout, name="logout"),
