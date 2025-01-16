@@ -14,7 +14,8 @@
                 </div>
                 <div class="col">
                     {% load static %}
-                    <img src="{%static 'images/avatar.png'%}" alt="avatar"/>
+                    <img src="{% if user.user.userprofile.avatar %}{{ user.user.userprofile.avatar.url }}{% else %}{% static 'images/avatar.png' %}{% endif %}" alt="avatar"/>
+                    {% comment %} <img src="{%static 'images/avatar.png'%}" alt="avatar"/> {% endcomment %}
                 </div>
             </div>
             <div class="row"> 
