@@ -41,14 +41,6 @@ class UserProfile(models.Model):
         totp = pyotp.TOTP(self.otp_secret)
         return totp.now()
 
-# class UserProfileBis(models.Model):
-# 	username = models.ForeignKey(User, on_delete=models.CASCADE)
-# 	avatar = models.ImageField(
-#         upload_to='avatars/',  # Dossier où les images seront stockées
-#         blank=True,            # Le champ peut être laissé vide
-#         null=True              # Valeur NULL autorisée dans la base de données
-#     )
-
 class Messages(models.Model):
 	friendship = models.ForeignKey(FriendList, on_delete=models.CASCADE)
 	message = models.TextField()

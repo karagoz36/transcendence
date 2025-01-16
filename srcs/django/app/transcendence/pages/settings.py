@@ -23,63 +23,6 @@ def response(request):
         "message": None,
     })
 
-
-# @permission_classes([AllowAny])
-# def handle_update_settings(request):
-#     if request.method != "POST":
-#         return JsonResponse({"error": "Invalid HTTP method"}, status=405)
-
-#     try:
-#         user = request.user
-#         if user.is_anonymous:
-#             return JsonResponse({"error": "Authentication required"}, status=401)
-
-#         profile, _ = UserProfile.objects.get_or_create(user=user)
-
-#         username = request.POST.get("username")
-#         email = request.POST.get("email")
-#         is_2fa_enabled = request.POST.get("is_2fa_enabled") == 'on'
-
-#         # # Gestion de l'avatar
-#         # avatar = request.FILES.get("avatar")
-#         # if avatar:
-#         #     if profile.avatar:
-#         #         # Supprimez l'ancien avatar s'il existe
-#         #         profile.avatar.delete(save=False)
-#         #     profile.avatar = avatar
-
-#         if 'avatar' in request.FILES:
-#             profile.avatar = request.FILES['avatar']
-
-#         # Enregistrez le profil mis à jour
-#         profile.save()
-
-
-#         # Mise à jour des autres champs
-#         if not username:
-#             return JsonResponse({"error": "Username is required"}, status=400)
-#         if len(username) < 3:
-#             return JsonResponse({"error": "Username must be at least 3 characters long"}, status=400)
-#         if User.objects.filter(username=username).exclude(id=user.id).exists():
-#             return JsonResponse({"error": "Username already taken"}, status=400)
-
-#         if not email:
-#             return JsonResponse({"error": "Email is required"}, status=400)
-#         try:
-#             validate_email(email)
-#         except ValidationError:
-#             return JsonResponse({"error": "Wrong Email format"}, status=400)
-
-#         user.username = username
-#         user.email = email
-#         user.save()
-
-#         profile.is_2fa_enabled = is_2fa_enabled
-#         profile.save()
-
-#         return JsonResponse({"message": "Settings updated successfully"}, status=200)
-#     except Exception as e:
-#         return JsonResponse({"error": str(e)}, status=500)
     
 @permission_classes([AllowAny])
 def handle_update_settings(request):
@@ -87,10 +30,14 @@ def handle_update_settings(request):
         return JsonResponse({"error": "Invalid HTTP method"}, status=405)
 
     try:
-        data = json.loads(request.body)
-        username = data.get("username")
-        email = data.get("email")
-        is_2fa_enabled = data.get("is_2fa_enabled", False)
+        user = request.user
+        if user.is_anonymous:
+            return JsonResponse({"error": "Authentication required"}, status=401)
+        
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        is_2fa_enabled = request.POST.get("is_2fa_enabled", False)
+        avatar = request.FILES.get("avatar")  # Récupère le fichier avatar
 
         if not username:
             return JsonResponse({"error": "Username is required"}, status=400)
@@ -99,16 +46,22 @@ def handle_update_settings(request):
         if len(username) < 3:
             return JsonResponse({"error": "Username must be at least 3 characters long"}, status=400)
         
-        user = request.user
-        if user.is_anonymous:
-            return JsonResponse({"error": "Authentication required"}, status=401)
-        
         # Vérification de l'unicité du username
         if User.objects.filter(username=username).exclude(id=user.id).exists():
             return JsonResponse({"error": "Username already taken"}, status=400)
 
-        if 'avatar' in request.FILES:
-            profile.avatar = request.FILES['avatar']
+        profile, _ = UserProfile.objects.get_or_create(user=user)
+
+        if avatar:
+            print("Avatar reçu :", avatar, flush=True)  # Débogage pour vérifier si l'avatar est bien reçu
+            # if profile.avatar:
+            #     # Supprimez l'ancien avatar s'il existe
+            #     profile.avatar.delete(save=False)
+            #     print("Ancien avatar supprimé", flush=True)
+            profile.avatar = avatar
+            print("Avatar sauvegardé dans le profil", flush=True)
+        else:   
+            print("Aucun avatar reçu",flush=True)
 
         if not email:
             return JsonResponse({"error": "Email is required"}, status=400)
@@ -123,9 +76,14 @@ def handle_update_settings(request):
         user.email = email
         user.save()
 
-        profile, _ = UserProfile.objects.get_or_create(user=user)
-        profile.is_2fa_enabled = is_2fa_enabled
+        if is_2fa_enabled == 'true':
+            profile.is_2fa_enabled = True
+        if is_2fa_enabled == 'false':
+            profile.is_2fa_enabled = False
+
         profile.save()
+        print("TEST", flush=True)
+
 
         return JsonResponse({"message": "Settings updated successfully"}, status=200)
     except Exception as e:

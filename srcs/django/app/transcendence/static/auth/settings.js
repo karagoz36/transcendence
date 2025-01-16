@@ -13,19 +13,29 @@ async function handleSettingsUpdate(e) {
     const email = form['email'].value;
     const is_2fa_enabled = form['is_2fa_enabled'].checked;
     const csrftoken = form['csrfmiddlewaretoken'].value;
+    const avatar = form['avatar'].files[0];
+
     console.log("CSRF Token:", csrftoken);
-    console.log("Collected Data:", { username, email, is_2fa_enabled });
+    console.log("Collected Data:", { username, email, avatar, is_2fa_enabled });
 
     try {
+        // Créer un objet FormData pour inclure l'avatar et les autres données
+        const formData = new FormData();
+        formData.append("username", username);
+        formData.append("email", email);
+        formData.append("is_2fa_enabled", is_2fa_enabled);
+        formData.append("avatar", avatar); // Ajouter l'avatar dans les données
+        
         const response = await fetch("/api/settings/update/", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
+                // "Content-Type": "application/json",
                 "X-CSRFToken": csrftoken,
             },
-            body: JSON.stringify({ username, email, is_2fa_enabled }),
+            body: formData,
+            // body: JSON.stringify({ username, email, is_2fa_enabled }),
         });
-
+        
         if (response.ok) {
             const data = await response.json();
             console.log("Settings update response:", data);
