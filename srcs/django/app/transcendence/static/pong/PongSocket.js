@@ -113,6 +113,14 @@ class PongSocket extends BaseWebSocket {
         await refreshScripts(container, container, "#pong-container")
         this.state = e_states.IN_GAME
         this.initGame()
+        //IN WORK
+        // const playerName = document.querySelector("#player-name");
+        // const opponentName = document.querySelector("#opponent-name").textContent = this.opponent || "Opponent";
+        // if (!playerName || !opponentName) return;
+        // playerName.style.position = "absolute";
+        // playerName.style.position.left = this.game.paddle1.position.x + "px"; 
+        // opponent.style.position = "absolute";
+        // opponent.style.position.left = this.game.paddle2.position.x + "px"; 
     }
 
     /** @param {MessageEvent} e */
