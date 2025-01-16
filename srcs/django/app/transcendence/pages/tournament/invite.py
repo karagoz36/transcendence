@@ -3,7 +3,7 @@ from django.http.response import HttpResponse
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .create import tournaments
+from .create import tournaments, Tournament
 
 @login_required(login_url="/api/logout")
 async def response(request: Request) -> HttpResponse:
@@ -22,6 +22,7 @@ async def response(request: Request) -> HttpResponse:
 
     tournament = tournaments.get(user.id)
     if tournament is None:
-        return redirect("/tournament/create/?error=Tried to send invite without creating tournament.")
+        tournament = Tournament(user)
+        tournaments[user.id] = tournament
     await tournament.inviteUser(invited)
     return redirect("/tournament/create/?success=Invite sent.")

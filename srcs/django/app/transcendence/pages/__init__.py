@@ -7,7 +7,8 @@ from . import profile
 
 from .tournament import create as tournamentCreate
 from .tournament import invite as tournamentInvite
-from .tournament import join as tournamentJoin
+from .tournament import lobby as tournamentLobby
+from .tournament import leave as tournamentLeave
 
 from .pong import lobby
 

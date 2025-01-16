@@ -30,7 +30,8 @@ urlpatterns = [
     path("pong/play/", views.play, name="playPong"),
     path("tournament/create/", views.tournament, name="tournament"),
     path("tournament/invite/", views.tournamentInvite, name="tournamentInnvite"),
-    path("tournament/join/", views.tournamentJoin, name="tournamentJoin"),
+    path("tournament/lobby/", views.tournamentLobby, name="tournamentLobby"),
+    path("tournament/leave/", views.tournamentLeave, name="tournamentLeave"),
 
     path("api/login", views.login, name="login"),
     path("api/logout", views.logout, name="logout"),

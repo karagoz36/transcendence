@@ -4,6 +4,6 @@
 {% include "modules/navbar.html" %}
 <a href="/tournament/create/" class="btn btn-primary">Create Tournament</a>
 {% for tournament in tournaments %}
-{{tournament.state.value}}
+{% include "tournament/invited.html" %}
 {% endfor %}
 {% endblock %}

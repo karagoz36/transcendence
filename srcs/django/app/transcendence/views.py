@@ -147,5 +147,9 @@ async def tournamentInvite(request: Request):
     return await pages.tournamentInvite.response(request)
 
 @api_view(["GET"])
-async def tournamentJoin(request: Request):
-    return await pages.tournamentJoin.response(request)
+async def tournamentLobby(request: Request):
+    return await pages.tournamentLobby.response(request)
+
+@api_view(["GET"])
+async def tournamentLeave(request: Request):
+    return await pages.tournamentLeave.response(request)
