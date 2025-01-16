@@ -21,8 +21,8 @@ async def response(request: Request) -> Response:
     if tournament is None:
         return redirect("/")
 
-    tournament.removePlayer(user)
-    msg = {"message": f"{user.username} left the tournament", "refresh": ["/tournament/create/", "/tournament/lobby/"]}
+    await tournament.removePlayer(user)
+    msg = {"message": f"{user.username} left the tournament", "refresh": ["/", "/tournament/create/", "/tournament/lobby/"]}
     msg = json.dumps(msg)
 
     for player in tournament.players.values():

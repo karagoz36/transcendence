@@ -4,6 +4,9 @@
 {% include "modules/navbar.html" %}
 <div style="margin: 0 auto; max-width: 95vw; width: 20rem; text-align: center; padding: 0.5rem; margin-bottom: 1rem;" class="alert alert-danger hide-empty">{{ERROR}}</div>
 <div style="margin: 0 auto; max-width: 95vw; width: 20rem; text-align: center; padding: 0.5rem; margin-bottom: 1rem;" class="alert alert-success hide-empty">{{SUCCESS}}</div>
+<div style="display: flex; justify-content: center; align-items: center; margin-bottom: 0.2rem" >
+  <a class="btn btn-danger" href="/tournament/leave/?id={{organizer.id}}">Delete tournament</a>
+</div>
 <form style="width: 20rem; margin: 0 auto; max-width: 95vw;" class="input-group mb-3" id="tournament-invite">
   <input style="border-top-left-radius: 5px; border-bottom-left-radius: 5px;" type="text" class="form-control" name="username" id="friend-username-input" placeholder="Insert username..." />
   <button type="submit" class="btn btn-outline-primary">Invite to tournament</button>

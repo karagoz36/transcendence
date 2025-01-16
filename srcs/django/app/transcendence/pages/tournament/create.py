@@ -30,16 +30,27 @@ class Tournament:
         self.players[player.id] = player
         msg = {"message": f"{player.username} accepted your invitation to your tournament", "refresh": ["/tournament/create/"]}
         sendMessageWS(self.organizer, "notifications", json.dumps(msg))
+    
+    async def deleteTournament(self):
+        tournaments.pop(self.organizer.id)
+        msg = {"message": f"{self.organizer.username} deleted its tournament", "refresh": ["/tournament/create/", "/tournament/lobby/", "/"]}
+        msg = json.dumps(msg)
+    
+        for player in self.players.values():
+            await sendMessageWS(player, "notifications", msg)
+    
+        for player in self.invited.values():
+            await sendMessageWS(player, "notifications", msg)
 
-    def removePlayer(self, player: User):
+    async def removePlayer(self, player: User):
         try: self.invited.pop(player.id)
         except: pass
 
         try: self.players.pop(player.id)
         except: pass
 
-        if len(self.players) == 0:
-            tournaments.pop(self.organizer.id)
+        if player.id == self.organizer.id:
+            await self.deleteTournament()
 
     def userInvited(self, user: User) -> bool:
         return self.invited.get(user.id) != None
@@ -73,4 +84,4 @@ async def response(request: Request) -> Response:
         elif tournament.userInvited(friend) or tournament.userJoined(friend):
             friends.remove(friend)
     return render(request, "tournament/create.html",
-        {"friends": friends, "ERROR": error, "SUCCESS": success, "players": tournament.players})
+        {"friends": friends, "ERROR": error, "SUCCESS": success, "players": tournament.players, "organizer": tournament.organizer})
