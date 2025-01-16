@@ -13,7 +13,8 @@
                     <h2>{{ user.user.username }}</h2>
                 </div>
                 <div class="col">
-                    avatar:
+                    {% load static %}
+                    <img src="{%static 'images/avatar.png'%}" alt="avatar"/>
                 </div>
             </div>
             <div class="row"> 

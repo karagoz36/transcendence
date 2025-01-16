@@ -11,7 +11,13 @@
     <label for="username">Username:</label>
     <input type="text" id="username" name="username" value="{{ user.username }}" required>
     <br><br>
-
+    <label for="avatar">Upload Avatar:</label>
+    <input type="file" id="avatar" name="avatar">
+    {% if profile.avatar %}
+        <br><br>
+        <img src="{{ profile.avatar.url }}" alt="Current Avatar" width="100" height="100">
+    {% endif %}
+    <br><br>
     <h2> Authentication</h2>
     <label for="email">Email Address:</label>
     <input type="email" id="email" name="email" value="{{ user.email }}" required>
