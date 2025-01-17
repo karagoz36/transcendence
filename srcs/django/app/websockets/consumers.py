@@ -136,8 +136,22 @@ class Pong(BaseConsumer):
                     err = {"type": "error", "error": "trying to launch a game without an opponent"}
                     return sendMessageWS(self.user, "pong", json.dumps(err))
                 htmlSTR = render_to_string("pong/play.html")
-                await sendMessageWS(self.opponent, "pong", json.dumps({"type": "launch_game", "html": htmlSTR}))
-                await sendMessageWS(self.user, "pong", json.dumps({"type": "launch_game", "html": htmlSTR}))
+                launch_data = {
+                    "type": "launch_game",
+                    "html": htmlSTR,
+                    "player": self.user.username,
+                    "opponent": self.opponent.username,
+                    "initiator": self.user.username,
+				}
+                launch_data_opponent = {
+                    "type": "launch_game",
+                    "html": htmlSTR,
+                    "player": self.opponent.username,
+                    "opponent": self.user.username,
+                    "initiator": self.user.username,
+				}
+                await sendMessageWS(self.opponent, "pong", json.dumps(launch_data))
+                await sendMessageWS(self.user, "pong", json.dumps(launch_data_opponent))
                 asyncio.create_task(gameLoop(self.user, self.opponent))
 
             case "join_game":

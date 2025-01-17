@@ -160,7 +160,7 @@ async def gameLoop(user1: User, user2: User):
             return
         data = {
             "type": "update_pong",
-            "p1": {"x": p1.pos.x, "y": p1.pos.y, "user":p1.user.username},
+            "p1": {"x": p1.pos.x, "y": p1.pos.y},
             "p2": {"x": p2.pos.x, "y": p2.pos.y},
             "ball": {"x": ball.pos.x, "y": ball.pos.y}
         }

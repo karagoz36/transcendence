@@ -8,6 +8,9 @@ import { PongScene } from "./PongScene.js"
  * @property {string} [type]
  * @property {string} [friend]
  * @property {string} [html]
+ * @property {string} [player]
+ * @property {string} [opponent]
+ * @property {string} [initiator]
 */
 
 /**
@@ -28,7 +31,6 @@ class PongSocket extends BaseWebSocket {
     game = null
     direction = ""
     clickPressed = false
-    playerUsername = null
 
 	constructor() {
 		super("pong")
@@ -106,35 +108,38 @@ class PongSocket extends BaseWebSocket {
         setInterval(this.sendDirection.bind(this), 1_000 / 60_000)
     }
 
-    /** @param {string} html */
-    async launchGame(html) {
-        const container = document.querySelector("#pong-container")
-        if (!container) return
-        container.innerHTML = html
-        await refreshScripts(container, container, "#pong-container")
-        this.state = e_states.IN_GAME
-        this.initGame()
-        //IN WORK
+	/** @param {string} html */
+	async launchGame(html, player, opponent, initiator) {
+		const container = document.querySelector("#pong-container");
+		if (!container) return;
+		container.innerHTML = html;
+		await refreshScripts(container, container, "#pong-container");
+		this.state = e_states.IN_GAME;
+		this.initGame();
+	
         /** @type {HTMLElement|null} */
-        const playerName = document.querySelector("#player-name");
-        const opponentName = document.querySelector("#opponent-name").textContent = this.opponent || "Opponent";
+		const playerName = document.querySelector("#player-name");
         /** @type {HTMLElement|null} */
-        const opponentPos = document.querySelector("#opponent-name");
-        if (!playerName || !opponentName || !opponentPos) return;
-        if (!this.game)
-            return;
-        console.log(this.game.paddle1.position.x);
-        console.log(this.game.paddle2.position.x);
-        console.log(opponentName);
-        console.log(" this.game.you :", this.playerUsername);
-        if (opponentName != this.playerUsername) {
-            playerName.style.left = this.game.paddle1.position.x + "px"; 
-            opponentPos.style.left = this.game.paddle2.position.x + "px"; 
-        } else {
-            opponentPos.style.left = this.game.paddle1.position.x + "px"; 
-            playerName.style.left = this.game.paddle2.position.x + "px"; 
-        }
-    }
+		const opponentName = document.querySelector("#opponent-name");
+		const namesContainer = document.querySelector("#pong-names");
+	
+		if (!playerName || !opponentName || !namesContainer) {
+			return;
+		}
+		if (!this.game)
+			return
+		if (player === initiator) {
+			playerName.textContent = "YOU";
+			opponentName.textContent = opponent;
+			playerName.style.left = this.game.paddle1.position.x + "px";
+			opponentName.style.left = this.game.paddle2.position.x + "px"; 
+		} else {
+			playerName.textContent = opponent;
+			opponentName.textContent = "YOU";
+			playerName.style.left = this.game.paddle1.position.x + "px"; 
+			opponentName.style.left = this.game.paddle2.position.x + "px"; 
+		}
+	}
 
     /** @param {MessageEvent} e */
     async receive(e) {
@@ -155,11 +160,6 @@ class PongSocket extends BaseWebSocket {
 
             this.game.ball.position.x = json.ball.x
             this.game.ball.position.y = json.ball.y
-            this.playerUsername = json.p1.user
-            // if (json.p1.user) {
-                this.playerUsername = json.p1.user;
-                console.log("Joueur défini :", this.playerUsername);
-            // }
         }
         if (json.type == "invite_accepted" && this.state == e_states.IN_GAME)
             return this.socket.send(JSON.stringify({"type": "join_game"}))
@@ -174,11 +174,11 @@ class PongSocket extends BaseWebSocket {
                 this.socket.send(JSON.stringify({"type": "launch_game"}))
                 break;
             case e_states.LAUNCH_GAME:
-                if (!json.html) {
+                if (!json.html || !json.player || !json.opponent || !json.initiator) {
                     console.error(json)
                     throw new Error("expected html")
                 }
-                await this.launchGame(json.html)
+                await this.launchGame(json.html, json.player, json.opponent, json.initiator)
                 break
         }
     }
