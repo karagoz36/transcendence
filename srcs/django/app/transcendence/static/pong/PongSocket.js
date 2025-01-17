@@ -160,6 +160,14 @@ class PongSocket extends BaseWebSocket {
 
             this.game.ball.position.x = json.ball.x
             this.game.ball.position.y = json.ball.y
+			
+			const playerScoreElement = document.querySelector("#player-score");
+			const opponentScoreElement = document.querySelector("#opponent-score");
+	
+			if (playerScoreElement && opponentScoreElement) {
+				playerScoreElement.textContent = json.score.p1;
+				opponentScoreElement.textContent = json.score.p2;
+			}
         }
         if (json.type == "invite_accepted" && this.state == e_states.IN_GAME)
             return this.socket.send(JSON.stringify({"type": "join_game"}))

@@ -162,7 +162,8 @@ async def gameLoop(user1: User, user2: User):
             "type": "update_pong",
             "p1": {"x": p1.pos.x, "y": p1.pos.y},
             "p2": {"x": p2.pos.x, "y": p2.pos.y},
-            "ball": {"x": ball.pos.x, "y": ball.pos.y}
+            "ball": {"x": ball.pos.x, "y": ball.pos.y},
+            "score": {"p1": p1.score, "p2": p2.score}
         }
         await sendMessageWS(p1.user, "pong", json.dumps(data))
         await sendMessageWS(p2.user, "pong", json.dumps(data))

@@ -1,30 +1,50 @@
 <style>
-  #pong-container {
-    display: flex;
-    justify-content: center;
-    overflow: hidden;
-  }
-
-  #pong-container>canvas {
-    max-height: 80vh;
-    margin-bottom: 2vh;
-  }
-  #pong-names {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    width: 100%;
-    font-size: 20px;
-    font-weight: bold;
-    color: white;
-    position: absolute;
-    bottom: 20px;
-    left: 0;
-    text-align: center;
-  }
+	#pong-container {
+	  display: flex;
+	  justify-content: center;
+	  overflow: hidden;
+	}
+  
+	#pong-container > canvas {
+	  max-height: 80vh;
+	  margin-bottom: 2vh;
+	}
+  
+	#pong-names {
+	  display: flex;
+	  justify-content: space-around;
+	  align-items: center;
+	  width: 100%;
+	  font-size: 20px;
+	  font-weight: bold;
+	  color: white;
+	  position: absolute;
+	  bottom: 20px;
+	  left: 0;
+	  text-align: center;
+	}
+  
+	#player-container {
+	  display: flex;
+	  flex-direction: column;
+	  align-items: center;
+	}
+  
+	.score {
+	  font-size: 16px;
+	  font-weight: normal;
+	  margin-top: 5px;
+	}
 </style>
-
+  
 <div id="pong-names">
-  <span id="player-name">YOU</span>
-  <span id="opponent-name"></span>
+<div class="player-container">
+	<span id="player-score" class="score">0</span>
+	<span id="player-name">YOU</span>
 </div>
+<div class="player-container">
+	<span id="opponent-score" class="score">0</span>
+	<span id="opponent-name"></span>
+</div>
+</div>
+  
