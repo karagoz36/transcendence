@@ -2,7 +2,11 @@
 {% block title %}Profile{% endblock %}
 {% block content %}
 {% include "modules/navbar.html" %}
+HEllo
 {% for game in history %}
     <p>{{game.user.username}}</p>
+    played against <p>{{game.opponent}}</p>
+    and got <p>{{game.user_score}}</p>
+    to <p>{{game.opponent_score}}</p>
 {% endfor %}
 {% endblock %}

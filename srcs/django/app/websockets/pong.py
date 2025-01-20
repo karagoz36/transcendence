@@ -155,8 +155,12 @@ async def gameLoop(user1: User, user2: User):
             data = {"type": "game_over"}
             await sendMessageWS(p1.user, "pong", json.dumps(data))
             await sendMessageWS(p2.user, "pong", json.dumps(data))
-            await PongHistory.objects.acreate(player1=p1.user, player2=p2.user,
-                player1_score=p1.score, player2_score=p2.score)
+            if p1.score == 3:
+                await PongHistory.objects.acreate(player1=p1.user, player2=p2.user,
+                    player1_score=p1.score, player2_score=p2.score, winner=p1.user)
+            if p2.score == 3:
+                await PongHistory.objects.acreate(player1=p1.user, player2=p2.user,
+                    player1_score=p1.score, player2_score=p2.score, winner=p2.user)
             return
         data = {
             "type": "update_pong",

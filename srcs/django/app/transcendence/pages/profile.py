@@ -26,11 +26,13 @@ async def getPongHistory(user: User):
     return history
 
 async def response(request: Request):
+
     id: int = request.query_params.get("id")
     user: User = None
 
     if id is None:
         return redirect("/")
+    print("COUCOU", flush=True)
     try:
         user = await User.objects.aget(id=id)
     except:

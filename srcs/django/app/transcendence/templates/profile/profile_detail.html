@@ -8,21 +8,29 @@
 <main>
     <section>
         <div class="container">
-            <div class="row"> 
-                <div class="col"> 
+            <div class="row mb-3"> 
+                <div class="col-10 bg-secondary d-flex align-items-center justify-content-center">
                     <h2>{{ user.user.username }}</h2>
                 </div>
-                <div class="col">
+                <div class="col-2" style="background-color: transparent;">
                     {% load static %}
-                    <img src="{% if user.user.userprofile.avatar %}{{ user.user.userprofile.avatar.url }}{% else %}{% static 'images/avatar.png' %}{% endif %}" alt="avatar"/>
-                    {% comment %} <img src="{%static 'images/avatar.png'%}" alt="avatar"/> {% endcomment %}
+                    <img class="img-fluid"
+                    src="{% if user.user.userprofile.avatar %}{{ user.user.userprofile.avatar.url }}{% else %}{% static 'images/avatar-transparent.png' %}{% endif %}" 
+                    alt="avatar"
+                    style="background-color: transparent;"
+                    width="150" 
+                    height="150"/>
                 </div>
             </div>
-            <div class="row"> 
-                stats:
+            <div class="row mb-3 border d-flex 
+            align-items-center text-center
+            py-3">
+                <h2>Stats:</h2>
             </div>
-            <div class="row"> 
-                Match history:
+            <div class="row mb-3 border d-flex 
+            align-items-center text-center
+            py-3"> 
+                <h2>Match history:</h2>
             </div>
         </div>
     </section>

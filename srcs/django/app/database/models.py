@@ -30,7 +30,6 @@ class UserProfile(models.Model):
         blank=True,            # Le champ peut être laissé vide
         null=True              # Valeur NULL autorisée dans la base de données
     )
-	# avatar = models.ImageField(default='avatar.png', blank=True)
 
     def generate_otp_secret(self):
         if not self.otp_secret:
@@ -52,3 +51,5 @@ class PongHistory(models.Model):
 	player1_score = models.IntegerField()
 	player2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="player2")
 	player2_score = models.IntegerField()
+	game_date = models.DateTimeField(auto_now_add=True)
+	winner = winner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="winner", null=True, blank=True)
