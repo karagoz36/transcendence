@@ -52,6 +52,10 @@ def settings(request: Request):
 def update_settings(request: Request):
     return pages.settings.handle_update_settings(request)
 
+@api_view(['POST'])
+def remove_avatar(request: Request):
+    return pages.settings.handle_remove_avatar(request)
+
 @api_view(['GET'])
 async def friends(request: Request):
     return await pages.friends.response(request)

@@ -9,20 +9,20 @@
     <section>
         <div class="container">
             <div class="row mb-3"> 
-                <div class="col-10 d-flex justify-content-center flex-column">
+                <div class="col-9 d-flex justify-content-center flex-column">
                     <h1>{{ user.username }}</h1>
-                    Joined: {{user.date_joined}}<br>
+                    Joined: {{user.date_joined}}
                     <br>
                     Last login: {{user.last_login}}
                 </div>
-                <div class="col-2" style="background-color: transparent;">
+                <div class="col-3" style="background-color: transparent;">
                     {% load static %}
                     <img class="img-fluid"
-                    src="{% if user.user.userprofile.avatar %}{{ user.user.userprofile.avatar.url }}{% else %}{% static 'images/avatar-transparent.png' %}{% endif %}" 
+                    src="{% if avatar %}{{ avatar.url }}{% else %}{% static 'images/avatar-transparent.png' %}{% endif %}" 
                     alt="avatar"
                     style="background-color: transparent;"
-                    width="150" 
-                    height="150"/>
+                    width="300" 
+                    height="300"/>
                 </div>
             </div>
             <div class="row mb-3 border d-flex 

@@ -53,24 +53,15 @@ def handle_update_settings(request):
         profile, _ = UserProfile.objects.get_or_create(user=user)
 
         if avatar:
-            print("Avatar reçu :", avatar, flush=True)  # Débogage pour vérifier si l'avatar est bien reçu
-            # if profile.avatar:
-            #     # Supprimez l'ancien avatar s'il existe
-            #     profile.avatar.delete(save=False)
-            #     print("Ancien avatar supprimé", flush=True)
             profile.avatar = avatar
-            print("Avatar sauvegardé dans le profil", flush=True)
-        else:   
-            print("Aucun avatar reçu",flush=True)
 
-        if not email:
-            return JsonResponse({"error": "Email is required"}, status=400)
-
-        try:
-            validate_email(email)
-        except ValidationError:
-            return JsonResponse({"error": "Wrong Email format"}, status=400)
-
+        if is_2fa_enabled == True:
+            if not email:
+                return JsonResponse({"error": "Email is required"}, status=400)
+            try:
+                validate_email(email)
+            except ValidationError:
+                return JsonResponse({"error": "Wrong Email format"}, status=400)
 
         user.username = username
         user.email = email
@@ -82,9 +73,24 @@ def handle_update_settings(request):
             profile.is_2fa_enabled = False
 
         profile.save()
-        print("TEST", flush=True)
-
 
         return JsonResponse({"message": "Settings updated successfully"}, status=200)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+@permission_classes([AllowAny])
+def handle_remove_avatar(request):
+    try:
+        user = request.user
+        if user.is_anonymous:
+            return JsonResponse({"error": "Authentication required"}, status=401)
+        profile, _ = UserProfile.objects.get_or_create(user=user)
+
+        if profile.avatar:
+            profile.avatar.delete(save=False)  # Supprimer le fichier
+            profile.avatar = None  # Réinitialiser le champ
+            profile.save()
+        return JsonResponse({"message": "Avatar removed successfully"}, status=200)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+

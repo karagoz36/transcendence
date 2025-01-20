@@ -24,7 +24,7 @@ async function handleSettingsUpdate(e) {
         formData.append("username", username);
         formData.append("email", email);
         formData.append("is_2fa_enabled", is_2fa_enabled);
-        formData.append("avatar", avatar); // Ajouter l'avatar dans les données
+        formData.append("avatar", avatar);
         
         const response = await fetch("/api/settings/update/", {
             method: "POST",
@@ -51,6 +51,32 @@ async function handleSettingsUpdate(e) {
     }
 }
 
+
+/** Remove avatar logic */
+async function handleRemoveAvatar() {
+    const csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+    try {
+        const response = await fetch("/api/settings/remove-avatar/", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrftoken,
+            },
+        });
+
+        if (response.ok) {
+            alert("Avatar removed successfully!");
+            location.reload();
+        } else {
+            const errorData = await response.json();
+            alert("Error removing avatar: " + (errorData.error || "Unknown error"));
+        }
+    } catch (err) {
+        console.error("Error in handleRemoveAvatar:", err);
+        alert("An unexpected error occurred. Please try again.");
+    }
+}
+
 /** Initialize event listeners */
 function main() {
     /** @type {HTMLFormElement|null} */
@@ -59,6 +85,11 @@ function main() {
         throw new Error("main: Unable to find settings form");
     }
     form.onsubmit = handleSettingsUpdate;
+
+    const removeAvatarButton = document.querySelector("#remove-avatar");
+    if (removeAvatarButton) {
+        removeAvatarButton.onclick = handleRemoveAvatar;
+    }
 }
 
 main();

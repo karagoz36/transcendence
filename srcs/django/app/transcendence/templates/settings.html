@@ -1,34 +1,69 @@
+<style>
+    .settings-container {
+        display: flex;
+        gap: 20px; /* Espace entre les deux blocs */
+        align-items: flex-start; /* Aligner les blocs en haut */
+    }
+
+    .personal-info, .authentication {
+        flex: 1; /* Les deux colonnes occupent la même largeur */
+        max-width: 50%; /* Limite la largeur de chaque bloc */
+    }
+
+    .personal-info img {
+        display: block; /* Assure que l'image n'a pas de comportement inline */
+        margin-top: 10px;
+    }
+
+    button {
+        margin-top: 10px;
+    }
+</style>
+
+
+
 {% extends "modules/base.html" %}
 {% block title %}Settings{% endblock %}
 {% block content %}
 {% include "modules/navbar.html" %}
 
 <h1>Settings</h1>
-
 <form id="settings-form" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
-    <h2> Personal information</h2>
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" value="{{ user.username }}" required>
-    <br><br>
-    <label for="avatar">Upload Avatar:</label>
-    <input type="file" id="avatar" name="avatar">
-    {% if profile.avatar %}
-        <br><br>
-        <img src="{{ profile.avatar.url }}" alt="Current Avatar" width="100" height="100">
-    {% endif %}
-    <br><br>
-    <h2> Authentication</h2>
-    <label for="email">Email Address:</label>
-    <input type="email" id="email" name="email" value="{{ user.email }}" required>
-    <br><br>
-
-    <label for="2fa">Enable Two-Factor Authentication (2FA):</label>
-    <input type="checkbox" id="2fa" name="is_2fa_enabled" 
-           {% if profile.is_2fa_enabled %}checked{% endif %}>
-    <br><br>
-
-    <button type="submit">Save Changes</button>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h2> Personal information</h2>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" value="{{ user.username }}" required>
+                <br><br>
+                <label for="avatar">Upload Avatar:</label>
+                <input type="file" id="avatar" name="avatar">
+                {% if profile.avatar %}
+                    <br><br>
+                    <img src="{{ profile.avatar.url }}" alt="Current Avatar" width="100" height="100">
+                    <br><br>
+                    <button type="button" id="remove-avatar">Remove Avatar</button>
+                {% endif %}
+                <br><br>
+            </div>
+            <div class="col-md-6">
+                <h2> Authentication</h2>
+                <label for="email">Email Address:</label>
+                <input type="email" id="email" name="email" value="{{ user.email }}">
+                <br><br>
+                
+                <label for="2fa">Enable Two-Factor Authentication (2FA):</label>
+                <input type="checkbox" id="2fa" name="is_2fa_enabled" 
+                {% if profile.is_2fa_enabled %}checked{% endif %}>
+                <br><br>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="d-flex justify-content-center mt-3">
+        <button type="submit">Save Changes</button>
+    </div>
 </form>
 
 {% if message %}

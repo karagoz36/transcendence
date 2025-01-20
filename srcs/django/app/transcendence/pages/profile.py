@@ -1,7 +1,7 @@
 from rest_framework.request import Request
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
-from database.models import PongHistory
+from database.models import PongHistory, UserProfile
 from asgiref.sync import sync_to_async
 from django.db.models import Q
 
@@ -50,15 +50,18 @@ async def response(request: Request):
 
     id: int = request.query_params.get("id")
     user: User = None
+    profile: UserProfile = None
 
     if id is None:
         return redirect("/")
     try:
         user = await User.objects.aget(id=id)
+        profile = await UserProfile.objects.aget(user_id=id)
     except:
         return redirect("/")
 
     context = {'user': user,
+               "avatar": profile.avatar,
               "history": await getPongHistory(user),
               "stats": await getStats(user) }
     return render(request, "profile/profile.html", context)
