@@ -132,6 +132,18 @@ class Ball:
         self.pos.x += self.velocity.x
         self.pos.y += self.velocity.y
 
+    async def gameOver(self) -> bool:
+        if self.p1.score != 3 and self.p2.score != 3:
+            return False
+
+        data = {"type": "game_over"}
+        await sendMessageWS(self.p1.user, "pong", json.dumps(data))
+        await sendMessageWS(self.p2.user, "pong", json.dumps(data))
+
+        await PongHistory.objects.acreate(player1=self.p1.user, player2=self.p2.user,
+            player1_score=self.p1.score, player2_score=self.p2.score)
+        return True
+
 async def gameLoop(user1: User, user2: User):
     p1 = PongPlayer(user1, 10)
     p2 = PongPlayer(user2, -10)
@@ -141,13 +153,10 @@ async def gameLoop(user1: User, user2: User):
         p1.move()
         p2.move()
         ball.move()
-        if p1.score == 3 or p2.score == 3:
-            data = {"type": "game_over"}
-            await sendMessageWS(p1.user, "pong", json.dumps(data))
-            await sendMessageWS(p2.user, "pong", json.dumps(data))
-            await PongHistory.objects.acreate(player1=p1.user, player2=p2.user,
-                player1_score=p1.score, player2_score=p2.score)
+
+        if await ball.gameOver() == True:
             return
+
         data = {
             "type": "update_pong",
             "p1": {"x": p1.pos.x, "y": p1.pos.y},

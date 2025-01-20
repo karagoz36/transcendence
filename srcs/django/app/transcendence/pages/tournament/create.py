@@ -1,6 +1,7 @@
 from rest_framework.request import Request
 from rest_framework.response import Response
 from django.shortcuts import render
+from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from utils.friends import getFriends
@@ -8,6 +9,8 @@ from utils.websocket import sendMessageWS
 from typing import Tuple
 import math
 import json
+import asyncio
+from websockets.pong import gameLoop
 
 class Tournament:
     organizer: User
@@ -74,16 +77,32 @@ class Tournament:
 
     def createGames(self):
         i = self.getNumberOfByes()
+        players = list(self.players.values())
 
-        while i < len(self.players):
-            if i + 1 == len(self.players):
+        while i < len(players):
+            if i + 1 == len(players):
                 break
-            self.games.append((self.players[i], self.players[i + 1]))
+            self.games.append((players[i], players[i + 1]))
             i += 2
-    
-    def launchGame(self):
+
+    async def launchGame(self):
         self.started = True
         self.createGames()
+        htmlSTR = render_to_string("pong/play.html")
+
+        for players in self.games:
+            msg = json.dumps({"type": "launch_game", "html": htmlSTR})
+            await sendMessageWS(players[0], "pong", msg)
+            await sendMessageWS(players[1], "pong", msg)
+
+            task = asyncio.create_task(gameLoop(players[0], players[1]))
+
+            def onGameover(players: Tuple[User, User]):
+                print(players, flush=True)
+
+            def callback(task):
+                onGameover(players)
+            task.add_done_callback(callback)
 
 tournaments: dict[int, Tournament] = {}
 

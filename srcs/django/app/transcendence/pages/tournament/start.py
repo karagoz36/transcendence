@@ -12,5 +12,5 @@ async def response(request: Request) -> Response:
 
     if tournament is None:
         return redirect("/")
-    tournament.launchGame()
+    await tournament.launchGame()
     return redirect("/")

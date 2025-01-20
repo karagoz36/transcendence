@@ -137,7 +137,7 @@ class PongSocket extends BaseWebSocket {
         const json = JSON.parse(e.data)
         
         if (json.type == "game_over")
-            return await getPage("/friends")
+            return await getPage("/")
 
         if (json.type == "update_pong" && this.state == e_states.IN_GAME)
             return this.updatePong(json)
