@@ -72,9 +72,9 @@ async def profile(request: Request):
 def profile_list(request: Request):
     return pages.profile_list.response(request)
 
-@api_view(['GET'])
-def profile_detail(request: Request, id):
-    return pages.profile_detail.response(request, id)
+# @api_view(['GET'])
+# def profile_detail(request: Request, id):
+#     return pages.profile_detail.response(request, id)
 
 @api_view(['POST'])
 async def addFriend(request: Request):
