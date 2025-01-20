@@ -12,14 +12,16 @@ import json
 class Tournament:
     organizer: User
     public: bool = False
-    players: dict[int, User] = {}
-    invited: dict[int, User] = {}
-    games: list[Tuple[User, User]] = []
+    players: dict[int, User]
+    invited: dict[int, User]
+    games: list[Tuple[User, User]]
     started: bool = False
 
     def __init__(self, organizer: User):
         self.organizer = organizer
-        self.players[organizer.id] = organizer
+        self.players = {organizer.id: organizer}
+        self.invited = {}
+        self.games = []
     
     async def inviteUser(self, invited: User):
         self.invited[invited.id] = invited
@@ -102,7 +104,6 @@ async def response(request: Request) -> Response:
     if tournament == None:
         tournament = Tournament(user)
         tournaments[user.id] = tournament
-
     for friend in friends:
         if tournament.userInvited(friend) or tournament.userJoined(friend):
             friends.remove(friend)
