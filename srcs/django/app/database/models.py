@@ -52,4 +52,4 @@ class PongHistory(models.Model):
 	player2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="player2")
 	player2_score = models.IntegerField()
 	game_date = models.DateTimeField(auto_now_add=True)
-	winner = winner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="winner", null=True, blank=True)
+	winner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="winner", null=True, blank=True)

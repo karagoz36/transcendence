@@ -5,6 +5,7 @@ from database.models import PongHistory
 from asgiref.sync import sync_to_async
 from django.db.models import Q
 
+@sync_to_async
 def getStats(user: User):
     wins = PongHistory.objects.filter(winner=user).count()
 
@@ -59,5 +60,5 @@ async def response(request: Request):
 
     context = {'user': user,
               "history": await getPongHistory(user),
-              "stats": getStats(user) }
+              "stats": await getStats(user) }
     return render(request, "profile/profile.html", context)
