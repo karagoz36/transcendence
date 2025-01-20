@@ -89,10 +89,10 @@ class Ball:
 
     def scored(self) -> int:
         if self.pos.x >= self.p1.pos.x + 1:
-            self.p1.score += 1
+            self.p2.score += 1
             return True
         if self.pos.x <= self.p2.pos.x - 1:
-            self.p2.score += 1
+            self.p1.score += 1
             return True
         return False
 
@@ -132,9 +132,9 @@ class Ball:
         self.pos.x += self.velocity.x
         self.pos.y += self.velocity.y
 
-    async def gameOver(self) -> bool:
+    async def getWinner(self) -> User|None:
         if self.p1.score != 3 and self.p2.score != 3:
-            return False
+            return None
 
         data = {"type": "game_over"}
         await sendMessageWS(self.p1.user, "pong", json.dumps(data))
@@ -142,9 +142,9 @@ class Ball:
 
         await PongHistory.objects.acreate(player1=self.p1.user, player2=self.p2.user,
             player1_score=self.p1.score, player2_score=self.p2.score)
-        return True
+        return self.p1.user if self.p1.score > self.p2.score else self.p2.user
 
-async def gameLoop(user1: User, user2: User):
+async def gameLoop(user1: User, user2: User) -> User:
     p1 = PongPlayer(user1, 10)
     p2 = PongPlayer(user2, -10)
     ball = Ball(p1, p2)
@@ -154,8 +154,9 @@ async def gameLoop(user1: User, user2: User):
         p2.move()
         ball.move()
 
-        if await ball.gameOver() == True:
-            return
+        winner = await ball.getWinner()
+        if winner != None:
+            break
 
         data = {
             "type": "update_pong",
@@ -166,3 +167,4 @@ async def gameLoop(user1: User, user2: User):
         await sendMessageWS(p1.user, "pong", json.dumps(data))
         await sendMessageWS(p2.user, "pong", json.dumps(data))
         await asyncio.sleep(1 / 60)
+    return winner

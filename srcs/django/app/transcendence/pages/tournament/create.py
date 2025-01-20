@@ -11,13 +11,19 @@ import math
 import json
 import asyncio
 from websockets.pong import gameLoop
+from asyncio import Task
+
+class GameData:
+    p1: User
+    p2: User
+    started: bool
 
 class Tournament:
     organizer: User
     public: bool = False
     players: dict[int, User]
     invited: dict[int, User]
-    games: list[Tuple[User, User]]
+    games: list[GameData]
     started: bool = False
 
     def __init__(self, organizer: User):
@@ -82,7 +88,11 @@ class Tournament:
         while i < len(players):
             if i + 1 == len(players):
                 break
-            self.games.append((players[i], players[i + 1]))
+            data = GameData()
+            data.p1 = players[i]
+            data.p2 = players[i + 1]
+            data.started = False
+            self.games.append(data)
             i += 2
 
     async def launchGame(self):
@@ -90,18 +100,22 @@ class Tournament:
         self.createGames()
         htmlSTR = render_to_string("pong/play.html")
 
-        for players in self.games:
+        for game in self.games:
             msg = json.dumps({"type": "launch_game", "html": htmlSTR})
-            await sendMessageWS(players[0], "pong", msg)
-            await sendMessageWS(players[1], "pong", msg)
+            await sendMessageWS(game.p1, "pong", msg)
+            await sendMessageWS(game.p2, "pong", msg)
 
-            task = asyncio.create_task(gameLoop(players[0], players[1]))
+            if game.started:
+                return
+            game.started = True
+            task = asyncio.create_task(gameLoop(game.p1, game.p2))
 
-            def onGameover(players: Tuple[User, User]):
-                print(players, flush=True)
+            def onGameover(winner: User, game: GameData, games: list[GameData]):
+                self.games.pop(self.games.index(game))
+                print(winner, flush=True)
 
-            def callback(task):
-                onGameover(players)
+            def callback(task: Task[User]):
+                onGameover(task.result(), game, self.games)
             task.add_done_callback(callback)
 
 tournaments: dict[int, Tournament] = {}
