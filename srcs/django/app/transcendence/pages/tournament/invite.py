@@ -24,5 +24,8 @@ async def response(request: Request) -> HttpResponse:
     if tournament is None:
         tournament = Tournament(user)
         tournaments[user.id] = tournament
+
+    if tournament.started:
+        return redirect("/tournament/create?error=Tournament already started.")
     await tournament.inviteUser(invited)
     return redirect("/tournament/create/?success=Invite sent.")

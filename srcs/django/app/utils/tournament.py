@@ -3,26 +3,24 @@ from django.contrib.auth.models import User
 from enum import Enum
 
 class e_UserTournamentStatus(Enum):
-    NOT_INVITED = "not_invited"
-    INVITED = "invited"
-    JOINED = "joined"
+    UNREGISTERED = "unregistered"
+    REGISTERED = "registed"
 
 class UserTournamentData:
-    state = e_UserTournamentStatus.NOT_INVITED
+    state = e_UserTournamentStatus.UNREGISTERED
     organizer: User
 
 def getTournaments(user: User):
     userTournaments: list[UserTournamentData] = []
 
     for curr in tournaments.values():
+        if curr.organizer == user:
+            continue
         data = UserTournamentData()
         data.organizer = curr.organizer
+        data.state = e_UserTournamentStatus.UNREGISTERED
 
-        if curr.userInvited(user):
-            data.state = e_UserTournamentStatus.INVITED
-        elif curr.userJoined(user):
-            data.state = e_UserTournamentStatus.JOINED
-
-        if data.state != e_UserTournamentStatus.NOT_INVITED:
-            userTournaments.append(data)
+        if curr.userJoined(user):
+            data.state = e_UserTournamentStatus.REGISTERED
+        userTournaments.append(data)
     return userTournaments

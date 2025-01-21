@@ -12,14 +12,16 @@ async def response(request: Request) -> Response:
 
     if id is None:
         return redirect("/")
-
     id = int(id)
     tournament = tournaments.get(id)
 
+    if id == user.id:
+        return redirect("/")
     if tournament is None:
         return redirect("/")
-    if not tournament.userJoined(user) and not tournament.userInvited(user):
-        return redirect("/")
-    if not tournament.started and tournament.userInvited(user):
+    if not tournament.started:
         await tournament.addPlayer(user)
-    return render(request, "tournament/lobby.html", context={"players": tournament.players})
+    return render(request, "tournament/lobby.html", context={
+            "players": tournament.players.values(),
+            "organizer": tournament.organizer
+        })

@@ -22,53 +22,36 @@ class Tournament:
     organizer: User
     public: bool = False
     players: dict[int, User]
-    invited: dict[int, User]
     games: list[GameData]
     started: bool = False
 
     def __init__(self, organizer: User):
         self.organizer = organizer
         self.players = {organizer.id: organizer}
-        self.invited = {}
         self.games = []
-    
-    async def inviteUser(self, invited: User):
-        self.invited[invited.id] = invited
-        msg = {
-            "message": f"<a href='/tournament/lobby/?id={self.organizer.id}'>{self.organizer.username} invited you to its tournament</a>",
-            "refresh": ["/"]
-            }
-        await sendMessageWS(invited, "notifications", json.dumps(msg))
 
     async def removePlayer(self, player: User):
         if player.id == self.organizer.id:
             return await self.deleteTournament()
 
-        try: self.invited.pop(player.id)
-        except: pass
-
         try: self.players.pop(player.id)
         except: pass
     
     async def addPlayer(self, player: User):
-        del self.invited[player.id]
+        if self.userJoined(player):
+            return
         self.players[player.id] = player
-        msg = {"message": f"{player.username} accepted your invitation to your tournament", "refresh": ["/tournament/create/"]}
-        await sendMessageWS(self.organizer, "notifications", json.dumps(msg))
+        await self.sendNotifToPlayers({
+            "message": f"{player.username} joined {self.organizer.username}'s tournament",
+            "refresh": ["/tournament/create/"]
+        })
     
     async def deleteTournament(self):
         tournaments.pop(self.organizer.id)
-        msg = {"message": f"{self.organizer.username} deleted its tournament", "refresh": ["/tournament/create/", "/tournament/lobby/", "/"]}
-        msg = json.dumps(msg)
-    
-        for player in self.players.values():
-            await sendMessageWS(player, "notifications", msg)
-    
-        for player in self.invited.values():
-            await sendMessageWS(player, "notifications", msg)
-
-    def userInvited(self, user: User) -> bool:
-        return self.invited.get(user.id) != None
+        await self.sendNotifToPlayers({
+            "message": f"{self.organizer.username} deleted its tournament",
+            "refresh": ["/tournament/create/", "/tournament/lobby/", "/"]
+        })
     
     def userJoined(self, user: User) -> bool:
         return self.players.get(user.id) != None
@@ -100,6 +83,12 @@ class Tournament:
         self.createGames()
         htmlSTR = render_to_string("pong/play.html")
 
+        def onGameover(winner: User, game: GameData):
+            self.games.pop(self.games.index(game))
+            loser: User = game.p1 if game.p2 == winner else game.p2
+            self.players.pop(loser.id)
+            print(f"{loser.username} lost one game of tournament")
+
         for game in self.games:
             msg = json.dumps({"type": "launch_game", "html": htmlSTR})
             await sendMessageWS(game.p1, "pong", msg)
@@ -110,13 +99,14 @@ class Tournament:
             game.started = True
             task = asyncio.create_task(gameLoop(game.p1, game.p2))
 
-            def onGameover(winner: User, game: GameData, games: list[GameData]):
-                self.games.pop(self.games.index(game))
-                print(winner, flush=True)
-
             def callback(task: Task[User]):
-                onGameover(task.result(), game, self.games)
+                onGameover(task.result(), game)
             task.add_done_callback(callback)
+
+    async def sendNotifToPlayers(self, msg: dict):
+        msg: str = json.dumps(msg)
+        for player in self.players.values():
+            await sendMessageWS(player, "notifications", msg)
 
 tournaments: dict[int, Tournament] = {}
 
@@ -138,9 +128,9 @@ async def response(request: Request) -> Response:
         tournament = Tournament(user)
         tournaments[user.id] = tournament
     for friend in friends:
-        if tournament.userInvited(friend) or tournament.userJoined(friend):
+        if tournament.userJoined(friend):
             friends.remove(friend)
     return render(request, "tournament/create.html", {
         "friends": friends, "ERROR": error, "SUCCESS": success,
         "players": tournament.players.values(), "organizer": tournament.organizer
-        })
+    })

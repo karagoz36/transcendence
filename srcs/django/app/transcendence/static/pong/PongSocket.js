@@ -13,17 +13,6 @@ import { PongScene } from "./PongScene.js"
  * @property {Object} [ball]
 */
 
-/**
- * @readonly
- * @enum {number}
- */
-const e_states = {
-    INVITE_SENT: 0,
-    INVITE_ACCEPTED: 1,
-    LAUNCH_GAME: 2,
-    IN_GAME: 3,
-}
-
 class PongSocket extends BaseWebSocket {
     /** @type {string} */
     opponent
@@ -31,6 +20,7 @@ class PongSocket extends BaseWebSocket {
     game = null
     direction = ""
     clickPressed = false
+    inGame = false
 
 	constructor() {
 		super("pong")
@@ -113,7 +103,7 @@ class PongSocket extends BaseWebSocket {
         const container = document.querySelector("#pong-container")
         if (!container) return
         container.innerHTML = html
-        this.state = e_states.IN_GAME
+        this.inGame = true
         this.initGame()
     }
 
@@ -139,28 +129,20 @@ class PongSocket extends BaseWebSocket {
         if (json.type == "game_over")
             return await getPage("/")
 
-        if (json.type == "update_pong" && this.state == e_states.IN_GAME)
+        if (json.type == "update_pong" && this.inGame)
             return this.updatePong(json)
 
-        if (json.type == "invite_accepted" && this.state == e_states.IN_GAME)
+        if (json.type == "invite_accepted" && this.inGame)
             return this.socket.send(JSON.stringify({"type": "join_game"}))
 
         if (json.type == "invite_accepted" && this.opponent == json.friend)
-            this.state = e_states.INVITE_ACCEPTED
-        else if (json.type == "launch_game")
-            this.state = e_states.LAUNCH_GAME
-
-        switch (this.state) {
-            case e_states.INVITE_ACCEPTED:
-                this.socket.send(JSON.stringify({"type": "launch_game"}))
-                break;
-            case e_states.LAUNCH_GAME:
-                if (!json.html) {
-                    console.error(json)
-                    throw new Error("expected html")
-                }
-                this.launchGame(json.html)
-                break
+            this.socket.send(JSON.stringify({"type": "launch_game"}))
+        else if (json.type == "launch_game") {
+            if (!json.html) {
+                console.error(json)
+                throw new Error("expected html")
+            }
+            this.launchGame(json.html)
         }
     }
 }

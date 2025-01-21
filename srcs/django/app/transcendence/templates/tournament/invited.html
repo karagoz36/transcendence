@@ -7,20 +7,13 @@
 		<form style="width: 100%;" id="tournament-invite">
 			<input style="display: none;" type="text" name="username" value={{tournament.organizer.username}}>
 			<div style="display: flex; flex-direction: column; gap: 0.5rem; justify-content: center; align-items: center; width: 100%;">
-			<a class="btn btn-primary" href="/tournament/lobby/?id={{tournament.organizer.id}}">
-				{% if tournament.state.value == "invited" %}
-					Accept invitation
-				{% else %}
-					Join lobby
-				{% endif %}
-			</a>
-			<a class="btn btn-danger" href="/tournament/leave/?id={{tournament.organizer.id}}">
-				{% if tournament.state.value == "invited" %}
-					Decline invitation
-				{% else %}
-					Leave tournament
-				{% endif %}
-			</a>
+				<a class="btn btn-primary" href="/tournament/lobby/?id={{tournament.organizer.id}}">
+					{% if tournament.state.value == "unregistered" %}
+						Register
+					{% else %}
+						Join lobby
+					{% endif %}
+				</a>
 			</div>
 		</form>
 	</div>

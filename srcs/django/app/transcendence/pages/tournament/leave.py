@@ -27,5 +27,4 @@ async def response(request: Request) -> Response:
 
     for player in tournament.players.values():
         await sendMessageWS(player, "notifications", msg)
-
     return redirect("/")
