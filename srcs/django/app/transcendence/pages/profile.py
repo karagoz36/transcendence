@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from database.models import PongHistory, UserProfile
 from asgiref.sync import sync_to_async
 from django.db.models import Q
+from django.db import models
+
 
 @sync_to_async
 def getStats(user: User):
@@ -46,18 +48,30 @@ def getPongHistory(user: User):
     history.sort(key=lambda x: x["game_date"], reverse=True)
     return history
 
-async def response(request: Request):
+@sync_to_async
+def get_or_create_profile(user):
+    profile = UserProfile.objects.filter(user=user).first()
 
+    if not profile:
+        profile = UserProfile.objects.create(user=user)
+    
+    return profile
+
+
+async def response(request: Request):
     id: int = request.query_params.get("id")
     user: User = None
     profile: UserProfile = None
-
     if id is None:
         return redirect("/")
+    
     try:
         user = await User.objects.aget(id=id)
-        profile = await UserProfile.objects.aget(user_id=id)
-    except:
+
+        profile = await get_or_create_profile(user)
+    
+    except Exception as e:
+        print(f"Error: {e}", flush=True)
         return redirect("/")
 
     context = {'user': user,

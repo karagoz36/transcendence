@@ -7,39 +7,55 @@
 </header>
 <main>
     <section>
-        <div class="container">
+        <div class="container d-flex justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
             <div class="row mb-3"> 
                 <div class="col-9 d-flex justify-content-center flex-column">
                     <h1>{{ user.username }}</h1>
-                    Joined: {{user.date_joined}}
                     <br>
-                    Last login: {{user.last_login}}
+                    Joined: {{user.date_joined|date:"d F Y" }}
+                    <br><br>
+                    Last login: {{user.last_login|date:"d F Y H:i" }}
                 </div>
                 <div class="col-3" style="background-color: transparent;">
                     {% load static %}
                     <img class="img-fluid"
-                    src="{% if avatar %}{{ avatar.url }}{% else %}{% static 'images/avatar-transparent.png' %}{% endif %}" 
+                    src="{% if avatar %}{{ avatar.url }}{% else %}{% static 'images/avatar3.png' %}{% endif %}" 
                     alt="avatar"
                     style="background-color: transparent;"
-                    width="300" 
-                    height="300"/>
+                    width="200" 
+                    height="200"/>
                 </div>
             </div>
             <div class="row mb-3 border d-flex 
             align-items-center text-center
             py-3">
                 <h2>Stats:</h2>
-                {% include 'profile/stats.html' %}
+                {% comment %} <ul style="list-style-type: none; margin: 0; padding: 0; display: flex; align-items: center; flex-direction: column;"> {% endcomment %}
+                {% if history %}
+                    {% include 'profile/stats.html' %}
+                {% else %}
+                    <div class="alert alert-info text-center col-8 mx-auto" role="alert" style="margin-top: 20px;">
+                        No game played yet.
+                    </div>
+                {% endif %}
             </div>
             <div class="row mb-3 border d-flex 
             align-items-center text-center
             py-3"> 
                 <h2>Match history:</h2>
                 <ul style="list-style-type: none; margin: 0; padding: 0; display: flex; align-items: center; flex-direction: column;">
-                    {% for game in history %}
-                      {% include 'profile/pong_history.html' %}
-                    {% endfor %}
-                  </ul>
+                    {% if history %}
+                        {% for game in history %}
+                        {% include 'profile/pong_history.html' %}
+                        {% endfor %}
+                    {% else %}
+                        <li class="alert alert-info text-center col-8 mx-auto" role="alert" style="margin-top: 20px;">
+                            No game played yet.
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
             </div>
         </div>
     </section>
