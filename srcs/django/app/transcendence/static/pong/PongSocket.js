@@ -38,8 +38,8 @@ class PongSocket extends BaseWebSocket {
 			this.socket.onmessage = null
 			this.socket.close()
 		})
-	}
-    
+	} 
+
     open() {
         const urlParams = new URLSearchParams(window.location.search) // @ts-ignore
         this.opponent = urlParams.get("opponent")
@@ -73,7 +73,7 @@ class PongSocket extends BaseWebSocket {
         this.game = new PongScene()
         /** @type {HTMLCanvasElement} */
         const canvas = this.game.renderer.domElement
-        
+
         canvas.addEventListener("mousedown", (e) => {
             if (e.buttons != 1) return
             this.clickPressed = true
