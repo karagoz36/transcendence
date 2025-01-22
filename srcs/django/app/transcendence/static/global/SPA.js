@@ -48,6 +48,7 @@ export function refreshScripts(newContainer, oldContainer, toUpdate) {
 function convertOptionsToRequestInit(options) {
 	/** @type {RequestInit} */
 	let init = {}
+
 	init.body = JSON.stringify(options.body)
 	init.method = options.method
 	init.headers = {
@@ -68,14 +69,19 @@ async function getHTML(url, options, addToHistory) {
 	/** @type {Response} */
 	let res
 	res = await fetch(url, options)
+
 	if (res.status == 404 || res.status >= 500)
 		throw new Error(`SPA: failed to fetch ${url}`)
+
 	if (addToHistory && !res.url.includes("api"))
 		history.pushState({page: res.url}, "", res.url)
+
 	if (res.headers.get("content-type") == "application/json") {
 		console.error(await res.json())
 		throw new Error("got json instead of html")	
 	}
+	if (res.url == "https://localhost:8000/tournament/create/")
+		console.log("")
 	return await res.text()
 }
 
@@ -84,7 +90,7 @@ async function getHTML(url, options, addToHistory) {
  * @param {PageOptions} options
  * @param {boolean} addToHistory 
  * @param {string} toUpdate
- **/
+**/
 export async function getPage(url, options = {}, addToHistory = true, toUpdate = ".main-container") {
 	const requestInit = convertOptionsToRequestInit(options)
 	const res = await getHTML(url, requestInit, addToHistory)

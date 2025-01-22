@@ -34,8 +34,12 @@ class Tournament:
         if player.id == self.organizer.id:
             return await self.deleteTournament()
 
-        try: self.players.pop(player.id)
-        except: pass
+        msg = {
+            "message": f"{player.username} left {self.organizer.username}'s tournament",
+            "refresh": ["/", "/tournament/create/", "/tournament/lobby/"]
+        }
+        await self.sendNotifToPlayers(msg)
+        self.players.pop(player.id)
     
     async def addPlayer(self, player: User):
         if self.userJoined(player):
@@ -43,14 +47,14 @@ class Tournament:
         self.players[player.id] = player
         await self.sendNotifToPlayers({
             "message": f"{player.username} joined {self.organizer.username}'s tournament",
-            "refresh": ["/tournament/create/"]
+            "refresh": ["/tournament/create/", "/tournmanet/lobby/"]
         })
     
     async def deleteTournament(self):
         tournaments.pop(self.organizer.id)
         await self.sendNotifToPlayers({
             "message": f"{self.organizer.username} deleted its tournament",
-            "refresh": ["/tournament/create/", "/tournament/lobby/", "/"]
+            "refresh": ["/tournament/lobby/", "/"]
         })
     
     def userJoined(self, user: User) -> bool:
@@ -101,6 +105,7 @@ class Tournament:
 
             def callback(task: Task[User]):
                 onGameover(task.result(), game)
+
             task.add_done_callback(callback)
 
     async def sendNotifToPlayers(self, msg: dict):

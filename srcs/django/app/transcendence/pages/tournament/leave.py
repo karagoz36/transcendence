@@ -22,9 +22,4 @@ async def response(request: Request) -> Response:
         return redirect("/")
 
     await tournament.removePlayer(user)
-    msg = {"message": f"{user.username} left the tournament", "refresh": ["/", "/tournament/create/", "/tournament/lobby/"]}
-    msg = json.dumps(msg)
-
-    for player in tournament.players.values():
-        await sendMessageWS(player, "notifications", msg)
     return redirect("/")
