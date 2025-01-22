@@ -42,7 +42,7 @@ def handle_update_settings(request):
         is_2fa_enabled = request.POST.get("is_2fa_enabled", "false").lower() == "true"
         avatar = request.FILES.get("avatar")  # Récupère le fichier avatar
 
-        # verification du username
+        # # verification du username
         # if not username:
         #     return JsonResponse({"error": "Username is required"}, status=400)
         # err: str = usernamePolicy(username)
@@ -80,13 +80,9 @@ def handle_update_settings(request):
         user.save()
 
         profile.is_2fa_enabled = is_2fa_enabled
-        if alias:
-            profile.alias = alias
+        profile.alias = alias
         profile.save()
-        # if is_2fa_enabled == 'true':
-        #     profile.is_2fa_enabled = True
-        # if is_2fa_enabled == 'false':
-        #     profile.is_2fa_enabled = False
+
         return JsonResponse({"message": "Settings updated successfully"}, status=200)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)

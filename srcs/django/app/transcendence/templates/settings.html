@@ -16,7 +16,7 @@
                 </div> {% endcomment %}
                 <div class="mb-3">
                     <label for="alias" class="form-label">Choose an alias name for tournaments:</label>
-                    <input type="text" id="alias" name="alias" value="{{ profile.alias }}" class="form-control" required>
+                    <input type="text" id="alias" name="alias" value="{% if profile.alias %}{{ profile.alias }}{% else %}{{ default_value }}{% endif %}"  class="form-control">
                 </div>
                 <div class="mb-3">
                     <label for="avatar" class="form-label">Upload Avatar:</label>

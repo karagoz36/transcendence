@@ -31,4 +31,4 @@ async def response(request: Request) -> HttpResponse:
 		return Response({"message": "friendship not found"}, status=401)
 
 	messageList = await getMessages(friendship)
-	return render(request, "friendlist/message-list.html", context={"messages": messageList })
+	return render(request, "friendlist/message-list.html", context={"messages": messageList, "friend":friend })

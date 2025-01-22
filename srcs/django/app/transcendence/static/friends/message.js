@@ -1,6 +1,18 @@
 // @ts-check
 import {getPage} from "../global/SPA.js"
 
+/** @param {CustomEvent} e */
+function suppressModalBackDrop(e) {
+	if (e.detail == ".main-container") {
+		const backdrop = document.getElementsByClassName("modal-backdrop")
+		if backdrop{
+			backdrop[0].remove()
+		}
+	}
+}
+
+addEventListener('page-changed', suppressModalBackDrop)
+
 /** @param {MouseEvent} e */
 async function openChat(e) {
    	/** @type {HTMLButtonElement|EventTarget|null} */
@@ -22,7 +34,21 @@ async function openChat(e) {
 		return
 	const modalLabel = document.getElementById("chatModalLabel");
 	if (modalLabel) {
-		modalLabel.textContent = `${username}`;
+		// Créer un élément <a>
+		const userLinkElement = document.createElement("a");
+		
+		// Assigner l'URL du lien
+		userLinkElement.href = `/profile/?id=${userId}`;
+		// Assigner le texte du lien (nom de l'utilisateur)
+		userLinkElement.textContent = username;
+		
+		// Ajouter des classes CSS
+		userLinkElement.classList.add("text-decoration-none");
+		
+		// Ajouter l'élément créé dans le DOM (par exemple dans un élément existant avec id "userLinksContainer")
+
+		modalLabel.innerHTML = '';  // Effacer le contenu actuel
+		modalLabel.appendChild(userLinkElement);  // Ajouter le lien
 	}
 
 	// /** Mettre à jour le lien et le texte */
