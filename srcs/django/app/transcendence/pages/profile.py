@@ -4,8 +4,7 @@ from django.contrib.auth.models import User
 from database.models import PongHistory, UserProfile
 from asgiref.sync import sync_to_async
 from django.db.models import Q
-from django.db import models
-
+from django.views.decorators.cache import never_cache
 
 @sync_to_async
 def getStats(user: User):
@@ -54,24 +53,21 @@ def get_or_create_profile(user):
 
     if not profile:
         profile = UserProfile.objects.create(user=user)
-    
     return profile
 
-
+@never_cache
 async def response(request: Request):
+
     id: int = request.query_params.get("id")
     user: User = None
     profile: UserProfile = None
+
     if id is None:
         return redirect("/")
-    
     try:
         user = await User.objects.aget(id=id)
-
         profile = await get_or_create_profile(user)
-    
-    except Exception as e:
-        print(f"Error: {e}", flush=True)
+    except:
         return redirect("/")
 
     context = {'user': user,

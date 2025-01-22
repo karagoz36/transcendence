@@ -7,18 +7,16 @@
     <form id="settings-form" method="POST" enctype="multipart/form-data" class="mt-4">
     {% csrf_token %}
     <div class="container d-flex justify-content-center">
-        {% comment %} <div class="col-12 col-md-8 col-lg-6"> {% endcomment %}
-            <div class="row g-4">
-
+        <div class="row g-4">
             <div class="col-6 text-start pe-md-5">
-                <h2>Personal Information</h2>
-                <div class="mb-3">
+                <h2> Personal information</h2>
+                {% comment %} <div class="mb-3">
                     <label for="username" class="form-label">Username:</label>
                     <input type="text" id="username" name="username" value="{{ user.username }}" class="form-control" required>
-                </div>
+                </div> {% endcomment %}
                 <div class="mb-3">
-                    <label for="game-name" class="form-label">Alias for tournaments:</label>
-                    <input type="text" id="game-name" name="game_name" value="{{ profile.game_name }}" class="form-control">
+                    <label for="alias" class="form-label">Choose an alias name for tournaments:</label>
+                    <input type="text" id="alias" name="alias" value="{{ profile.alias }}" class="form-control" required>
                 </div>
                 <div class="mb-3">
                     <label for="avatar" class="form-label">Upload Avatar:</label>
@@ -34,7 +32,7 @@
             </div>
 
             <div class="col-6 text-start ps-md-5">
-                <h2>Authentication</h2>
+                <h2> Authentication</h2>
                 <div class="mb-3">
                     <label for="password" class="form-label">New Password:</label>
                     <input type="password" id="password" name="password" class="form-control">
@@ -51,10 +49,9 @@
             </div>
         </div>
     </div>
-    </div>
-
+    <br>
     <div class="mt-4 text-center">
-        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <button type="submit" id="save-changes" class="btn btn-primary">Save Changes</button>
     </div>
 </form>
 

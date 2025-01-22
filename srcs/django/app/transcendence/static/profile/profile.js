@@ -1,12 +1,14 @@
 // @ts-check
-
-document.addEventListener('DOMContentLoaded', function () {
+function udpatePie() {
+    console.log("test")
     const canvas = document.getElementById('statsPieChart');
 
     // Requête pour récupérer les stats
     const wins = parseInt(canvas.getAttribute('data-wins'), 10);
     const losses = parseInt(canvas.getAttribute('data-losses'), 10);
 
+    console.log(wins)
+    console.log(losses)
     // Initialisation du graphique
     const ctx = canvas.getContext('2d');
     new Chart(ctx, {
@@ -36,5 +38,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         }
     });
-});
+}
 
+addEventListener('page-changed', udpatePie);
+document.addEventListener("DOMContentLoaded", udpatePie)
