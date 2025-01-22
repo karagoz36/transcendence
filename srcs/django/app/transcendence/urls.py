@@ -20,6 +20,7 @@ from . import views
 from .pages.settings import response as settings_view
 from .pages.settings import handle_update_settings
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from django_prometheus import exports
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -46,4 +47,5 @@ urlpatterns = [
     path("api/csrf-token/", views.get_csrf_token, name="get_csrf_token"),
     path('auth/login42/', views.auth_with_42, name='login42'),
     path('auth/callback42/', views.callback_from_42, name='callback42'),
+	path('api/metrics/', exports.ExportToDjangoView, name='django-metrics'),
 ]

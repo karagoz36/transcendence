@@ -18,6 +18,8 @@ services:
     restart: always
     build: ./django
     container_name: django
+    expose:
+      - "8000"
     volumes:
       - ./django/app:/app/
     networks:
