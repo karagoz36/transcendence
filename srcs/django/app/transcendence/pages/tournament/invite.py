@@ -1,3 +1,4 @@
+from utils.websocket import sendMessageWS
 from rest_framework.request import Request
 from django.http.response import HttpResponse
 from django.shortcuts import redirect
@@ -27,5 +28,8 @@ async def response(request: Request) -> HttpResponse:
 
     if tournament.started:
         return redirect("/tournament/create?error=Tournament already started.")
-    await tournament.inviteUser(invited)
+    msg = {
+        "message": f"<a href=/tournament/lobby/?id={user.id}></a>"
+    }
+    await sendMessageWS(user, "notifications",)    
     return redirect("/tournament/create/?success=Invite sent.")

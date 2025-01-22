@@ -139,5 +139,6 @@ async def response(request: Request) -> Response:
             friends.remove(friend)
     return render(request, "tournament/create.html", {
         "friends": friends, "ERROR": error, "SUCCESS": success,
-        "players": tournament.players.values(), "organizer": tournament.organizer
+        "players": tournament.players.values(),
+        "organizer": tournament.organizer
     })
