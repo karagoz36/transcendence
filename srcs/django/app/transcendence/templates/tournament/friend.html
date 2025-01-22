@@ -10,9 +10,6 @@
 		<a href="/profile/?id={{friend.id}}">{{friend.username}}</a>
 	</div>
 	<div class="d-flex flex-wrap md-nowrap gap-2 card-body friend-button-container">
-		<form id="tournament-invite">
-			<input style="display: none;" type="text" name="username" value={{friend.username}}>
-			<button type="submit" class="btn btn-primary">Invite to tournament</button>
-		</form>
+		<a class="btn btn-primary" href="/tournament/invite/?username={{friend.username}}">Invite to tournament</a>
 	</div>
 </div>

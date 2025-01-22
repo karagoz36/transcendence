@@ -31,7 +31,8 @@
   {% endfor %}
 
   <div style="text-align: center; margin: 1rem">
-    <button id="start-tournament" class="btn btn-primary">Start tournament</button>
+    <a class="btn btn-primary" href="/tournament/start">Start tournament</a>
+    {% comment %} <button id="start-tournament" class="btn btn-primary">Start tournament</button> {% endcomment %}
   </div>
   <script type="module" src="/static/tournament/invite.js"></script>
   <script type="module" src="/static/tournament/start.js"></script>

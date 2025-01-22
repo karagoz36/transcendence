@@ -56,7 +56,7 @@ class Notification(BaseConsumer):
             return
         if user.username == "":
             return
-        onlineUsers[user.id] = True
+        onlineUsers[user.id] = user
 
         friends = await getFriends(user)
         for friend in friends:
@@ -75,7 +75,7 @@ class Notification(BaseConsumer):
             return
         if user.username == "":
             return
-        if user.id in onlineUsers:
+        if userIsLoggedIn(user):
             del onlineUsers[user.id]
 
         friends = await getFriends(user)

@@ -6,12 +6,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from utils.friends import getFriends
 from utils.websocket import sendMessageWS
-from typing import Tuple
 import math
 import json
 import asyncio
 from websockets.pong import gameLoop
 from asyncio import Task
+from utils.users import notifEveryone
 
 class GameData:
     p1: User
@@ -49,14 +49,14 @@ class Tournament:
             "message": f"{player.username} joined {self.organizer.username}'s tournament",
             "refresh": ["/tournament/create/", "/tournmanet/lobby/"]
         })
-    
+
     async def deleteTournament(self):
         tournaments.pop(self.organizer.id)
         await self.sendNotifToPlayers({
             "message": f"{self.organizer.username} deleted its tournament",
-            "refresh": ["/tournament/lobby/", "/"]
         })
-    
+        await notifEveryone({"refresh": "/"}, [self.organizer])
+
     def userJoined(self, user: User) -> bool:
         return self.players.get(user.id) != None
 
@@ -132,6 +132,8 @@ async def response(request: Request) -> Response:
     if tournament == None:
         tournament = Tournament(user)
         tournaments[user.id] = tournament
+        await notifEveryone({"refresh": "/"}, [user])
+
     for friend in friends:
         if tournament.userJoined(friend):
             friends.remove(friend)
