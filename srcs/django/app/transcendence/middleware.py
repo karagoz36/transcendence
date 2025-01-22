@@ -26,8 +26,7 @@ class RequiredLoginMiddleware:
 			return self.get_response(request)
 		user, _ = CustomAuthentication().authenticate(request=request)
 		path: str = request.path
-		# if path.startswith('/metrics'):
-		# 	return self.get_response(request)
+
 		if path.startswith("/api"):
 			return self.get_response(request)
 		if not path.startswith("/auth"):
