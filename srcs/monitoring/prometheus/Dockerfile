@@ -1,6 +1,8 @@
 FROM prom/prometheus:latest
 
 COPY /conf/prometheus.yml /etc/prometheus/prometheus.yml
+COPY /conf/alertrules.yml /etc/prometheus/alertrules.yml
+
 
 WORKDIR /etc/prometheus
 
