@@ -43,6 +43,7 @@ urlpatterns = [
     path("api/friend/remove", views.removeFriend, name="rejectFriend"),
     path("api/friend/send-message", views.sendMessage, name="sendMessage"),
     path("api/friend/open-message", views.openMessage, name="openMessage"),
+
     path("api/token", views.getToken, name="createToken"),
     path("api/token/refresh", views.refreshToken, name="refreshToken"),
     path("api/settings/update/", views.update_settings, name="update_settings"),

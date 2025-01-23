@@ -4,10 +4,10 @@
             <small><b>{{ message.sender }}</b></small><br>
             {{ message.text }}<br>
             <small 
-            style="bottom: 2px; float: right; font-size: 0.6rem; line-height: 1;"
-            class="{% if message.sender == user.username %}text-white{% else %}text-dark{% endif %}">
-            {{ message.created_at|date:"d/m H:i" }}
-        </small>
+                style="bottom: 2px; float: right; font-size: 0.6rem; line-height: 1;"
+                class="{% if message.sender == user.username %}text-white{% else %}text-dark{% endif %}">
+                {{ message.created_at|date:"d/m H:i" }}
+            </small>
         </div>
     </div>
 </div>

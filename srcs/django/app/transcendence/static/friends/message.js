@@ -1,18 +1,6 @@
 // @ts-check
 import {getPage} from "../global/SPA.js"
 
-/** @param {CustomEvent} e */
-function suppressModalBackDrop(e) {
-	if (e.detail == ".main-container") {
-		const backdrop = document.getElementsByClassName("modal-backdrop")
-		if backdrop{
-			backdrop[0].remove()
-		}
-	}
-}
-
-addEventListener('page-changed', suppressModalBackDrop)
-
 /** @param {MouseEvent} e */
 async function openChat(e) {
    	/** @type {HTMLButtonElement|EventTarget|null} */
@@ -25,58 +13,44 @@ async function openChat(e) {
 	/** @type {string|null} */ // @ts-ignore
 	const userId = button.getAttribute("user-id")
 	if (userId == null)
-		return
-	
+			return
+
+
 	/** Mettre à jour le titre du modal */
-	/** @type {string|null} */ // @ts-ignore
+    /** @type {string|null} */ // @ts-ignore
 	const username = button.getAttribute("user-name")
-	if (username == null)
-		return
-	const modalLabel = document.getElementById("chatModalLabel");
-	if (modalLabel) {
-		// Créer un élément <a>
-		const userLinkElement = document.createElement("a");
-		
-		// Assigner l'URL du lien
-		userLinkElement.href = `/profile/?id=${userId}`;
-		// Assigner le texte du lien (nom de l'utilisateur)
-		userLinkElement.textContent = username;
-		
-		// Ajouter des classes CSS
-		userLinkElement.classList.add("text-decoration-none");
-		
-		// Ajouter l'élément créé dans le DOM (par exemple dans un élément existant avec id "userLinksContainer")
+    if (username == null)
+        return
+    const modalLabel = document.getElementById("chatModalLabel");
+    if (modalLabel) {
+        modalLabel.textContent = `${username}`;
+    }
 
-		modalLabel.innerHTML = '';  // Effacer le contenu actuel
-		modalLabel.appendChild(userLinkElement);  // Ajouter le lien
-	}
-
-	// /** Mettre à jour le lien et le texte */
+    // /** Mettre à jour le lien et le texte */
     // const userLink = document.getElementById("chatModalUserLink");
-	// if (userLink instanceof HTMLAnchorElement) {
+       // if (userLink instanceof HTMLAnchorElement) {
     //     userLink.textContent = username;
     //     userLink.href = `/profile/${userId}`; // URL vers la page de profil de l'utilisateur
     // }
-	
     modalButton.setAttribute("user-id", userId)
 	await getPage("/api/friend/open-message", {
-		method: "POST",
-		headers: {"content-type": "application/json"},
-		body: {			
-			"friendID": Number(userId),
-		}
-	}, false, "#messages-container");
+            method: "POST",
+            headers: {"content-type": "application/json"},
+            body: {                 
+            	"friendID": Number(userId),
+            }
+    }, false, "#messages-container");
 
-	const modal = document.getElementById("chatModal");
-	if (modal)
-		modal.addEventListener("shown.bs.modal", () => {
-			const messagesContainer = document.querySelector("#chatModal .modal-body");
-			if (messagesContainer) {
-				messagesContainer.scrollTo({
-					top: messagesContainer.scrollHeight,
-				});
-			}
-		});
+    const modal = document.getElementById("chatModal");
+    if (modal)
+        modal.addEventListener("shown.bs.modal", () => {
+            const messagesContainer = document.querySelector("#chatModal .modal-body");
+            if (messagesContainer) {
+                messagesContainer.scrollTo({
+                    top: messagesContainer.scrollHeight,
+                });
+            }
+        });
 }
 
 /** @param {SubmitEvent} event */
@@ -98,14 +72,14 @@ async function sendMessage(event) {
 	}, false, "#messages-container");
 	event.target["message"].value = "";
 	const modal = document.getElementById("chatModal");
-	if (modal){
-		const messagesContainer = document.querySelector("#chatModal .modal-body");
-		if (messagesContainer) {
-			messagesContainer.scrollTo({
-				top: messagesContainer.scrollHeight,
-			});
-		};
-	}
+    if (modal){
+        const messagesContainer = document.querySelector("#chatModal .modal-body");
+        if (messagesContainer) {
+            messagesContainer.scrollTo({
+                top: messagesContainer.scrollHeight,
+            });
+        };
+    }
 }
 
 function main() {

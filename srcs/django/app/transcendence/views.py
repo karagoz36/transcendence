@@ -134,7 +134,7 @@ async def sendMessage(request: Request):
 
 @api_view(['POST'])
 async def openMessage(request: Request):
-	return await pages.openMessage.response(request)
+    return await pages.openMessage.response(request)
 
 @authentication_classes([])
 @permission_classes([AllowAny])

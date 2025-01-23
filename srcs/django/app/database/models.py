@@ -45,7 +45,7 @@ class Messages(models.Model):
 	friendship = models.ForeignKey(FriendList, on_delete=models.CASCADE)
 	message = models.TextField()
 	sender = models.ForeignKey(User, on_delete=models.CASCADE)
-	created_at = models.DateTimeField(auto_now_add=True,)
+	created_at = models.DateTimeField(auto_now_add=True)
 
 class PongHistory(models.Model):
 	player1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="player1")

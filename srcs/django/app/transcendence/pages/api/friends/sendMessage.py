@@ -6,18 +6,15 @@ from database.models import FriendList, getFriendship, Messages
 from websockets.consumers import sendMessageWS
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
+from asgiref.sync import sync_to_async
 import json
 from django.http import JsonResponse
-from database.models import Messages
-from asgiref.sync import sync_to_async
 
 async def getMessages(friendship: FriendList):
 	arr = []
+
 	async for message in Messages.objects.select_related("sender").filter(friendship=friendship).order_by("created_at"):
-		arr.append({\
-			"text": message.message, 
-			"sender": message.sender.username, 
-			"created_at": message.created_at,})
+		arr.append({"text": message.message, "sender": message.sender.username, "created_at": message.created_at,})
 	return arr
 
 async def sendNewMessageToFriend(sender: User, receiver: User, message: str):
@@ -34,8 +31,14 @@ async def response(request: Request) -> HttpResponse:
 		return redirect("/api/logout")
 	if "friendID" not in request.data:
 		return Response({"message": "friend id missing in request body"}, status=401)
+	# if "message" not in request.data or request.data["message"].strip() == "":
+	# 	return Response({"message": "message missing in request body"}, status=401)
+	# if request.data["message"].strip() == "":
+	# 	# return Response({"message": "message missing in request body"}, status=401)
+	# 	return redirect("/friends/?error=This friendship already exists.")
+	# print("Requête reçue :", request.data)
 	if "message" not in request.data or not request.data["message"].strip():
-		return Response({"message": "message missing in request body"}, status=401)		
+		return Response({"message": "message missing in request body"}, status=401)
 	message: str = request.data["message"]
 	friend_id: int = request.data["friendID"]
 
