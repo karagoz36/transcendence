@@ -119,6 +119,18 @@ services:
     depends_on:
       - prometheus
 
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    build:
+      context: ./monitoring/alertmanager
+    volumes:
+      - ./monitoring/alertmanager/conf/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    expose:
+      - "9093"
+    networks:
+      - app-network
+
 volumes:
   grafana_data: {}
 

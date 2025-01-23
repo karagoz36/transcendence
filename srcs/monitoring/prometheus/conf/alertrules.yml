@@ -45,3 +45,21 @@ groups:
     annotations:
       summary: "High Memory Consumption"
       description: "Django process memory usage above 90%. Current usage: {{ $value }}"
+
+  # - alert: TestEmailAlert
+  #   expr: up == 0  # This will trigger if any service is down
+  #   for: 1m
+  #   labels:
+  #     severity: warning
+  #   annotations:
+  #     summary: "Test Email Alert"
+  #     description: "This is a test alert to verify email notification system"
+
+  - alert: TestEmailAlert
+    expr: vector(1)
+    for: 10s
+    labels:
+      severity: warning
+    annotations:
+      summary: "Test Email Alert"
+      description: "This is a test alert to verify email notification system"
