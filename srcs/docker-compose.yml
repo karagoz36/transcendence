@@ -120,16 +120,20 @@ services:
       - prometheus
 
   alertmanager:
-    image: prom/alertmanager:latest
-    container_name: alertmanager
     build:
       context: ./monitoring/alertmanager
+      dockerfile: Dockerfile
+    # image: prom/alertmanager:latest
+    container_name: alertmanager
     volumes:
       - ./monitoring/alertmanager/conf/alertmanager.yml:/etc/alertmanager/alertmanager.yml
     expose:
       - "9093"
     networks:
       - app-network
+    # environment:
+    #   EMAIL_HOST_USER: "${EMAIL_HOST_USER}"
+    #   EMAIL_HOST_PASSWORD: "${EMAIL_HOST_PASSWORD}"
 
 volumes:
   grafana_data: {}
