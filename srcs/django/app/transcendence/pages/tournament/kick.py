@@ -16,6 +16,6 @@ async def response(request: Request) -> HttpResponse:
     if id is None:
         return redirect("/tournament/create")
     id = int(id)
-    toKick: User = User.objects.aget(id=id)
+    toKick: User = await User.objects.aget(id=id)
     await tournament.removePlayer(toKick)
     return redirect("/tournament/create")

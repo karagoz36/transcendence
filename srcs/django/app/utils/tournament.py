@@ -14,7 +14,7 @@ def getTournaments(user: User):
     userTournaments: list[UserTournamentData] = []
 
     for curr in tournaments.values():
-        if curr.organizer == user:
+        if curr.organizer == user or curr.started:
             continue
         data = UserTournamentData()
         data.organizer = curr.organizer

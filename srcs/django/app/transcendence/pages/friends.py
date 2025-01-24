@@ -40,7 +40,7 @@ async def response(request: Request) -> HttpResponse:
     status = 200
     err = ""
     success = ""
- 
+
     if "error" in request.query_params:
         status = 401
         err = request.query_params["error"]

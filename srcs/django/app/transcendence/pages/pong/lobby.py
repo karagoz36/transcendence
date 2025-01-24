@@ -18,7 +18,7 @@ async def response(req: Request):
 
     if username is None:
         return redirect("/friends/?error=No username passed in parameter", status=401)
-    
+
     if username == user.username:
         return redirect("/friends/?error=You cannot invite yourself", status=401)
 

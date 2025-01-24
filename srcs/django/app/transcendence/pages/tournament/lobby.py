@@ -19,8 +19,9 @@ async def response(request: Request) -> Response:
         return redirect("/")
     if tournament is None:
         return redirect("/")
-    if not tournament.started:
-        await tournament.addPlayer(user)
+    if tournament.started:
+        return redirect("/")
+    await tournament.addPlayer(user)
     return render(request, "tournament/lobby.html", context={
             "players": tournament.players.values(),
             "organizer": tournament.organizer

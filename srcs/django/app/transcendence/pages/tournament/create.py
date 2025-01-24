@@ -54,7 +54,7 @@ class Tournament:
         tournaments.pop(self.organizer.id)
         await self.sendNotifToPlayers({
             "message": f"{self.organizer.username} deleted its tournament",
-        })
+        }, [self.organizer])
         await notifEveryone({"refresh": "/"}, [self.organizer])
 
     def userJoined(self, user: User) -> bool:
@@ -83,6 +83,8 @@ class Tournament:
             i += 2
 
     async def launchGame(self):
+        if len(self.players) < 3:
+            return
         self.started = True
         self.createGames()
         htmlSTR = render_to_string("pong/play.html")
@@ -108,10 +110,11 @@ class Tournament:
 
             task.add_done_callback(callback)
 
-    async def sendNotifToPlayers(self, msg: dict):
+    async def sendNotifToPlayers(self, msg: dict, blacklist: list[User] = []):
         msg: str = json.dumps(msg)
         for player in self.players.values():
-            await sendMessageWS(player, "notifications", msg)
+            if player not in blacklist:
+                await sendMessageWS(player, "notifications", msg)
 
 tournaments: dict[int, Tournament] = {}
 
