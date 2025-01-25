@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 import json
 import asyncio
-from .pong import gameLoop, redisClient
+from .pong import gameLoop, redisClient, PongPlayer, Ball
 from utils.friends import getFriends
 from utils.users import onlineUsers, userIsLoggedIn
 from database.models import getFriendship
@@ -177,17 +177,22 @@ class Pong(BaseConsumer):
                         redisClient.hmset(key, {"direction": "down"})
                     case _:
                         redisClient.delete(key)
-                        
+
 class PongSocketConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
-        print("PongSocket WebSocket connected", flush=True)
+
+        self.p1 = PongPlayer(LocalGamer("p1"), 10)
+        self.p2 = PongPlayer(LocalGamer("p2"), -10)
+        self.ball = Ball(self.p1, self.p2)
+
+        self.game_running = True
+        asyncio.create_task(self.start_game_loop())
 
     async def disconnect(self, close_code):
-        print("PongSocket WebSocket disconnected", flush=True)
+        self.game_running = False
 
     async def receive(self, text_data):
-        print(f"PongSocket WebSocket received: {text_data}", flush=True)
 
         try:
             data = json.loads(text_data)
@@ -196,19 +201,38 @@ class PongSocketConsumer(AsyncWebsocketConsumer):
             return
 
         match data.get("type"):
-            case "accept_invite":
-                await self.handle_accept_invite(data)
             case "move":
                 await self.handle_move(data)
             case _:
                 await self.send(json.dumps({"error": "Unknown message type"}))
 
-    # async def handle_accept_invite(self, data):
-    #     opponent = data.get("opponent", "Unknown")
-    #     print(f"Invite accepted for {opponent}", flush=True)
-    #     await self.send(json.dumps({"type": "invite_accepted", "friend": opponent}))
-
     async def handle_move(self, data):
         direction = data.get("direction", "none")
-        print(f"Received move: {direction}", flush=True)
-        await self.send(json.dumps({"type": "move_ack", "direction": direction}))
+        player = data.get("player", "none")
+        
+        if isinstance(self.p1.user, LocalGamer) or isinstance(self.p2.user, LocalGamer):
+            key = f"pong_direction:{player}"
+        else:
+            key = f"pong_direction:{self.p1.user.id if player == 'p1' else self.p2.user.id}"
+
+        if direction in ["up", "down"]:
+            redisClient.hmset(key, {"direction": direction})
+        else:
+            redisClient.delete(key)
+
+
+    async def start_game_loop(self):
+        while self.game_running:
+            self.p1.move()
+            self.p2.move()
+            self.ball.move()
+
+            data = {
+                "type": "update_pong",
+                "p1": {"x": self.p1.pos.x, "y": self.p1.pos.y},
+                "p2": {"x": self.p2.pos.x, "y": self.p2.pos.y},
+                "ball": {"x": self.ball.pos.x, "y": self.ball.pos.y},
+            }
+            await self.send(json.dumps(data))
+
+            await asyncio.sleep(1 / 60)

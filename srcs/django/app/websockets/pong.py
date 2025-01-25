@@ -45,7 +45,10 @@ class PongPlayer:
             self.pos.y = -self.field_height / 2 + 1.5
 
     def move(self):
-        key = f"pong_direction:{self.user.id}"
+        if (self.user.username == "p1" or self.user.username == "p2"):
+            key = f"pong_direction:{self.user.username}"
+        else:
+            key = f"pong_direction:{self.user.id}"
         direction = redisClient.hgetall(key)
         direction: str | None = direction.get("direction")
         match direction:

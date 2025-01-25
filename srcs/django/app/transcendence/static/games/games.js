@@ -6,75 +6,69 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (localButton) {
         localButton.addEventListener("click", async () => {
-            console.log("Submit button clicked. Initializing Local Game Mode...");
             const title = document.getElementById("title");
-			title.remove();
-			localButton.remove();
-			await initializeLocalMode();
+            title.remove();
+            localButton.remove();
+            await initializeLocalMode();
         });
     }
 });
 
 async function initializeLocalMode() {
-    console.log("Initializing Local Game Mode...");
-
     if (window.localPongWebSocket) {
-        console.log("Closing existing LocalGame WebSocket...");
         window.localPongWebSocket.socket.close();
     }
 
     window.localPongWebSocket = new LocalGameWebSocket();
-
     window.pongScene = new PongScene();
 
     await waitForWebSocketOpen(window.localPongWebSocket.socket);
 
-    console.log("WebSocket connection ready! Starting game...");
-    window.localPongWebSocket.socket.send(JSON.stringify({ "type": "start_game" }));
     setupKeyboardControls();
 }
 
 function setupKeyboardControls() {
-    const paddleSpeed = 0.5;
     let keysPressed = {};
 
     document.addEventListener("keydown", (event) => {
         keysPressed[event.key] = true;
+        sendMoveCommand(event.key);
     });
 
     document.addEventListener("keyup", (event) => {
         keysPressed[event.key] = false;
+        sendMoveCommand(null);
     });
 
-    function movePaddles() {
-        if (!window.pongScene) return;
+    function sendMoveCommand(key) {
+        let direction = null;
+        let player = null;
 
-        if (keysPressed["w"] || keysPressed["W"]) {
-            window.pongScene.paddle1.position.y = Math.min(window.pongScene.paddle1.position.y + paddleSpeed, 7);
+        if (key === "w" || key === "W") {
+            direction = "up";
+            player = "p1";
         }
-        if (keysPressed["s"] || keysPressed["S"]) {
-            window.pongScene.paddle1.position.y = Math.max(window.pongScene.paddle1.position.y - paddleSpeed, -7);
-        }
-
-        if (keysPressed["ArrowUp"]) {
-            window.pongScene.paddle2.position.y = Math.min(window.pongScene.paddle2.position.y + paddleSpeed, 7);
-        }
-        if (keysPressed["ArrowDown"]) {
-            window.pongScene.paddle2.position.y = Math.max(window.pongScene.paddle2.position.y - paddleSpeed, -7);
+        if (key === "s" || key === "S") {
+            direction = "down";
+            player = "p1";
         }
 
-        requestAnimationFrame(movePaddles);
+        if (key === "ArrowUp") {
+            direction = "up";
+            player = "p2";
+        }
+        if (key === "ArrowDown") {
+            direction = "down";
+            player = "p2";
+        }
+
+        if (direction && player) {
+            console.log(`🎮 Sending move: ${player} -> ${direction}`);
+            window.localPongWebSocket.socket.send(JSON.stringify({ "type": "move", "direction": direction, "player": player }));
+        }
     }
-
-    movePaddles();
-	gameLoop();
 }
 
-/**
- * Attendre que le WebSocket soit ouvert avant d'envoyer des messages.
- * @param {WebSocket} socket
- * @returns {Promise<void>}
- */
 function waitForWebSocketOpen(socket) {
     return new Promise((resolve) => {
         if (socket.readyState === WebSocket.OPEN) {
@@ -85,17 +79,13 @@ function waitForWebSocketOpen(socket) {
     });
 }
 
-
 class LocalGameWebSocket extends BaseWebSocket {
     constructor() {
         super("pongsocket");
     }
 
-    /** @param {MessageEvent} e */
     receive(e) {
         const data = JSON.parse(e.data);
-        console.log("WebSocket message received:", data);
-
         if (!window.pongScene) return;
 
         switch (data.type) {
@@ -107,26 +97,7 @@ class LocalGameWebSocket extends BaseWebSocket {
                 break;
             
             case "game_over":
-                console.log("Game Over!");
                 break;
         }
     }
-}
-
-function gameLoop() {
-    if (!window.pongScene) return;
-
-    let ballSpeedX = 0.2;
-    let ballSpeedY = 0.1;
-
-    setInterval(() => {
-        if (!window.pongScene) return;
-
-        window.pongScene.ball.position.x += ballSpeedX;
-        window.pongScene.ball.position.y += ballSpeedY;
-
-        if (window.pongScene.ball.position.y > 7 || window.pongScene.ball.position.y < -7) {
-            ballSpeedY *= -1;
-        }
-    }, 16);
 }
