@@ -34,6 +34,7 @@ class UserProfile(models.Model):
     def get_otp(self):
         totp = pyotp.TOTP(self.otp_secret)
         return totp.now()
+
 class Messages(models.Model):
 	friendship = models.ForeignKey(FriendList, on_delete=models.CASCADE)
 	message = models.TextField()

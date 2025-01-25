@@ -115,13 +115,16 @@ def callback_from_42(request):
 		username = f"{base_username}{counter}"
 		counter += 1
 
-	user, created = User.objects.get_or_create(username=username)
+	user, created = User.objects.get_or_create(id=user_info.get('id'))
 
 	if created:
+		user.username = user_info.get('login', '')
 		user.first_name = user_info.get('first_name', '')
-		user.last_name = user_info.get('last_name', '')
+		user.last_name = 	user_info.get('last_name', '')
 		user.email = user_info.get('email', '')
 		user.save()
+	else:
+		user = user
 
 	login(request, user)
 	tokens = get_tokens_for_user(user)
