@@ -91,6 +91,18 @@ class Messages(BaseConsumer):
     def __init__(self):
         super().__init__("messages")
 
+class LocalGamer:
+    def __init__(self, username='LocalGamer'):
+        self.username = username
+        self.is_local = True
+        self.id = 99999
+
+    def __eq__(self, other):
+        return isinstance(other, LocalGamer)
+    
+    def __hash__(self):
+        return hash('LocalGamer')
+
 class Pong(BaseConsumer):
     def __init__(self):
         super().__init__("pong")
@@ -102,13 +114,10 @@ class Pong(BaseConsumer):
             opponent: User = await User.objects.aget(username=self.data.get("opponent"))
         except:
             return sendMessageWS(self.user, "pong", "failed to find opponent")
-
         if not userIsLoggedIn(opponent):
             return sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "opponent not logged in"}))
-
         if await getFriendship(self.user, opponent) is None:
             return sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "you are not friend with this user"}))
-
         self.opponent = opponent
         await sendMessageWS(opponent, "pong", json.dumps({"type": "invite_accepted", "friend": self.user.username}))
 
@@ -168,3 +177,38 @@ class Pong(BaseConsumer):
                         redisClient.hmset(key, {"direction": "down"})
                     case _:
                         redisClient.delete(key)
+                        
+class PongSocketConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        await self.accept()
+        print("PongSocket WebSocket connected", flush=True)
+
+    async def disconnect(self, close_code):
+        print("PongSocket WebSocket disconnected", flush=True)
+
+    async def receive(self, text_data):
+        print(f"PongSocket WebSocket received: {text_data}", flush=True)
+
+        try:
+            data = json.loads(text_data)
+        except json.JSONDecodeError:
+            await self.send(json.dumps({"error": "Invalid JSON format"}))
+            return
+
+        match data.get("type"):
+            case "accept_invite":
+                await self.handle_accept_invite(data)
+            case "move":
+                await self.handle_move(data)
+            case _:
+                await self.send(json.dumps({"error": "Unknown message type"}))
+
+    # async def handle_accept_invite(self, data):
+    #     opponent = data.get("opponent", "Unknown")
+    #     print(f"Invite accepted for {opponent}", flush=True)
+    #     await self.send(json.dumps({"type": "invite_accepted", "friend": opponent}))
+
+    async def handle_move(self, data):
+        direction = data.get("direction", "none")
+        print(f"Received move: {direction}", flush=True)
+        await self.send(json.dumps({"type": "move_ack", "direction": direction}))

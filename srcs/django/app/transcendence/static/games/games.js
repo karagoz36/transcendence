@@ -1,118 +1,132 @@
 import { PongScene } from "../pong/PongScene.js";
-import { getPage, refreshScripts } from "../global/SPA.js"
+import BaseWebSocket from "../global/websockets.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const localButton = document.getElementById("submit");
 
     if (localButton) {
-        localButton.addEventListener("click", () => {
-            const zone = document.getElementById("group");
+        localButton.addEventListener("click", async () => {
+            console.log("Submit button clicked. Initializing Local Game Mode...");
             const title = document.getElementById("title");
-            zone.remove();
-            title.remove();
-            initializeLocalMode();
+			title.remove();
+			localButton.remove();
+			await initializeLocalMode();
         });
     }
 });
 
-function initializeLocalMode() {
-    const container = document.querySelector("#pong-container");
+async function initializeLocalMode() {
+    console.log("Initializing Local Game Mode...");
 
-    if (!container) {
-        console.error("Conteneur #pong-container introuvable. Impossible de démarrer le mode local.");
-        return;
+    if (window.localPongWebSocket) {
+        console.log("Closing existing LocalGame WebSocket...");
+        window.localPongWebSocket.socket.close();
     }
 
-    container.innerHTML = "";
+    window.localPongWebSocket = new LocalGameWebSocket();
 
-    const pongScene = new PongScene();
-    container.appendChild(pongScene.renderer.domElement);
+    window.pongScene = new PongScene();
 
-    pongScene.ball.position.set(0, 0, 0);
-    let ballVelocity = { x: 0.1, y: 0.1 };
+    await waitForWebSocketOpen(window.localPongWebSocket.socket);
 
-    const keysPressed = {
-        paddle1Up: false,
-        paddle1Down: false,
-        paddle2Up: false,
-        paddle2Down: false,
-    };
+    console.log("WebSocket connection ready! Starting game...");
+    window.localPongWebSocket.socket.send(JSON.stringify({ "type": "start_game" }));
+    setupKeyboardControls();
+}
 
-    const paddleSpeed = 0.2;
+function setupKeyboardControls() {
+    const paddleSpeed = 0.5;
+    let keysPressed = {};
 
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "w") keysPressed.paddle1Up = true;
-        if (e.key === "s") keysPressed.paddle1Down = true;
-        if (e.key === "ArrowUp") keysPressed.paddle2Up = true;
-        if (e.key === "ArrowDown") keysPressed.paddle2Down = true;
+    document.addEventListener("keydown", (event) => {
+        keysPressed[event.key] = true;
     });
 
-    document.addEventListener("keyup", (e) => {
-        if (e.key === "w") keysPressed.paddle1Up = false;
-        if (e.key === "s") keysPressed.paddle1Down = false;
-        if (e.key === "ArrowUp") keysPressed.paddle2Up = false;
-        if (e.key === "ArrowDown") keysPressed.paddle2Down = false;
+    document.addEventListener("keyup", (event) => {
+        keysPressed[event.key] = false;
     });
 
-    function updateGame() {
-        if (keysPressed.paddle1Up) pongScene.paddle1.position.y += paddleSpeed;
-        if (keysPressed.paddle1Down) pongScene.paddle1.position.y -= paddleSpeed;
-        if (keysPressed.paddle2Up) pongScene.paddle2.position.y += paddleSpeed;
-        if (keysPressed.paddle2Down) pongScene.paddle2.position.y -= paddleSpeed;
+    function movePaddles() {
+        if (!window.pongScene) return;
 
-        pongScene.paddle1.position.y = Math.max(
-            Math.min(pongScene.paddle1.position.y, 4.5),
-            -4.5
-        );
-        pongScene.paddle2.position.y = Math.max(
-            Math.min(pongScene.paddle2.position.y, 4.5),
-            -4.5
-        );
-
-        pongScene.ball.position.x += ballVelocity.x;
-        pongScene.ball.position.y += ballVelocity.y;
-
-        if (pongScene.ball.position.y >= 5 || pongScene.ball.position.y <= -5) {
-            ballVelocity.y *= -1;
+        if (keysPressed["w"] || keysPressed["W"]) {
+            window.pongScene.paddle1.position.y = Math.min(window.pongScene.paddle1.position.y + paddleSpeed, 7);
+        }
+        if (keysPressed["s"] || keysPressed["S"]) {
+            window.pongScene.paddle1.position.y = Math.max(window.pongScene.paddle1.position.y - paddleSpeed, -7);
         }
 
-        if (
-            pongScene.ball.position.x <= pongScene.paddle1.position.x + 0.5 &&
-            pongScene.ball.position.x >= pongScene.paddle1.position.x &&
-            pongScene.ball.position.y >= pongScene.paddle1.position.y - 1.5 &&
-            pongScene.ball.position.y <= pongScene.paddle1.position.y + 1.5
-        ) {
-            ballVelocity.x *= -1;
+        if (keysPressed["ArrowUp"]) {
+            window.pongScene.paddle2.position.y = Math.min(window.pongScene.paddle2.position.y + paddleSpeed, 7);
+        }
+        if (keysPressed["ArrowDown"]) {
+            window.pongScene.paddle2.position.y = Math.max(window.pongScene.paddle2.position.y - paddleSpeed, -7);
         }
 
-        if (
-            pongScene.ball.position.x >= pongScene.paddle2.position.x - 0.5 &&
-            pongScene.ball.position.x <= pongScene.paddle2.position.x &&
-            pongScene.ball.position.y >= pongScene.paddle2.position.y - 1.5 &&
-            pongScene.ball.position.y <= pongScene.paddle2.position.y + 1.5
-        ) {
-            ballVelocity.x *= -1;
-        }
-
-        if (pongScene.ball.position.x < -10) {
-            resetBall();
-            console.log("Joueur 2 marque !");
-        } else if (pongScene.ball.position.x > 10) {
-            resetBall();
-            console.log("Joueur 1 marque !");
-        }
+        requestAnimationFrame(movePaddles);
     }
 
-    function resetBall() {
-        pongScene.ball.position.set(0, 0, 0);
-        ballVelocity.x *= -1;
+    movePaddles();
+	gameLoop();
+}
+
+/**
+ * Attendre que le WebSocket soit ouvert avant d'envoyer des messages.
+ * @param {WebSocket} socket
+ * @returns {Promise<void>}
+ */
+function waitForWebSocketOpen(socket) {
+    return new Promise((resolve) => {
+        if (socket.readyState === WebSocket.OPEN) {
+            resolve();
+        } else {
+            socket.addEventListener("open", () => resolve(), { once: true });
+        }
+    });
+}
+
+
+class LocalGameWebSocket extends BaseWebSocket {
+    constructor() {
+        super("pongsocket");
     }
 
-    function animate() {
-        updateGame();
-        pongScene.renderer.render(pongScene.scene, pongScene.camera);
-        requestAnimationFrame(animate);
-    }
+    /** @param {MessageEvent} e */
+    receive(e) {
+        const data = JSON.parse(e.data);
+        console.log("WebSocket message received:", data);
 
-    animate();
+        if (!window.pongScene) return;
+
+        switch (data.type) {
+            case "update_pong":
+                window.pongScene.paddle1.position.y = data.p1.y;
+                window.pongScene.paddle2.position.y = data.p2.y;
+                window.pongScene.ball.position.x = data.ball.x;
+                window.pongScene.ball.position.y = data.ball.y;
+                break;
+            
+            case "game_over":
+                console.log("Game Over!");
+                break;
+        }
+    }
+}
+
+function gameLoop() {
+    if (!window.pongScene) return;
+
+    let ballSpeedX = 0.2;
+    let ballSpeedY = 0.1;
+
+    setInterval(() => {
+        if (!window.pongScene) return;
+
+        window.pongScene.ball.position.x += ballSpeedX;
+        window.pongScene.ball.position.y += ballSpeedY;
+
+        if (window.pongScene.ball.position.y > 7 || window.pongScene.ball.position.y < -7) {
+            ballSpeedY *= -1;
+        }
+    }, 16);
 }

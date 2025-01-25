@@ -34,6 +34,8 @@ export class PongScene {
     }
 
     cameraControl() {
+		this.controls.enableZoom = false;
+        this.controls.enablePan = false;
         this.controls.enablePan = false
         this.controls.mouseButtons = {
             RIGHT: THREE.MOUSE.ROTATE,
