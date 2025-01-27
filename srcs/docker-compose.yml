@@ -93,6 +93,7 @@ services:
       - "9090" # Sadece Nginx erişebilsin
     volumes:
       - ./monitoring/prometheus/conf/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
     networks:
       - app-network
     restart: always
@@ -123,7 +124,6 @@ services:
     build:
       context: ./monitoring/alertmanager
       dockerfile: Dockerfile
-    # image: prom/alertmanager:latest
     container_name: alertmanager
     volumes:
       - ./monitoring/alertmanager/conf/alertmanager.yml:/etc/alertmanager/alertmanager.yml:rw
@@ -137,6 +137,7 @@ services:
 
 volumes:
   grafana_data: {}
+  prometheus_data: {}
 
 networks:
   app-network:

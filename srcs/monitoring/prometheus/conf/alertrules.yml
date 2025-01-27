@@ -46,6 +46,16 @@ groups:
       summary: "High Memory Consumption"
       description: "Django process memory usage above 90%. Current usage: {{ $value }}"
 
+  - alert: PrometheusStorageHigh
+    expr: prometheus_tsdb_head_series > 1e6
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Prometheus storage utilization is high"
+      description: "Prometheus TSDB contains over 1 million series."
+
+
   # - alert: TestEmailAlert
   #   expr: vector(1)
   #   for: 10s
