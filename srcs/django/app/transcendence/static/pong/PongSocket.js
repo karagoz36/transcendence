@@ -32,6 +32,13 @@ class PongSocket extends BaseWebSocket {
     
     open() {
         const urlParams = new URLSearchParams(window.location.search) // @ts-ignore
+        const id = urlParams.get("id")
+
+        if (id != null) {
+            const msg = {"type": "accept_invite", "id": id}
+            this.socket.send(JSON.stringify(msg))
+            return
+        }
         this.opponent = urlParams.get("opponent")
         if (!this.opponent) {
             this.opponent = ""
@@ -101,7 +108,7 @@ class PongSocket extends BaseWebSocket {
     /** @param {string} html */
     launchGame(html) {
         const container = document.querySelector("#pong-container")
-        if (!container) return
+        // @ts-ignore
         container.innerHTML = html
         this.inGame = true
         this.initGame()
@@ -110,7 +117,7 @@ class PongSocket extends BaseWebSocket {
     /** @param {PongSocketData} json */
     updatePong(json) {
         if (!this.game)
-            return
+            this.launchGame("")
         this.game.paddle1.position.x = json.p1.x
         this.game.paddle1.position.y = json.p1.y
     
@@ -129,7 +136,7 @@ class PongSocket extends BaseWebSocket {
         if (json.type == "game_over")
             return await getPage("/")
 
-        if (json.type == "update_pong" && this.inGame)
+        if (json.type == "update_pong")
             return this.updatePong(json)
 
         if (json.type == "invite_accepted" && this.inGame)

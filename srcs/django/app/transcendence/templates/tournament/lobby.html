@@ -2,17 +2,31 @@
 {% block title %}Tournament{% endblock %}
 {% block content %}
 {% include "modules/navbar.html" %}
+<style>
+  #pong-container {
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  #pong-container>canvas {
+    max-height: 80vh;
+    margin-bottom: 2vh;
+  }
+</style>
 <div id="pong-container">
-  <h2 style="text-align: center">{{organizer.username}}'s tournament</h2>
-  <h3 style="text-align: center">Players</h3>
-  {% for player in players %}
-  <div style="text-align: center">
-    <a href="/profile/?id={{player.id}}">{{player.username}}</a>
+  <div>
+    <h2 style="text-align: center">{{organizer.username}}'s tournament</h2>
+    <h3 style="text-align: center">Players</h3>
+    {% for player in players %}
+    <div style="text-align: center">
+      <a href="/profile/?id={{player.id}}">{{player.username}}</a>
+    </div>
+    {% endfor %}
+    {% if tournament.started %}
+    <script type="module" src="/static/tournament/lobby.js"></script>
+    {% endif %}
   </div>
-  {% endfor %}
-  {% if tournament.started %}
-  <script type="module" src="/static/tournament/lobby.js"></script>
-  {% endif %}
 </div>
 <script type="module" src="/static/pong/PongSocket.js"></script>
 {% endblock %}

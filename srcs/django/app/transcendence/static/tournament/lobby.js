@@ -1,1 +1,0 @@
-setTimeout(async () => await fetch(window.location.href), 100)

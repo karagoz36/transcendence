@@ -23,13 +23,14 @@ class Tournament:
     public: bool = False
     players: dict[int, User]
     games: list[GameData]
-    started: bool = False
+    started: bool
     waitTime = 10
 
     def __init__(self, organizer: User):
         self.organizer = organizer
         self.players = {organizer.id: organizer}
         self.games = []
+        self.started = False
 
     async def removePlayer(self, player: User):
         if player.id == self.organizer.id:
@@ -121,21 +122,24 @@ class Tournament:
             dict = json.dumps({ "message": msg })
             await sendMessageWS(game.p1, "notifications", dict)
 
-    async def launch(self) -> str:
-        if len(self.players) < 2:
-            return "Need at least 2 players to start"
+    async def launch(self):
         self.started = True
         self.createGames()
         await self.announceGames()
         await asyncio.sleep(self.waitTime)
         await self.startGames()
-        return ""
 
     async def sendNotifToPlayers(self, msg: dict, blacklist: list[User] = []):
         msg: str = json.dumps(msg)
         for player in self.players.values():
             if player not in blacklist:
                 await sendMessageWS(player, "notifications", msg)
+    
+    def userHasGameRunning(self, user: User) -> bool:
+        for game in self.games:
+            if (game.p1 == user or game.p2 == user) and game.started:
+                return True
+        return False
 
 tournaments: dict[int, Tournament] = {}
 

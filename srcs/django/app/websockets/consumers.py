@@ -101,13 +101,20 @@ class Pong(BaseConsumer):
         try:
             opponent: User = await User.objects.aget(username=self.data.get("opponent"))
         except:
-            return sendMessageWS(self.user, "pong", "failed to find opponent")
+            id: int = self.data.get("id")
+            if id is None:
+                await sendMessageWS(self.user, "pong", "failed to find opponent")
+            id = int(id)
+            await sendMessageWS(self.user, "pong", json.dumps({"type": "invite_accepted", "friend": None}))
+            return
 
         if not userIsLoggedIn(opponent):
-            return sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "opponent not logged in"}))
+            await sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "opponent not logged in"}))
+            return
 
         if await getFriendship(self.user, opponent) is None:
-            return sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "you are not friend with this user"}))
+            await sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "you are not friend with this user"}))
+            return
 
         self.opponent = opponent
         await sendMessageWS(opponent, "pong", json.dumps({"type": "invite_accepted", "friend": self.user.username}))
@@ -117,15 +124,18 @@ class Pong(BaseConsumer):
         self.user: User = self.scope["user"]
 
         if self.user.is_anonymous:
-            return sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "not logged in"}))
+            await sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "not logged in"}))
+            return
 
         try:
             self.data = json.loads(text_data)
         except:
-            return sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "invalid message"}))
+            await sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "invalid message"}))
+            return
 
         if type(self.data) is not dict:
-            return sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "invalid message"}))
+            await sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "invalid message"}))
+            return
 
         match self.data.get("type"):
             case "accept_invite":
@@ -134,7 +144,8 @@ class Pong(BaseConsumer):
             case "launch_game":
                 if self.opponent is None:
                     err = {"type": "error", "error": "trying to launch a game without an opponent"}
-                    return sendMessageWS(self.user, "pong", json.dumps(err))
+                    await sendMessageWS(self.user, "pong", json.dumps(err))
+                    return
                 htmlSTR = render_to_string("pong/play.html")
                 await sendMessageWS(self.opponent, "pong", json.dumps({"type": "launch_game", "html": htmlSTR}))
                 await sendMessageWS(self.user, "pong", json.dumps({"type": "launch_game", "html": htmlSTR}))
