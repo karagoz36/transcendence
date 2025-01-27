@@ -10,9 +10,11 @@ import asyncio
 async def response(request: Request) -> Response:
     user: User = request.user
     tournament: Tournament = tournaments.get(user.id)
+    error = ""
 
     if tournament is None:
         return redirect("/")
-    await tournament.launchGame()
-    await asyncio.sleep(10)
-    return redirect("/")
+    error = await tournament.launch()
+    if error != "":
+        return redirect(f"/tournament/create/?error={error}")
+    return redirect(f"/tournament/lobby/?id={user.id}")

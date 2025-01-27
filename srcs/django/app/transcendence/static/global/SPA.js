@@ -80,8 +80,6 @@ async function getHTML(url, options, addToHistory) {
 		console.error(await res.json())
 		throw new Error("got json instead of html")	
 	}
-	if (res.url == "https://localhost:8000/tournament/create/")
-		console.log("")
 	return await res.text()
 }
 

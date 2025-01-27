@@ -136,8 +136,9 @@ class PongSocket extends BaseWebSocket {
             return this.socket.send(JSON.stringify({"type": "join_game"}))
 
         if (json.type == "invite_accepted" && this.opponent == json.friend)
-            this.socket.send(JSON.stringify({"type": "launch_game"}))
-        else if (json.type == "launch_game") {
+            return this.socket.send(JSON.stringify({"type": "launch_game"}))
+
+        if (json.type == "launch_game") {
             if (!json.html) {
                 console.error(json)
                 throw new Error("expected html")

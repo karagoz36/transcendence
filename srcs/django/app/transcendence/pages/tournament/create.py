@@ -1,6 +1,6 @@
 from rest_framework.request import Request
 from rest_framework.response import Response
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -81,18 +81,17 @@ class Tournament:
             data.started = False
             self.games.append(data)
             i += 2
-
-    async def launchGame(self):
-        if len(self.players) < 3:
-            return
-        self.started = True
-        self.createGames()
+    
+    async def startGames(self):
         htmlSTR = render_to_string("pong/play.html")
-
         def onGameover(winner: User, game: GameData):
             self.games.pop(self.games.index(game))
             loser: User = game.p1 if game.p2 == winner else game.p2
             self.players.pop(loser.id)
+            if len(self.players) == 1:
+                tournaments.pop(self.organizer.id)
+                print("TOURNAMENT OVER")
+                return
             print(f"{loser.username} lost one game of tournament")
 
         for game in self.games:
@@ -101,7 +100,7 @@ class Tournament:
             await sendMessageWS(game.p2, "pong", msg)
 
             if game.started:
-                return
+                return ""
             game.started = True
             task = asyncio.create_task(gameLoop(game.p1, game.p2))
 
@@ -109,6 +108,14 @@ class Tournament:
                 onGameover(task.result(), game)
 
             task.add_done_callback(callback)
+
+    async def launch(self) -> str:
+        if len(self.players) < 2:
+            return "Need at least 2 players to start"
+        self.started = True
+        self.createGames()
+        await self.startGames()
+        return ""
 
     async def sendNotifToPlayers(self, msg: dict, blacklist: list[User] = []):
         msg: str = json.dumps(msg)
@@ -121,7 +128,6 @@ tournaments: dict[int, Tournament] = {}
 @login_required(login_url="/api/logout")
 async def response(request: Request) -> Response:
     user: User = request.user
-    friends = await getFriends(user)
 
     error = request.query_params.get("error")
     if error is None:
@@ -136,12 +142,9 @@ async def response(request: Request) -> Response:
         tournament = Tournament(user)
         tournaments[user.id] = tournament
         await notifEveryone({"refresh": "/"}, [user])
-
-    for friend in friends:
-        if tournament.userJoined(friend):
-            friends.remove(friend)
+    if tournament.started:
+        return redirect("/tournament/lobby/")
     return render(request, "tournament/create.html", {
-        "friends": friends, "ERROR": error, "SUCCESS": success,
         "players": tournament.players.values(),
         "organizer": tournament.organizer
     })

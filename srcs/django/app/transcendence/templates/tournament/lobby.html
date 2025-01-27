@@ -10,6 +10,10 @@
     <a href="/profile/?id={{player.id}}">{{player.username}}</a>
   </div>
   {% endfor %}
+  {% if tournament.started %}
+  <button class="btn btn-primary" id="join-running-game">Join running game</a>
+  <script type="module" src="/static/tournament/lobby.js"></script>
+  {% endif %}
 </div>
 <script type="module" src="/static/pong/PongSocket.js"></script>
 {% endblock %}
