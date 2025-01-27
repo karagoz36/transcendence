@@ -1,0 +1,66 @@
+groups:
+- name: django_alerts
+  rules:
+  - alert: HighErrorRate
+    expr: increase(django_http_responses_total_by_status{status=~"5.."}[5m]) > 10
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High 5xx Error Rate on Django Application"
+      description: "More than 10 server errors in 5 minutes. Current error count: {{ $value }}"
+
+  - alert: SlowRequests
+    expr: django_http_request_duration_seconds_sum / django_http_request_duration_seconds_count > 0.5
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Slow Django Request Processing"
+      description: "Average request duration exceeding 500ms. Current avg: {{ $value }}s"
+
+  - alert: DatabaseConnectionIssues
+    expr: django_db_connection_errors_total > 0
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Django Database Connection Errors"
+      description: "Database connection errors detected. Total errors: {{ $value }}"
+
+  - alert: HighCPUUsage
+    expr: process_cpu_seconds_total{job="django"} > 80
+    for: 15m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High Django Process CPU Usage"
+      description: "Django process CPU usage above 80%. Current usage: {{ $value }}%"
+
+  - alert: LowMemory
+    expr: process_resident_memory_bytes{job="django"} / process_virtual_memory_bytes{job="django"} > 0.9
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High Memory Consumption"
+      description: "Django process memory usage above 90%. Current usage: {{ $value }}"
+
+  - alert: PrometheusStorageHigh
+    expr: prometheus_tsdb_head_series > 1e6
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Prometheus storage utilization is high"
+      description: "Prometheus TSDB contains over 1 million series."
+
+
+  # - alert: TestEmailAlert
+  #   expr: vector(1)
+  #   for: 10s
+  #   labels:
+  #     severity: warning
+  #   annotations:
+  #     summary: "Test Email Alert"
+  #     description: "This is a test alert to verify email notification system"
