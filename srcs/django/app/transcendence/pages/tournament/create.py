@@ -24,6 +24,7 @@ class Tournament:
     players: dict[int, User]
     games: list[GameData]
     started: bool = False
+    waitTime = 10
 
     def __init__(self, organizer: User):
         self.organizer = organizer
@@ -108,12 +109,25 @@ class Tournament:
                 onGameover(task.result(), game)
 
             task.add_done_callback(callback)
+    
+    async def announceGames(self):
+        format = f"You will play against $OPPONENT in {self.organizer.username}'s tournament in {self.waitTime} seconds."
+        for game in self.games:
+            msg = format.replace("$OPPONENT", game.p1.username)
+            dict = json.dumps({ "message": msg })
+            await sendMessageWS(game.p2, "notifications", dict)
+    
+            msg = format.replace("$OPPONENT", game.p2.username)
+            dict = json.dumps({ "message": msg })
+            await sendMessageWS(game.p1, "notifications", dict)
 
     async def launch(self) -> str:
         if len(self.players) < 2:
             return "Need at least 2 players to start"
         self.started = True
         self.createGames()
+        await self.announceGames()
+        await asyncio.sleep(self.waitTime)
         await self.startGames()
         return ""
 
@@ -146,5 +160,6 @@ async def response(request: Request) -> Response:
         return redirect("/tournament/lobby/")
     return render(request, "tournament/create.html", {
         "players": tournament.players.values(),
-        "organizer": tournament.organizer
+        "organizer": tournament.organizer,
+        "ERROR": error,
     })
