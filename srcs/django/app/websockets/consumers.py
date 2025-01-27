@@ -7,7 +7,6 @@ from .pong import gameLoop, redisClient
 from utils.friends import getFriends
 from utils.users import onlineUsers, userIsLoggedIn
 from database.models import getFriendship
-from utils.websocket import sendMessageWS
 
 class BaseConsumer(AsyncWebsocketConsumer):
     def __init__(self, consumerName: str):
@@ -17,19 +16,17 @@ class BaseConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         user: User = self.scope.get("user")
     
-        if user is None:
+        if user is None or user.username == "":
             self.group_name = "unauthenticated"
             await self.close(code=4000)
-            print(f"WebSocket: {self.group_name} connected", flush=True)
+            print(f"WebSocket: {self.group_name} closed", flush=True)
             return
 
-        await self.accept()
         self.group_name = f"{user.id}_{self.consumerName}"
-        print(f"WebSocket: {self.group_name} connected", flush=True)
-        if user.username == "":
-            await self.close(code=4000)
-            return
+
+        await self.accept()
         await self.channel_layer.group_add(self.group_name, self.channel_name)
+        print(f"WebSocket: {self.group_name} connected", flush=True)
 
     async def disconnect(self, close_code):
         print(f"WebSocket: {self.group_name} disconnected", flush=True)
@@ -63,6 +60,7 @@ class Notification(BaseConsumer):
             receiver: User = await User.objects.aget(id=friend["id"])
             message = json.dumps({
                 "message": f"{user.username} logged in.",
+                "link": "/friends/",
                 "refresh": ["/friends/", "/pong/"]
                 })
             await sendMessageWS(receiver, "notifications", message)
@@ -83,6 +81,7 @@ class Notification(BaseConsumer):
             receiver: User = await User.objects.aget(id=friend["id"])
             message = json.dumps({
                 "message": f"{user.username} logged out.",
+                "link": "/friends/",
                 "refresh": ["/friends/", "/pong/"]
                 })
             await sendMessageWS(receiver, "notifications", message)

@@ -5,12 +5,14 @@ class MessagesHandler extends BaseWebSocket {
 	/** @param {string} url */
 	constructor(url) {
 		super(url)
-		// addEventListener("page-changed", () => {
-		// 	this.socket.onmessage = null
-		// 	this.socket.close()
-		// })
-		this.socket.onmessage = this.receive.bind(this);
-		//alternative
+		//close seulement si pas le container
+		addEventListener("page-changed", (e) => {
+			if (e.detail != "#messages-container"){
+				console.log(e.detail)
+				this.socket.onmessage = null
+				this.socket.close()
+			}
+		})
 	}
 
     /** @param {MessageEvent} e */

@@ -15,7 +15,6 @@ async function openChat(e) {
 	if (userId == null)
 			return
 
-
 	/** Mettre à jour le titre du modal */
     /** @type {string|null} */ // @ts-ignore
 	const username = button.getAttribute("user-name")

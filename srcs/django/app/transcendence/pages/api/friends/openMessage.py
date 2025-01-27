@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from django.http.response import HttpResponse
 from django.contrib.auth.models import User
 from database.models import FriendList, getFriendship, Messages
-from websockets.consumers import sendMessageWS
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 
@@ -27,6 +26,5 @@ async def response(request: Request) -> HttpResponse:
 	friendship: FriendList = await getFriendship(user, friend)
 	if friendship is None:
 		return Response({"message": "friendship not found"}, status=401)
-
 	messageList = await getMessages(friendship)
 	return render(request, "friendlist/message-list.html", context={"messages": messageList })

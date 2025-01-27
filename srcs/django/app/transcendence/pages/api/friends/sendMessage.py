@@ -20,6 +20,7 @@ async def getMessages(friendship: FriendList):
 async def sendNewMessageToFriend(sender: User, receiver: User, message: str):
 	latest_message = await sync_to_async(Messages.objects.order_by('-created_at').first)()
 	context = {}
+	print(message, flush=True)
 	context["message"] = {"sender": sender.username, "text": message, "created_at":latest_message.created_at}
 	html = render_to_string("friendlist/message.html", context=context)
 	await sendMessageWS(receiver, "messages", html)
@@ -58,6 +59,6 @@ async def response(request: Request) -> HttpResponse:
 	if friend.id == user.id:
 		friend = friendship.user
 	await sendNewMessageToFriend(user, friend, message)
-	message = {"message": f"New message received from {user.username}.", "refresh": ["friends/"]}
+	message = {"message": f"New message received from {user.username}.", "link":"/friends", "refresh": ["friends/"]}
 	await sendMessageWS(friend, "notifications", json.dumps(message))
 	return render(request, "friendlist/message-list.html", context={"messages": messageList })
