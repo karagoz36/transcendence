@@ -4,74 +4,105 @@ global:
   smtp_auth_username: '${EMAIL_HOST_USER}'
   smtp_auth_password: '${EMAIL_HOST_PASSWORD}'
   smtp_require_tls: true
+  resolve_timeout: 5m
 
 route:
-  group_by: ['alertname', 'job']
+  group_by: ['alertname', 'job', 'severity']
   group_wait: 30s
   group_interval: 5m
   repeat_interval: 1h
   receiver: 'email-alerts'
+  routes:
+    - match:
+        severity: critical
+      group_wait: 10s  # Critical alerts should be sent faster
+      receiver: 'email-alerts'
+    - match:
+        severity: warning
+      receiver: 'email-alerts'
 
 receivers:
 - name: 'email-alerts'
   email_configs:
   - to: '${EMAIL_HOST_USER}'
     send_resolved: true
+    headers:
+      subject: '🚨 [ALERT] {{ .Status | toUpper }} - {{ .GroupLabels.alertname }}'
+    html: |
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          .alert-header {
+            background-color: {{ if eq .Status "firing" }}#ff4444{{ else }}#44cc44{{ end }};
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+          }
+          .alert-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+          }
+          .service-list {
+            list-style-type: none;
+            padding: 0;
+          }
+          .service-item {
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 3px;
+          }
+          .label { font-weight: bold; }
+          .timestamp { color: #666; font-size: 0.9em; }
+        </style>
+      </head>
+      <body>
+        <h2 class="alert-header">
+          {{ if eq .Status "firing" }}🔥{{ else }}✅{{ end }}
+          {{ .Status | toUpper }} - {{ .GroupLabels.alertname }}
+        </h2>
 
-# route:
-#   group_by: ['alertname', 'job']
-#   group_wait: 30s
-#   group_interval: 5m
-#   repeat_interval: 1h
-#   receiver: 'email-alerts'
+        <div class="alert-info">
+          <p><span class="label">Severity:</span> {{ .CommonLabels.severity }}</p>
+          <p><span class="label">Description:</span> {{ .CommonAnnotations.description }}</p>
+          {{ if .CommonAnnotations.summary }}
+          <p><span class="label">Summary:</span> {{ .CommonAnnotations.summary }}</p>
+          {{ end }}
+        </div>
 
-# receivers:
-# - name: 'email-alerts'
-#   email_configs:
-#   - to: '${EMAIL_HOST_USER}'
-#     from: '${EMAIL_HOST_USER}'
-#     smarthost: 'smtp.gmail.com:587'
-#     auth_username: '${EMAIL_HOST_USER}'
-#     auth_password: '${EMAIL_HOST_PASSWORD}'
-#     auth_identity: '${EMAIL_HOST_USER}'
-#     send_resolved: true
-#     headers:
-#       subject: '[ALERT] {{ .Status | toUpper }} - {{ .GroupLabels.alertname }}'
-#     html: |
-#       <html>
-#       <body>
-#       <h2>{{ .Status | toUpper }} - {{ .GroupLabels.alertname }}</h2>
-#       <p><strong>Severity:</strong> {{ .CommonLabels.severity }}</p>
-#       <p><strong>Description:</strong> {{ .CommonAnnotations.description }}</p>
-#       <h3>Affected Services:</h3>
-#       <ul>
-#       {{ range .Alerts }}
-#         <li>
-#           <strong>Job:</strong> {{ .Labels.job }}<br>
-#           <strong>Instance:</strong> {{ .Labels.instance }}
-#         </li>
-#       {{ end }}
-#       </ul>
-#       </body>
-#       </html>
+        <h3>📊 Affected Services:</h3>
+        <ul class="service-list">
+        {{ range .Alerts }}
+          <li class="service-item">
+            <p><span class="label">Job:</span> {{ .Labels.job }}</p>
+            <p><span class="label">Instance:</span> {{ .Labels.instance }}</p>
+            {{ if .Annotations.value }}
+            <p><span class="label">Value:</span> {{ .Annotations.value }}</p>
+            {{ end }}
+            <p class="timestamp">Started: {{ .StartsAt.Format "2006-01-02 15:04:05" }}</p>
+          </li>
+        {{ end }}
+        </ul>
 
+        <p style="margin-top: 20px; font-size: 0.8em; color: #666;">
+          This is an automated alert from Alertmanager.
+          {{ if eq .Status "firing" }}
+          The issue requires attention.
+          {{ else }}
+          The alert has been resolved.
+          {{ end }}
+        </p>
+      </body>
+      </html>
 
-
-
-# global:
-#   smtp_smarthost: 'smtp.gmail.com:587'  # Replace with your SMTP server
-#   smtp_from: 'your-email@gmail.com'    # Replace with your email address
-#   smtp_auth_username: 'your-email@gmail.com'
-#   smtp_auth_password: 'your-email-password'
-#   smtp_require_tls: true
-
-# route:
-#   receiver: 'email-alert'
-
-# receivers:
-#   - name: 'email-alert'
-#     email_configs:
-#       - to: 'recipient-email@gmail.com'  # Replace with the recipient's email address
-#         send_resolved: true             # Set to true if you want notifications when an alert is resolved
-
-
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'instance']
