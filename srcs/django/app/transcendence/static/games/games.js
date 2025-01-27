@@ -1,18 +1,34 @@
 import { PongScene } from "../pong/PongScene.js";
 import BaseWebSocket from "../global/websockets.js";
 
+let gameInitialized = false;
 
 async function initializeLocalMode() {
     if (window.localPongWebSocket) {
         window.localPongWebSocket.socket.close();
     }
-    
+
     window.localPongWebSocket = new LocalGameWebSocket();
-    window.pongScene = new PongScene();
-    
     await waitForWebSocketOpen(window.localPongWebSocket.socket);
     
+    await new Promise(resolve => {
+        if (document.body.clientWidth > 0 && document.body.clientHeight > 0) {
+            resolve();
+        } else {
+            window.addEventListener('resize', () => resolve(), { once: true });
+        }
+    });
+
+    window.dispatchEvent(new Event('resize'));
+    
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    
+    window.pongScene = new PongScene();
+    
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    
     setupKeyboardControls();
+    gameInitialized = true;
 }
 
 function setupKeyboardControls() {
@@ -22,45 +38,57 @@ function setupKeyboardControls() {
         keysPressed[event.key] = true;
         sendMoveCommand();
     });
-    
+
     document.addEventListener("keyup", (event) => {
         delete keysPressed[event.key];
         sendMoveCommand();
     });
-    
-    function sendMoveCommand(key) {
+
+    function sendMoveCommand() {
+        if (!gameInitialized || !window.pongScene) return;
+        
         let directionP1 = null;
         let directionP2 = null;
-        let player = null;
-        
+
         if (keysPressed["w"] || keysPressed["W"]) {
             directionP2 = "up";
-            // player = "p2";
         }
         if (keysPressed["s"] || keysPressed["S"]) {
             directionP2 = "down";
-            // player = "p2";
         }
-        
         if (keysPressed["ArrowUp"]) {
             directionP1 = "up";
-            // player = "p1";
         }
         if (keysPressed["ArrowDown"]) {
             directionP1 = "down";
-            // player = "p1";
         }
-        
+
         if (directionP1 !== null) {
-            window.localPongWebSocket.socket.send(JSON.stringify({ "type": "move", "direction": directionP1, "player": "p1" }));
+            window.localPongWebSocket.socket.send(JSON.stringify({
+                "type": "move",
+                "direction": directionP1,
+                "player": "p1"
+            }));
         } else if (!keysPressed["ArrowUp"] && !keysPressed["ArrowDown"]) {
-            window.localPongWebSocket.socket.send(JSON.stringify({ "type": "move", "direction": "none", "player": "p1" }));
+            window.localPongWebSocket.socket.send(JSON.stringify({
+                "type": "move",
+                "direction": "none",
+                "player": "p1"
+            }));
         }
-        
+
         if (directionP2 !== null) {
-            window.localPongWebSocket.socket.send(JSON.stringify({ "type": "move", "direction": directionP2, "player": "p2" }));
+            window.localPongWebSocket.socket.send(JSON.stringify({
+                "type": "move",
+                "direction": directionP2,
+                "player": "p2"
+            }));
         } else if (!keysPressed["w"] && !keysPressed["W"] && !keysPressed["s"] && !keysPressed["S"]) {
-            window.localPongWebSocket.socket.send(JSON.stringify({ "type": "move", "direction": "none", "player": "p2" }));
+            window.localPongWebSocket.socket.send(JSON.stringify({
+                "type": "move",
+                "direction": "none",
+                "player": "p2"
+            }));
         }
     }
 }
@@ -79,10 +107,10 @@ class LocalGameWebSocket extends BaseWebSocket {
     constructor() {
         super("pongsocket");
     }
-    
+
     receive(e) {
         const data = JSON.parse(e.data);
-        if (!window.pongScene) return;
+        if (!window.pongScene || !gameInitialized) return;
         
         switch (data.type) {
             case "update_pong":
@@ -91,21 +119,36 @@ class LocalGameWebSocket extends BaseWebSocket {
                 window.pongScene.ball.position.x = data.ball.x;
                 window.pongScene.ball.position.y = data.ball.y;
                 break;
-                
-                case "game_over":
-                    break;
-                }
-            }
+            case "game_over":
+                break;
         }
-        
-const localButton = document.getElementById("submit");
-if (localButton) {
-    localButton.addEventListener("click", async () => {
-            document.addEventListener("DOMContentLoaded", () => {
-            const title = document.getElementById("title");
-            title.remove();
-            localButton.remove();
-        });
-        await initializeLocalMode();
-    });
+    }
 }
+
+function LocalGame() {
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", setupGame);
+    } else {
+        setupGame();
+    }
+}
+
+function setupGame() {
+    const localButton = document.getElementById("submit");
+    if (localButton) {
+        localButton.addEventListener("click", async () => {
+            const title = document.getElementById("title");
+            if (title) title.remove();
+            localButton.remove();
+            window.dispatchEvent(new Event('resize'));
+            
+            try {
+                await initializeLocalMode();
+            } catch (error) {
+                console.error("Erreur lors de l'initialisation:", error);
+            }
+        });
+    }
+}
+
+LocalGame();

@@ -61,29 +61,28 @@ class PongPlayer:
             case None:
                 return        
         redisClient.delete(key)
-    
+        
     def collidedTop(self, pos: Vector2) -> bool:
-        playerPos = self.pos.abs()
-        ballPos = pos.abs()
-        return ballPos.y >= playerPos.y - self.width / 2 and ballPos.y <= playerPos.y
-    
+        return pos.y >= self.pos.y - self.width / 2 and pos.y <= self.pos.y
+
     def collidedBottom(self, pos: Vector2) -> bool:
-        playerPos = self.pos.abs()
-        ballPos = pos.abs()
-        return ballPos.y <= playerPos.y + self.width / 2 and ballPos.y >= playerPos.y
+        return pos.y <= self.pos.y + self.width / 2 and pos.y >= self.pos.y
 
     def collided(self, pos: Vector2) -> int:
-        playerPos = self.pos.abs()
-        ballPos = pos.abs()
+        if self.user.username == "p1":
+            if pos.x < self.pos.x - self.thickness or pos.x > self.pos.x + self.thickness:
+                return e_direction["NONE"]
+        else:
+            if pos.x > self.pos.x + self.thickness or pos.x < self.pos.x - self.thickness:
+                return e_direction["NONE"]
 
-        if playerPos.x >= (ballPos.x + self.thickness):
-            return False
-
-        if self.collidedBottom(pos):
-            return e_direction["BOTTOM"]
-        if self.collidedTop(pos):
+        y_dist = abs(pos.y - self.pos.y)
+        if y_dist > self.width / 2:
+            return e_direction["NONE"]
+        
+        if pos.y > self.pos.y:
             return e_direction["TOP"]
-        return e_direction["NONE"]
+        return e_direction["BOTTOM"]
 
     def get_relative_impact(self, ball_y: float) -> float:
         relative_impact = (ball_y - self.pos.y) / (self.width / 2)
