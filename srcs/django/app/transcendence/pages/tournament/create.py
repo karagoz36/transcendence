@@ -89,7 +89,7 @@ class Tournament:
     async def startGames(self):
         htmlSTR = render_to_string("pong/play.html")
 
-        def onGameover(winner: User, game: GameData):
+        async def onGameover(winner: User, game: GameData):
             self.games.pop(self.games.index(game))
             loser: User = game.p1 if game.p2 == winner else game.p2
             self.players.pop(loser.id)
@@ -98,7 +98,7 @@ class Tournament:
                 print("TOURNAMENT OVER")
                 return
             if len(self.games) == 0:
-                self.launch()
+                await self.launch()
                 return
 
         for game in self.games:
@@ -112,10 +112,10 @@ class Tournament:
             task = asyncio.create_task(gameLoop(game.p1, game.p2))
 
             def callback(task: Task[User]):
-                onGameover(task.result(), game)
+                asyncio.create_task(onGameover(task.result(), game))
 
             task.add_done_callback(callback)
-    
+
     async def announceGames(self):
         format = f"You will play against $OPPONENT in {self.organizer.username}'s tournament in {self.waitTime} seconds."
         dict = {"message": format, "redirect": f"/tournament/lobby/?id={self.organizer.id}"}
