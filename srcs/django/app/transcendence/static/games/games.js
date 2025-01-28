@@ -40,20 +40,18 @@ async function initializeLocalMode() {
 
 function setupKeyboardControls() {
     let keysPressed = {};
-    
+
     document.addEventListener("keydown", (event) => {
         keysPressed[event.key] = true;
-        sendMoveCommand();
     });
 
     document.addEventListener("keyup", (event) => {
         delete keysPressed[event.key];
-        sendMoveCommand();
     });
 
-    function sendMoveCommand() {
+    setInterval(() => {
         if (!gameInitialized || !window.pongScene) return;
-        
+
         let directionP1 = null;
         let directionP2 = null;
 
@@ -76,7 +74,7 @@ function setupKeyboardControls() {
                 "direction": directionP1,
                 "player": "p1"
             }));
-        } else if (!keysPressed["ArrowUp"] && !keysPressed["ArrowDown"]) {
+        } else {
             window.localPongWebSocket.socket.send(JSON.stringify({
                 "type": "move",
                 "direction": "none",
@@ -90,15 +88,16 @@ function setupKeyboardControls() {
                 "direction": directionP2,
                 "player": "p2"
             }));
-        } else if (!keysPressed["w"] && !keysPressed["W"] && !keysPressed["s"] && !keysPressed["S"]) {
+        } else {
             window.localPongWebSocket.socket.send(JSON.stringify({
                 "type": "move",
                 "direction": "none",
                 "player": "p2"
             }));
         }
-    }
+    }, 50);
 }
+
 
 function waitForWebSocketOpen(socket) {
     return new Promise((resolve) => {
