@@ -62,7 +62,7 @@ class NotificationHandler extends BaseWebSocket {
 			return
 
 		for (let url of urls) {
-			if (url == window.location.pathname) {
+			if (url == window.location.pathname || url == window.location.pathname + window.location.search) {
 				await getPage(url)
 				break
 			}

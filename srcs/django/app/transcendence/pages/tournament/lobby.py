@@ -1,13 +1,9 @@
 from rest_framework.request import Request
 from rest_framework.response import Response
 from django.shortcuts import render, redirect
-from django.template.loader import render_to_string
-import json
-import asyncio
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .create import tournaments
-from utils.websocket import sendMessageWS
 
 @login_required(login_url="/api/logout")
 async def response(request: Request) -> Response:
@@ -28,4 +24,5 @@ async def response(request: Request) -> Response:
             "players": tournament.players.values(),
             "organizer": tournament.organizer,
             "tournament": tournament,
+            "games": tournament.games,
         })

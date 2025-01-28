@@ -38,10 +38,11 @@ class Tournament:
 
         msg = {
             "message": f"{player.username} left {self.organizer.username}'s tournament",
-            "refresh": ["/", "/tournament/create/", "/tournament/lobby/"]
+            "refresh": ["/", "/tournament/create/", f"/tournament/lobby/?id={self.organizer.id}"]
         }
-        await self.sendNotifToPlayers(msg)
         self.players.pop(player.id)
+        await self.sendNotifToPlayers(msg)
+        await sendMessageWS(player, "notifications", json.dumps({ "redirect": "/" }))
     
     async def addPlayer(self, player: User):
         if self.userJoined(player):
@@ -49,13 +50,14 @@ class Tournament:
         self.players[player.id] = player
         await self.sendNotifToPlayers({
             "message": f"{player.username} joined {self.organizer.username}'s tournament",
-            "refresh": ["/tournament/create/", "/tournmanet/lobby/"]
+            "refresh": ["/tournament/create/", f"/tournament/lobby/?id={self.organizer.id}"]
         })
 
     async def deleteTournament(self):
         tournaments.pop(self.organizer.id)
         await self.sendNotifToPlayers({
-            "message": f"{self.organizer.username} deleted its tournament",
+            "message": f"{self.organizer.username}'s tournament deleted",
+            "redirect": "/"
         }, [self.organizer])
         await notifEveryone({"refresh": "/"}, [self.organizer])
 
@@ -86,6 +88,7 @@ class Tournament:
     
     async def startGames(self):
         htmlSTR = render_to_string("pong/play.html")
+
         def onGameover(winner: User, game: GameData):
             self.games.pop(self.games.index(game))
             loser: User = game.p1 if game.p2 == winner else game.p2
@@ -94,7 +97,9 @@ class Tournament:
                 tournaments.pop(self.organizer.id)
                 print("TOURNAMENT OVER")
                 return
-            print(f"{loser.username} lost one game of tournament")
+            if len(self.games) == 0:
+                self.launch()
+                return
 
         for game in self.games:
             msg = json.dumps({"type": "launch_game", "html": htmlSTR})
@@ -113,14 +118,18 @@ class Tournament:
     
     async def announceGames(self):
         format = f"You will play against $OPPONENT in {self.organizer.username}'s tournament in {self.waitTime} seconds."
+        dict = {"message": format, "redirect": f"/tournament/lobby/?id={self.organizer.id}"}
+
         for game in self.games:
-            msg = format.replace("$OPPONENT", game.p1.username)
-            dict = json.dumps({ "message": msg })
-            await sendMessageWS(game.p2, "notifications", dict)
-    
-            msg = format.replace("$OPPONENT", game.p2.username)
-            dict = json.dumps({ "message": msg })
-            await sendMessageWS(game.p1, "notifications", dict)
+            notif = format.replace("$OPPONENT", game.p1.username)
+            dict["message"] = notif
+            message = json.dumps(dict)
+            await sendMessageWS(game.p2, "notifications", message)
+
+            notif = format.replace("$OPPONENT", game.p2.username)
+            dict["message"] = notif
+            message = json.dumps(dict)
+            await sendMessageWS(game.p1, "notifications", message)
 
     async def launch(self):
         self.started = True

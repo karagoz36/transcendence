@@ -23,9 +23,9 @@
       <a href="/profile/?id={{player.id}}">{{player.username}}</a>
     </div>
     {% endfor %}
-    {% if tournament.started %}
-    <script type="module" src="/static/tournament/lobby.js"></script>
-    {% endif %}
+    {% for game in games %}
+      <p style="text-align: center">{{game.p1.username}} vs {{game.p2.username}}</p>
+    {% endfor %}
   </div>
 </div>
 <script type="module" src="/static/pong/PongSocket.js"></script>
