@@ -181,11 +181,12 @@ class Pong(BaseConsumer):
 class PongSocketConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
-
         self.p1 = PongPlayer(LocalGamer("p1"), 10)
         self.p2 = PongPlayer(LocalGamer("p2"), -10)
         self.ball = Ball(self.p1, self.p2)
 
+        htmlSTR = render_to_string("pong/play.html")
+        await self.send(json.dumps({"type": "launch_game", "html": htmlSTR}))
         self.game_running = True
         asyncio.create_task(self.start_game_loop())
 

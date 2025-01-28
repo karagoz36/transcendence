@@ -7,29 +7,36 @@ async function initializeLocalMode() {
     if (window.localPongWebSocket) {
         window.localPongWebSocket.socket.close();
     }
-
     window.localPongWebSocket = new LocalGameWebSocket();
     await waitForWebSocketOpen(window.localPongWebSocket.socket);
-    
-    await new Promise(resolve => {
-        if (document.body.clientWidth > 0 && document.body.clientHeight > 0) {
-            resolve();
-        } else {
-            window.addEventListener('resize', () => resolve(), { once: true });
+
+    window.localPongWebSocket.socket.addEventListener("message", async (event) => {
+        const data = JSON.parse(event.data);
+
+        if (data.type === "launch_game" && data.html) {
+            const container = document.querySelector("#pong-container");
+            if (!container) {
+                console.error("Erreur: #pong-container introuvable");
+                return;
+            }
+            container.innerHTML = data.html;
+
+            await new Promise(resolve => requestAnimationFrame(resolve)); 
+            window.pongScene = new PongScene();
+
+            requestAnimationFrame(() => {
+                window.dispatchEvent(new Event("resize"));
+            });
+
+            setupKeyboardControls();
+            gameInitialized = true;
         }
     });
-
-    window.dispatchEvent(new Event('resize'));
-    
-    await new Promise(resolve => requestAnimationFrame(resolve));
-    
-    window.pongScene = new PongScene();
-    
-    await new Promise(resolve => requestAnimationFrame(resolve));
-    
-    setupKeyboardControls();
-    gameInitialized = true;
+    window.localPongWebSocket.socket.send(JSON.stringify({
+        type: "launch_game"
+    }));
 }
+
 
 function setupKeyboardControls() {
     let keysPressed = {};
@@ -125,14 +132,6 @@ class LocalGameWebSocket extends BaseWebSocket {
     }
 }
 
-function LocalGame() {
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", setupGame);
-    } else {
-        setupGame();
-    }
-}
-
 function setupGame() {
     const localButton = document.getElementById("submit");
     if (localButton) {
@@ -140,7 +139,6 @@ function setupGame() {
             const title = document.getElementById("title");
             if (title) title.remove();
             localButton.remove();
-            window.dispatchEvent(new Event('resize'));
             
             try {
                 await initializeLocalMode();
@@ -151,4 +149,4 @@ function setupGame() {
     }
 }
 
-LocalGame();
+setupGame();
