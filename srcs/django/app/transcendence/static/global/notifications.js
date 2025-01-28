@@ -1,6 +1,8 @@
 // @ts-check
 import {getPage, setAnchorEvent} from "./SPA.js"
 import BaseWebSocket from "./websockets.js";
+import { openChat } from "../friends/message.js";
+
 
 /**
  * @param {string} text 
@@ -19,13 +21,11 @@ function createToast(text, link) {
       	<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
     <div class="toast-body">
-		<a href="${link}" style="text-decoration: none; color: inherit;">
 			${text}
-		</a>
 	</div>`
-	toast.addEventListener("click", (event) => {
+	toast.addEventListener("click", async (event) => {
 		event.preventDefault();
-		getPage(link); // Redirige vers le lien
+		await getPage(link);
 	});
 	return toast
 }

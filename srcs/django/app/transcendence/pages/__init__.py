@@ -5,6 +5,8 @@ from . import friends
 from . import play
 from . import profile
 from . import profile_list
+from . import update_settings
+
 
 from .pong import lobby
 

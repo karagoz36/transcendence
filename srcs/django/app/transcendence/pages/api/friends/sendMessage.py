@@ -20,7 +20,6 @@ async def getMessages(friendship: FriendList):
 async def sendNewMessageToFriend(sender: User, receiver: User, message: str):
 	latest_message = await sync_to_async(Messages.objects.order_by('-created_at').first)()
 	context = {}
-	print(message, flush=True)
 	context["message"] = {"sender": sender.username, "text": message, "created_at":latest_message.created_at}
 	html = render_to_string("friendlist/message.html", context=context)
 	await sendMessageWS(receiver, "messages", html)
@@ -32,12 +31,7 @@ async def response(request: Request) -> HttpResponse:
 		return redirect("/api/logout")
 	if "friendID" not in request.data:
 		return Response({"message": "friend id missing in request body"}, status=401)
-	# if "message" not in request.data or request.data["message"].strip() == "":
-	# 	return Response({"message": "message missing in request body"}, status=401)
-	# if request.data["message"].strip() == "":
-	# 	# return Response({"message": "message missing in request body"}, status=401)
-	# 	return redirect("/friends/?error=This friendship already exists.")
-	# print("Requête reçue :", request.data)
+
 	if "message" not in request.data or not request.data["message"].strip():
 		return Response({"message": "message missing in request body"}, status=401)
 	message: str = request.data["message"]
@@ -59,6 +53,9 @@ async def response(request: Request) -> HttpResponse:
 	if friend.id == user.id:
 		friend = friendship.user
 	await sendNewMessageToFriend(user, friend, message)
-	message = {"message": f"New message received from {user.username}.", "link":"/friends", "refresh": ["friends/"]}
+	message = {"message": f"New message received from {user.username}.", "link":f"/friends/?id={user.id}", "refresh": ["friends/"]}
 	await sendMessageWS(friend, "notifications", json.dumps(message))
-	return render(request, "friendlist/message-list.html", context={"messages": messageList })
+	return render(request, "friendlist/modal-content.html", context={
+		"messages": messageList,
+		"friend": friend
+		})

@@ -25,7 +25,6 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     is_2fa_enabled = models.BooleanField(default=False)
     otp_secret = models.CharField(max_length=32, blank=True, null=True)
-    alias = models.CharField(max_length=15, blank=True, null=True) 
     avatar = models.ImageField(
         upload_to='avatars/',  # Dossier où les images seront stockées
         blank=True,            # Le champ peut être laissé vide

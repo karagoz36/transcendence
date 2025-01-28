@@ -11,7 +11,7 @@
 </style>
 <div style="width: 15rem;" class="card">
 	<div class="card-header d-flex justify-content-between align-items-center">
-		<a href="/profile/?id={{friend.id}}">{{friend.username}}</a>
+		<a href="/profile/?id={{friend.id}}" class="text-decoration-none">{{friend.username}}</a>
 		<span class="badge {% if friend.status == 'online' %}bg-success{% else %}bg-danger{% endif %}">
             {{ friend.status }}
         </span>

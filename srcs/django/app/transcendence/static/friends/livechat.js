@@ -5,10 +5,8 @@ class MessagesHandler extends BaseWebSocket {
 	/** @param {string} url */
 	constructor(url) {
 		super(url)
-		//close seulement si pas le container
 		addEventListener("page-changed", (e) => {
-			if (e.detail != "#messages-container"){
-				console.log(e.detail)
+			if (e.detail != ".modal-content"){
 				this.socket.onmessage = null
 				this.socket.close()
 			}
@@ -22,7 +20,6 @@ class MessagesHandler extends BaseWebSocket {
 		const div = document.createElement("div")
 		div.innerHTML = e.data
 		messageContainer.appendChild(div)
-		// Scrolling automatique à chaque nouveau message
         messageContainer.scrollTo({
             top: messageContainer.scrollHeight,
         });

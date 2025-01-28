@@ -7,6 +7,7 @@ from .pong import gameLoop, redisClient
 from utils.friends import getFriends
 from utils.users import onlineUsers, userIsLoggedIn
 from database.models import getFriendship
+from utils.websocket import sendMessageWS
 
 class BaseConsumer(AsyncWebsocketConsumer):
     def __init__(self, consumerName: str):

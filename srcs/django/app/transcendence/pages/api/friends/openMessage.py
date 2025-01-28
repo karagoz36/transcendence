@@ -14,6 +14,7 @@ async def getMessages(friendship: FriendList):
 
 async def response(request: Request) -> HttpResponse:
 	user: User = request.user
+	friend: User
 
 	if user.is_anonymous:
 		return redirect("/api/logout")
@@ -23,8 +24,12 @@ async def response(request: Request) -> HttpResponse:
 		friend = await User.objects.aget(id=id)
 	except:
 		return Response({"message": "invalid friend id in request body"}, status=401)
+
 	friendship: FriendList = await getFriendship(user, friend)
 	if friendship is None:
 		return Response({"message": "friendship not found"}, status=401)
 	messageList = await getMessages(friendship)
-	return render(request, "friendlist/message-list.html", context={"messages": messageList })
+	return render(request, "friendlist/modal-content.html", context={
+		"messages": messageList,
+		"friend": friend
+		})
