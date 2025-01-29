@@ -23,6 +23,10 @@ function createToast(text, link) {
     <div class="toast-body">
 			${text}
 	</div>`
+	toast.querySelector(".btn-close").addEventListener("click", (event) => {
+		event.stopPropagation();
+	});
+	
 	toast.addEventListener("click", async (event) => {
 		event.preventDefault();
 		await getPage(link);

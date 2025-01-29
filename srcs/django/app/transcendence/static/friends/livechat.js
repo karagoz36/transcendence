@@ -20,9 +20,16 @@ class MessagesHandler extends BaseWebSocket {
 		const div = document.createElement("div")
 		div.innerHTML = e.data
 		messageContainer.appendChild(div)
-        messageContainer.scrollTo({
-            top: messageContainer.scrollHeight,
-        });
+		const modal = document.querySelector("#chatModal .modal-body");
+        console.log(modal)
+        if (modal) {
+            modal.scrollTo({
+                top: modal.scrollHeight,
+            });
+        }
+        // messageContainer.scrollTo({
+        //     top: messageContainer.scrollHeight,
+        // });
 	}
 }
 

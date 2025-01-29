@@ -14,7 +14,6 @@ function suppressModalBackDrop(e) {
 
 addEventListener('page-changed', suppressModalBackDrop)
 
-
 /** @param {number} userID */
 async function updateModal(userID) {
 	await getPage("/api/friend/open-message", {

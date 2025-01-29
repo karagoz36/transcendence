@@ -1,25 +1,27 @@
 // @ts-check
 function udpatePie() {
-    console.log("test")
     const canvas = document.getElementById('statsPieChart');
+    if (!canvas) return;
+    console.log("canvas=", canvas)
 
-    // Requête pour récupérer les stats
+    const existingChart = Chart.getChart(canvas); // Chart.js v3+
+    if (existingChart) {
+        existingChart.destroy();
+    }
+
     const wins = parseInt(canvas.getAttribute('data-wins'), 10);
     const losses = parseInt(canvas.getAttribute('data-losses'), 10);
 
-    console.log(wins)
-    console.log(losses)
-    // Initialisation du graphique
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d');/*  */
     new Chart(ctx, {
-        type: 'pie', // Diagramme circulaire
+        type: 'pie',
         data: {
             labels: ['Wins', 'Losses'],
             datasets: [{
                data: [wins, losses],
                 backgroundColor: [
-                    'rgba(40, 167, 69, 0.6)', // Vert pour les "Wins"
-                    'rgba(220, 53, 69, 0.6)'  // Rouge pour les "Losses"
+                    'rgba(40, 167, 69, 0.6)',
+                    'rgba(220, 53, 69, 0.6)' 
                 ],
                 borderColor: [
                     'rgba(40, 167, 69, 1)',
@@ -32,7 +34,7 @@ function udpatePie() {
             responsive: true,
             plugins: {
                 legend: {
-                    position: 'bottom', // Légende sous le graphique
+                    position: 'bottom',
                 }
             }
 
@@ -40,5 +42,10 @@ function udpatePie() {
     });
 }
 
-addEventListener('page-changed', udpatePie);
-document.addEventListener("DOMContentLoaded", udpatePie)
+// addEventListener('page-changed', udpatePie);
+
+function main() {
+    udpatePie()
+}
+
+main()
