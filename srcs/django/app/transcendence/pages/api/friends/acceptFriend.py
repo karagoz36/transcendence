@@ -25,6 +25,6 @@ async def response(request: Request):
 
     friendship.invitePending = False
     await friendship.asave()
-    message = {"message": f"{user.username} accepted your friend invitation.", "refresh": ["/friends/"]}
+    message = {"message": f"{user.username} accepted your friend invitation.", "link":"/friends", "refresh": ["/friends/"]}
     await sendMessageWS(friend, "notifications", json.dumps(message))
     return redirect("/friends?success=Friend invite accepted!")

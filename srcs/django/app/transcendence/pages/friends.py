@@ -3,10 +3,8 @@ from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from database.models import FriendList
-from channels.layers import get_channel_layer, BaseChannelLayer
-from rest_framework_simplejwt.tokens import AccessToken
-import pyotp
 from utils.friends import userToDict, getFriends
+from django.contrib.auth.decorators import login_required
 
 async def getInvitesReceived(user: User):
     res = []
@@ -34,6 +32,7 @@ async def getContext(user: User, err: str, success: str) -> dict:
     context["showModal"] = "show"
     return context
 
+@login_required(login_url="/api/logout")
 async def response(request: Request) -> HttpResponse:
     user: User = request.user
     if user.is_anonymous:

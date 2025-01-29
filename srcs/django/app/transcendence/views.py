@@ -1,6 +1,5 @@
 from rest_framework.request import Request
 from django.contrib.auth.models import User
-from django.contrib.auth import login
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from adrf.decorators import api_view
@@ -8,11 +7,10 @@ from rest_framework.decorators import authentication_classes, permission_classes
 from django.core.cache import cache
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from . import pages
+import pyotp
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from database.models import UserProfile
-from django.shortcuts import render
-import pyotp
 
 @api_view(['GET'])
 async def auth(request: Request):
@@ -52,7 +50,11 @@ def settings(request: Request):
 
 @api_view(['POST'])
 def update_settings(request: Request):
-    return pages.settings.handle_update_settings(request)
+    return pages.update_settings.handle_update_settings(request)
+
+@api_view(['POST'])
+def remove_avatar(request: Request):
+    return pages.update_settings.handle_remove_avatar(request)
 
 @api_view(['GET'])
 async def friends(request: Request):
@@ -61,6 +63,22 @@ async def friends(request: Request):
 @api_view(['GET'])
 async def lobby(request: Request):
     return await pages.lobby.response(request)
+
+@api_view(['GET'])
+def play(request: Request):
+    return pages.play.response(request)
+
+@api_view(['GET'])
+async def profile(request: Request):
+    return await pages.profile.response(request)
+
+@api_view(['GET'])
+def profile_list(request: Request):
+    return pages.profile_list.response(request)
+
+# @api_view(['GET'])
+# def profile_detail(request: Request, id):
+#     return pages.profile_detail.response(request, id)
 
 @api_view(['POST'])
 async def addFriend(request: Request):
@@ -116,7 +134,7 @@ async def sendMessage(request: Request):
 
 @api_view(['POST'])
 async def openMessage(request: Request):
-	return await pages.openMessage.response(request)
+    return await pages.openMessage.response(request)
 
 @authentication_classes([])
 @permission_classes([AllowAny])

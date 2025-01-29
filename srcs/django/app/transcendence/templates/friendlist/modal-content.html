@@ -1,0 +1,21 @@
+<div class="modal-content">
+  <div class="modal-header justify-content-center">
+    <a href="/profile/?id={{ friend.id }}" class="text-decoration-none">{{ friend.username }}</a>
+    <h1 class="modal-title fs-5 text-center" id="chatModalLabel"></h1>
+    <a id="chatModalUserLink" class="btn btn-link" href="#" target="_blank"></a>
+    <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <div id="messages-container">
+      {% for message in messages %}
+        {% include 'friendlist/message.html' %}
+      {% endfor %}
+    </div>
+  </div>
+  <div class="modal-footer">
+    <form class="input-group mb-3" id="send-message-form">
+      <input type="text" class="form-control" name="message" id="message-input" placeholder="Type your message..." />
+      <button user-id="{{ friend.id }}" id="send-message" type="submit" class="btn btn-outline-primary">Send</button>
+    </form>
+  </div>
+</div>

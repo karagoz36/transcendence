@@ -30,6 +30,5 @@ def response(request: Request) -> JsonResponse:
             return JsonResponse({"is_2fa_enabled": True}, status=200)
     except UserProfile.DoesNotExist:
         pass
-
+    login(request, user)
     return JsonResponse({"is_2fa_enabled": False}, status=200)
-

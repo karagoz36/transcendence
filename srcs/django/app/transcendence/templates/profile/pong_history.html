@@ -1,0 +1,70 @@
+<style>
+    .history-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .main-card {
+        margin-bottom: 1rem
+    }
+    .main-card.green {
+        background-color: rgba(40, 167, 69, 0.4);
+        color: white;
+    }
+
+    .main-card.red {
+        background-color: rgba(220, 53, 69, 0.4);
+        color: white;
+    }
+
+    .card-body-wrapper {
+        background-color: rgba(255, 255, 255, 0.12); /* Un peu plus transparent pour la zone de contenu */
+    }
+
+    /* Sous-cartes avec un fond atténué */
+    .sub-card {
+        background-color: rgba(40, 167, 69, 0.0); /* Vert avec 40% de transparence */
+        color: white;
+    }
+
+    .sub-card.red {
+        background-color: rgba(220, 53, 69, 0.0); /* Rouge avec 40% de transparence */
+        color: white;
+    }
+
+    .sub-card-body {
+        background-color: rgba(255, 255, 255, 0.15); /* Un peu de transparence dans l'entête des sous-cartes */
+    }
+</style>
+
+<div style="width: 28rem;" class="card main-card {% if game.user_score > game.opponent_score %}green{% else %}red{% endif %}">
+    <div class="card-header">
+       {{ game.game_date|date:"d F Y H:i" }}
+    </div>
+    <div class="card-body card-body-wrapper">
+        <div class="row history-container ">
+            <div class="col-6">
+                <div class="card sub-card {% if game.user_score > game.opponent_score %}green{% else %}red{% endif %}"
+                style="width: 12rem;">
+                    <div class="card-header">
+                        {{game.user.username}}
+                    </div>
+                    <div class="card-body sub-card-body">
+                    {{game.user_score}}
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card sub-card {% if game.user_score > game.opponent_score %}green{% else %}red{% endif %}" 
+                style="width: 12rem;">
+                    <div class="card-header">
+                        {{game.opponent}}
+                    </div>
+                    <div class="card-body sub-card-body">
+                        {{game.opponent_score}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

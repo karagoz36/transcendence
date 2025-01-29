@@ -3,4 +3,5 @@ data/
 __pycache__/
 .venv/
 migrations/
+media/
 env/

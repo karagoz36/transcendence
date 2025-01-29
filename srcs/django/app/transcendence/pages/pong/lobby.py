@@ -1,11 +1,13 @@
 from rest_framework.request import Request
 from django.shortcuts import redirect, render, render
 from django.contrib.auth.models import User
-from websockets.consumers import sendMessageWS
+from utils.websocket import sendMessageWS
+from django.contrib.auth.decorators import login_required
 import json
 from database.models import getFriendship
 from utils.users import userIsLoggedIn
 
+@login_required(login_url="/api/logout")
 async def response(req: Request):
     user: User = req.user
 
@@ -30,9 +32,10 @@ async def response(req: Request):
 
     if not userIsLoggedIn(friend):
         return redirect(f"/friends/?error={friend.username} is not online", status=401)
-
+    
     message = json.dumps({
-        "message": f"<a href=/pong/lobby/?opponent={user.username}>{user.username} invites you to play pong</a>",
+        "message": f"{user.username} invites you to play pong.</a>",
+        "link":f"/pong/lobby/?opponent={user.username}",
         "refresh": ["/pong/"]
     })
     await sendMessageWS(friend, "notifications", message)

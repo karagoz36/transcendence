@@ -15,11 +15,13 @@ export function setAnchorEvent() {
 /** 
  * @param {Element} newContainer
  * @param {Element} oldContainer
+ * @param {string} toUpdate
 */
-function refreshScripts(newContainer, oldContainer) {
+export function refreshScripts(newContainer, oldContainer, toUpdate) {
+	/** @type {NodeListOf<HTMLScriptElement>} */
+	const newScripts = newContainer.querySelectorAll("script")
 	/** @type {NodeListOf<HTMLScriptElement>} */
 	const oldScripts = oldContainer.querySelectorAll("script")
-	const newScripts = newContainer.querySelectorAll("script")
 
 	oldScripts.forEach(script => {
 		script.type = "application/json"
@@ -28,8 +30,8 @@ function refreshScripts(newContainer, oldContainer) {
 	newScripts.forEach(script => {
 		const newScript = document.createElement("script")
 		newScript.src = script.src + `?v=${Date.now()}`
-		newScript.type = script.type
-		document.querySelector(".main-container")?.append(newScript)
+		newScript.type = script.type == "application/json" ? "module" : script.type
+		document.querySelector(toUpdate)?.append(newScript)
 	})
 }
 
@@ -100,7 +102,7 @@ export async function getPage(url, options = {}, addToHistory = true, toUpdate =
 	oldContainer.innerHTML = newContainer.innerHTML
 
 	setAnchorEvent()
-	refreshScripts(newContainer, oldContainer)
+	refreshScripts(newContainer, oldContainer, toUpdate)
 	const event = new CustomEvent("page-changed", {"detail": toUpdate})
 	dispatchEvent(event)
 }

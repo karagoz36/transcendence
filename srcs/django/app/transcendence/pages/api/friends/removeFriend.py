@@ -27,8 +27,8 @@ async def response(request: Request):
 	await friendship.adelete()
 	if type == "remove":
 		await sendMessageWS(friend, "notifications",
-			json.dumps({"message": f"{user.username} removed you from your friend list.", "refresh": ["/friends/"]}))
+			json.dumps({"message": f"{user.username} removed you from your friend list.", "link":"/friends", "refresh": ["/friends/"]}))
 	elif type == "reject":
 		await sendMessageWS(friend, "notifications",
-			json.dumps({"message": f"{user.username} rejected your friend invitation.", "refresh": ["/friends/"]}))
+			json.dumps({"message": f"{user.username} rejected your friend invitation.", "link":"/friends", "refresh": ["/friends/"]}))
 	return redirect("/friends?success=Friend successfully removed")

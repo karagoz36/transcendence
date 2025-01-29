@@ -1,56 +1,49 @@
 // @ts-check
 import {getPage} from "../global/SPA.js"
+export { openChat };
+
+/** @param {CustomEvent} e */
+function suppressModalBackDrop(e) {
+    if (e.detail == ".main-container") {
+        const backdrop = document.getElementsByClassName("modal-backdrop")
+        if (backdrop.length > 0) {
+            backdrop[0].remove()
+        }
+    }
+}
+
+addEventListener('page-changed', suppressModalBackDrop)
+
+/** @param {number} userID */
+async function updateModal(userID) {
+	await getPage("/api/friend/open-message", {
+        method: "POST",
+        headers: {"content-type": "application/json"},
+        body: {                 
+        	"friendID": userID,
+        }
+    }, false, ".modal-content");
+
+    const modal = document.getElementById("chatModal");
+    if (modal)
+        modal.addEventListener("shown.bs.modal", () => {
+            const messagesContainer = document.querySelector("#chatModal .modal-body");
+            if (messagesContainer) {
+                messagesContainer.scrollTo({
+                    top: messagesContainer.scrollHeight,
+                });
+            }
+        });
+}
 
 /** @param {MouseEvent} e */
 async function openChat(e) {
-   	/** @type {HTMLButtonElement|EventTarget|null} */
-	const button = e.target
-	if (!button) return
-    /** @type {HTMLButtonElement|null} */
-    const modalButton = document.querySelector("#send-message")
-	if (modalButton == null)
-		return
-	/** @type {string|null} */ // @ts-ignore
-	const userId = button.getAttribute("user-id")
+    /** @type {string|null} */ // @ts-ignore
+	const userId = e.target.getAttribute("user-id")
 	if (userId == null)
-		return
-	
-	/** Mettre à jour le titre du modal */
-	/** @type {string|null} */ // @ts-ignore
-	const username = button.getAttribute("user-name")
-	if (username == null)
-		return
-	const modalLabel = document.getElementById("chatModalLabel");
-	if (modalLabel) {
-		modalLabel.textContent = `${username}`;
-	}
-
-	// /** Mettre à jour le lien et le texte */
-    // const userLink = document.getElementById("chatModalUserLink");
-	// if (userLink instanceof HTMLAnchorElement) {
-    //     userLink.textContent = username;
-    //     userLink.href = `/profile/${userId}`; // URL vers la page de profil de l'utilisateur
-    // }
-	
-    modalButton.setAttribute("user-id", userId)
-	await getPage("/api/friend/open-message", {
-		method: "POST",
-		headers: {"content-type": "application/json"},
-		body: {			
-			"friendID": Number(userId),
-		}
-	}, false, "#messages-container");
-
-	const modal = document.getElementById("chatModal");
-	if (modal)
-		modal.addEventListener("shown.bs.modal", () => {
-			const messagesContainer = document.querySelector("#chatModal .modal-body");
-			if (messagesContainer) {
-				messagesContainer.scrollTo({
-					top: messagesContainer.scrollHeight,
-				});
-			}
-		});
+        return
+    await updateModal(Number(userId))
+    setupModalEvents()
 }
 
 /** @param {SubmitEvent} event */
@@ -62,6 +55,7 @@ async function sendMessage(event) {
 	/** @type {HTMLButtonElement} */ // @ts-ignore
 	const button = event.submitter
 	const friendID = Number(button.getAttribute("user-id"))
+
 	await getPage("/api/friend/send-message", {
 		method: "POST",
 		headers: {"content-type": "application/json"},
@@ -69,28 +63,48 @@ async function sendMessage(event) {
 			"friendID": friendID,
 			"message": message
 		}
-	}, false, "#messages-container");
+	}, false, ".modal-content");
+    setupModalEvents()
 	event.target["message"].value = "";
 	const modal = document.getElementById("chatModal");
-	if (modal){
-		const messagesContainer = document.querySelector("#chatModal .modal-body");
-		if (messagesContainer) {
-			messagesContainer.scrollTo({
-				top: messagesContainer.scrollHeight,
-			});
-		};
-	}
+    if (modal){
+        const messagesContainer = document.querySelector("#chatModal .modal-body");
+        if (messagesContainer) {
+            messagesContainer.scrollTo({
+                top: messagesContainer.scrollHeight,
+            });
+        };
+    }
 }
 
-function main() {
+function setupModalEvents() {
 	/** @type {NodeListOf<HTMLFormElement>|null} */
 	const forms = document.querySelectorAll("form#send-message-form")
 	if (forms == null)
 		return
 	forms.forEach(form => form.onsubmit = sendMessage)
+
 	/** @type {NodeListOf<HTMLButtonElement>|null} */
 	const buttons = document.querySelectorAll("button#open-chat-modal")
-	buttons.forEach(button => button.onclick = openChat)
+
+	buttons.forEach(button => {
+        button.onclick = openChat
+    })
+}
+
+function main() {
+    setupModalEvents()
+	/** @type {NodeListOf<HTMLButtonElement>|null} */
+	const buttons = document.querySelectorAll("button#open-chat-modal")
+    const params = new URLSearchParams(window.location.search);
+    /** @type {string|null} */
+    const id = params.get("id")
+
+    buttons.forEach(button => {
+        if (id && button.getAttribute("user-id") == id) {
+            button.click()
+        }
+    })
 }
 
 main()
