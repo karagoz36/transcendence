@@ -57,4 +57,4 @@ class NotificationTest(APITestCase):
             "test": await self.connectWebSocket(self.test["user"])
         }
         message = await websockets["user"].receive_json_from()
-        self.assertEqual(message["message"], "test just logged in.")
+        self.assertEqual(message["message"], "test logged in.")
