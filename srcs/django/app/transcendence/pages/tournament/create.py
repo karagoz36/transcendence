@@ -100,6 +100,10 @@ class Tournament:
         htmlSTR = render_to_string("pong/play.html")
 
         async def onGameover(winner: User, game: GameData):
+            print("C'EST ICI WESH")
+            for game in self.games:
+                print(game.p1, game.p2)
+            print(game.p1, game.p2, flush=True)
             self.games.pop(self.games.index(game))
             loser: User = game.p2
             if loser == winner:
@@ -159,12 +163,6 @@ class Tournament:
         for player in self.players.values():
             if player not in blacklist:
                 await sendMessageWS(player, "notifications", msg)
-    
-    def userHasGameRunning(self, user: User) -> bool:
-        for game in self.games:
-            if (game.p1 == user or game.p2 == user) and game.started:
-                return True
-        return False
 
 tournaments: dict[int, Tournament] = {}
 
@@ -185,8 +183,10 @@ async def response(request: Request) -> Response:
         tournament = Tournament(user)
         tournaments[user.id] = tournament
         await notifEveryone({"refresh": "/"}, [user])
+
     if tournament.started:
         return redirect("/tournament/lobby/")
+
     return render(request, "tournament/create.html", {
         "players": tournament.players.values(),
         "organizer": tournament.organizer,
