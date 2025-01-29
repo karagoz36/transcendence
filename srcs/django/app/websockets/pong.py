@@ -82,10 +82,12 @@ class Ball:
     p1: PongPlayer
     p2: PongPlayer
     field_height: float = 15.0
+    tournament: bool
 
-    def __init__(self, p1: PongPlayer, p2: PongPlayer):
+    def __init__(self, p1: PongPlayer, p2: PongPlayer, tournament: bool):
         self.p1 = p1
         self.p2 = p2
+        self.tournament = tournament
 
     def scored(self) -> int:
         if self.pos.x >= self.p1.pos.x + 1:
@@ -125,7 +127,7 @@ class Ball:
         elif self.pos.x < 0 and self.p2.collided(self.pos) != 0:
             relative_impact = self.p2.get_relative_impact(self.pos.y)
             angle = relative_impact * (math.pi / 3)
-            speed = math.sqrt(self.velocity.x**2 + self.velocity.y**2)
+            speed = math.sqrt(self.velocity.x ** 2 + self.velocity.y ** 2)
             self.velocity.x = speed * math.cos(angle)
             self.velocity.y = speed * math.sin(angle)
 
@@ -136,18 +138,17 @@ class Ball:
         if self.p1.score != 3 and self.p2.score != 3:
             return None
 
-        data = {"type": "game_over"}
-        await sendMessageWS(self.p1.user, "pong", json.dumps(data))
-        await sendMessageWS(self.p2.user, "pong", json.dumps(data))
-
-        await PongHistory.objects.acreate(player1=self.p1.user, player2=self.p2.user,
+        game = await PongHistory.objects.acreate(player1=self.p1.user, player2=self.p2.user,
             player1_score=self.p1.score, player2_score=self.p2.score)
+        data = {"redirect": f"/result/?game={game.id}"}
+        await sendMessageWS(self.p1.user, "notifications", json.dumps(data))
+        await sendMessageWS(self.p2.user, "notifications", json.dumps(data))
         return self.p1.user if self.p1.score > self.p2.score else self.p2.user
 
-async def gameLoop(user1: User, user2: User) -> User:
+async def gameLoop(user1: User, user2: User, tournament: bool = False) -> User:
     p1 = PongPlayer(user1, 10)
     p2 = PongPlayer(user2, -10)
-    ball = Ball(p1, p2)
+    ball = Ball(p1, p2, tournament)
 
     while True:
         p1.move()

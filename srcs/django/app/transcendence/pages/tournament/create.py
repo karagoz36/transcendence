@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from utils.friends import getFriends
+from database.models import TournamentResults
 from utils.websocket import sendMessageWS
 import math
 import json
@@ -20,17 +20,19 @@ class GameData:
 
 class Tournament:
     organizer: User
-    public: bool = False
     players: dict[int, User]
     games: list[GameData]
     started: bool
     waitTime = 10
+    round: int
 
     def __init__(self, organizer: User):
         self.organizer = organizer
         self.players = {organizer.id: organizer}
         self.games = []
         self.started = False
+        self.round = 0
+        self.results = []
 
     async def removePlayer(self, player: User):
         if player.id == self.organizer.id:
@@ -85,24 +87,36 @@ class Tournament:
             data.started = False
             self.games.append(data)
             i += 2
-    
+
+    async def resetTournament(self):
+        lastPlayer = list(self.players.values())[0]
+        await sendMessageWS(lastPlayer, "notifications", json.dumps({
+            "redirect": f"/tournament/results/?id={self.organizer.id}"
+        }))
+        await TournamentResults.objects.acreate(player=lastPlayer, score=self.round * 2)
+        tournaments.pop(self.organizer.id)
+
     async def startGames(self):
         htmlSTR = render_to_string("pong/play.html")
 
         async def onGameover(winner: User, game: GameData):
             self.games.pop(self.games.index(game))
-            loser: User = game.p1 if game.p2 == winner else game.p2
+            loser: User = game.p2
+            if loser == winner:
+                loser = game.p1
+            await TournamentResults.objects.acreate(player=loser, score=self.round)
             self.players.pop(loser.id)
+
             if len(self.players) == 1:
-                tournaments.pop(self.organizer.id)
-                print("TOURNAMENT OVER")
+                await self.resetTournament()
                 return
             if len(self.games) == 0:
                 await self.launch()
                 return
 
+        msg = json.dumps({"type": "launch_game", "html": htmlSTR})
+        self.round += 1
         for game in self.games:
-            msg = json.dumps({"type": "launch_game", "html": htmlSTR})
             await sendMessageWS(game.p1, "pong", msg)
             await sendMessageWS(game.p2, "pong", msg)
 
@@ -117,7 +131,9 @@ class Tournament:
             task.add_done_callback(callback)
 
     async def announceGames(self):
-        format = f"You will play against $OPPONENT in {self.organizer.username}'s tournament in {self.waitTime} seconds."
+        format = f"<a href='/tournament/lobby?id={self.organizer.id}'>"
+        format += f"You will play against $OPPONENT in {self.organizer.username}'s tournament in {self.waitTime} seconds."
+        format += "</a>"
         dict = {"message": format, "redirect": f"/tournament/lobby/?id={self.organizer.id}"}
 
         for game in self.games:

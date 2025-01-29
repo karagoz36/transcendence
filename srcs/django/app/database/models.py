@@ -46,3 +46,7 @@ class PongHistory(models.Model):
 	player1_score = models.IntegerField()
 	player2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="player2")
 	player2_score = models.IntegerField()
+
+class TournamentResults(models.Model):
+	player = models.ForeignKey(User, on_delete=models.CASCADE)
+	score = models.IntegerField()
