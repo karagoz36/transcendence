@@ -33,6 +33,10 @@ export class PongScene {
         this.onWindowResize();
     }
 
+    animateBallHit() {
+        gsap.to(this.ball.scale, { x: 1.2, y: 1.2, duration: 0.2, yoyo: true, repeat: 1 });
+    }
+
     cameraControl() {
 		this.controls.enableZoom = false;
         this.controls.enablePan = false;
@@ -53,7 +57,12 @@ export class PongScene {
     addBall() {
         const geometry = new THREE.SphereGeometry(0.5);
         const material = new THREE.MeshStandardMaterial({ color: 0xffff00 });
-        const ball = new THREE.Mesh(geometry, material);
+        const neonMaterial = new THREE.MeshStandardMaterial({
+            color: 0x00ffcc,
+            emissive: 0x00ffcc,
+            emissiveIntensity: 2,
+        });
+        const ball = new THREE.Mesh(geometry, neonMaterial);
         this.scene.add(ball);
         return ball;
     }
@@ -65,7 +74,12 @@ export class PongScene {
     addPaddle(position, color) {
         const geometry = new THREE.BoxGeometry(-0.5, 3, 1);
         const material = new THREE.MeshStandardMaterial({ color });
-        const paddle = new THREE.Mesh(geometry, material);
+        const neonMaterial = new THREE.MeshStandardMaterial({
+            color,
+            emissive: color,
+            emissiveIntensity: 1.5,
+        });
+        const paddle = new THREE.Mesh(geometry, neonMaterial);
         paddle.position.x = position;
         this.scene.add(paddle);
         return paddle;
