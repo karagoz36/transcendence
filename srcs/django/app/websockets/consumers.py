@@ -194,7 +194,6 @@ class PongSocketConsumer(AsyncWebsocketConsumer):
         self.game_running = False
 
     async def receive(self, text_data):
-
         try:
             data = json.loads(text_data)
         except json.JSONDecodeError:
@@ -227,13 +226,19 @@ class PongSocketConsumer(AsyncWebsocketConsumer):
             self.p1.move()
             self.p2.move()
             self.ball.move()
-
+            hit_detected = False
+            if self.ball.pos.x > 0 and self.p1.collided(self.ball.pos) != 0:
+                hit_detected = True
+            elif self.ball.pos.x < 0 and self.p2.collided(self.ball.pos) != 0:
+                hit_detected = True
             data = {
                 "type": "update_pong",
                 "p1": {"x": self.p1.pos.x, "y": self.p1.pos.y},
                 "p2": {"x": self.p2.pos.x, "y": self.p2.pos.y},
                 "ball": {"x": self.ball.pos.x, "y": self.ball.pos.y},
             }
-            await self.send(json.dumps(data))
+            if hit_detected:
+                data["type"] = "hitBall"
 
+            await self.send(json.dumps(data))
             await asyncio.sleep(1 / 60)

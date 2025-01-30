@@ -33,18 +33,52 @@ export class PongScene {
         this.onWindowResize();
     }
 
-    // animateBallHit() {
-    //     gsap.to(this.ball.scale, { x: 1.2, y: 1.2, duration: 0.2, yoyo: true, repeat: 1 });
-    // }
-
     animateBallHit() {
-        const scaleUp = new THREE.Vector3(1.3, 0.8, 1);
-        const scaleDown = new THREE.Vector3(1, 1, 1);
+        const particleCount = 50;
+        const particles = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
     
-        new THREE.VectorKeyframeTrack('.scale', [0, 0.1, 0.2], [
-            scaleUp.x, scaleUp.y, scaleUp.z,
-            scaleDown.x, scaleDown.y, scaleDown.z
-        ]);
+        for (let i = 0; i < particleCount; i++) {
+            positions[i * 3] = (Math.random() - 0.5) * 0.5
+            positions[i * 3 + 1] = (Math.random() - 0.5) * 0.5
+            positions[i * 3 + 2] = (Math.random() - 0.5) * 0.5
+        }
+    
+        particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    
+        const particleMaterial = new THREE.PointsMaterial({
+            color: 0xffcc00,
+            size: 0.12,
+            transparent: true,
+            opacity: 1,
+        });
+    
+        const particleSystem = new THREE.Points(particles, particleMaterial);
+        particleSystem.position.copy(this.ball.position); 
+    
+        this.scene.add(particleSystem);
+    
+        const animateParticles = () => {
+            const positions = particles.attributes.position.array;
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3] *= 1.1;
+                positions[i * 3 + 1] *= 1.1;
+                positions[i * 3 + 2] *= 1.1;
+            }
+            particles.attributes.position.needsUpdate = true;
+        };
+    
+        setTimeout(() => {
+            this.scene.remove(particleSystem);
+        }, 500);
+    
+        const interval = setInterval(() => {
+            animateParticles();
+        }, 50);
+    
+        setTimeout(() => {
+            clearInterval(interval);
+        }, 500);     
     }    
 
     cameraControl() {

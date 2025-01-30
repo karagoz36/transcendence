@@ -39,7 +39,6 @@ async function initializeLocalMode() {
 
 
 function setupKeyboardControls() {
-
     let keysPressed = {};
 
     document.addEventListener("keydown", (event) => {
@@ -123,7 +122,7 @@ class LocalGameWebSocket extends BaseWebSocket {
             case "hitBall":
                 window.pongScene.animateBallHit();
                 break;
-                case "update_pong":
+            case "update_pong":
                 window.pongScene.paddle1.position.y = data.p1.y;
                 window.pongScene.paddle2.position.y = data.p2.y;
                 window.pongScene.ball.position.x = data.ball.x;

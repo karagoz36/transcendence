@@ -148,10 +148,15 @@ class Ball:
         self.pos.x += self.velocity.x
         self.pos.y += self.velocity.y
 
-async def notify_hit(players):
+async def notify_hit(players, socket_type="pong"):
     data = {"type": "hitBall"}
     for player in players:
-        await sendMessageWS(player.user, "pong", json.dumps(data))
+        if player.user.username == "LocalGamer":
+            socket_name = "pongsocket"
+        else:
+            socket_name = socket_type
+    for player in players:
+        await sendMessageWS(player.user, socket_name, json.dumps(data))
 
 
 async def gameLoop(user1: User, user2: User):
