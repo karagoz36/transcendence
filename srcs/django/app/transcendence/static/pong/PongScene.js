@@ -33,9 +33,19 @@ export class PongScene {
         this.onWindowResize();
     }
 
+    // animateBallHit() {
+    //     gsap.to(this.ball.scale, { x: 1.2, y: 1.2, duration: 0.2, yoyo: true, repeat: 1 });
+    // }
+
     animateBallHit() {
-        gsap.to(this.ball.scale, { x: 1.2, y: 1.2, duration: 0.2, yoyo: true, repeat: 1 });
-    }
+        const scaleUp = new THREE.Vector3(1.3, 0.8, 1);
+        const scaleDown = new THREE.Vector3(1, 1, 1);
+    
+        new THREE.VectorKeyframeTrack('.scale', [0, 0.1, 0.2], [
+            scaleUp.x, scaleUp.y, scaleUp.z,
+            scaleDown.x, scaleDown.y, scaleDown.z
+        ]);
+    }    
 
     cameraControl() {
 		this.controls.enableZoom = false;

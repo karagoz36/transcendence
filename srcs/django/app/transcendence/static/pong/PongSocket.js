@@ -169,9 +169,10 @@ class PongSocket extends BaseWebSocket {
 				opponentScoreElement.textContent = json.score.p2;
 			}
         }
+        if (json.type == "hitBall" && this.game)
+            this.game?.animateBallHit();
         if (json.type == "invite_accepted" && this.state == e_states.IN_GAME)
             return this.socket.send(JSON.stringify({"type": "join_game"}))
-
         if (json.type == "invite_accepted" && this.opponent == json.friend)
             this.state = e_states.INVITE_ACCEPTED
         else if (json.type == "launch_game")

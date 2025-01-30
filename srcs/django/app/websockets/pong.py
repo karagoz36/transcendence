@@ -134,15 +134,25 @@ class Ball:
             self.velocity.x = -speed * math.cos(angle)
             self.velocity.y = speed * math.sin(angle)
 
+            asyncio.create_task(notify_hit([self.p1, self.p2]))
+
         elif self.pos.x < 0 and self.p2.collided(self.pos) != 0:
             relative_impact = self.p2.get_relative_impact(self.pos.y)
             angle = relative_impact * (math.pi / 3)
             speed = math.sqrt(self.velocity.x**2 + self.velocity.y**2)
             self.velocity.x = speed * math.cos(angle)
             self.velocity.y = speed * math.sin(angle)
+            
+            asyncio.create_task(notify_hit([self.p1, self.p2]))
 
         self.pos.x += self.velocity.x
         self.pos.y += self.velocity.y
+
+async def notify_hit(players):
+    data = {"type": "hitBall"}
+    for player in players:
+        await sendMessageWS(player.user, "pong", json.dumps(data))
+
 
 async def gameLoop(user1: User, user2: User):
     p1 = PongPlayer(user1, 10)
