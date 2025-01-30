@@ -21,6 +21,7 @@ export class PongScene {
 
     constructor() {
         this.addLights()
+        this.addTexturedGridBackground()
         this.cameraControl()
         this.camera.position.z = 10;
         document.querySelector("#pong-container")?.appendChild(this.renderer.domElement);
@@ -32,7 +33,26 @@ export class PongScene {
         window.addEventListener("resize", this.onWindowResize.bind(this));
         this.onWindowResize();
     }
-
+    
+    addTexturedGridBackground() {
+        const loader = new THREE.TextureLoader();
+        loader.load("/static/assets/grid.jpg", (texture) => {
+            texture.wrapS = THREE.ClampToEdgeWrapping;
+            texture.wrapT = THREE.ClampToEdgeWrapping; 
+            texture.repeat.set(1, 1);
+    
+            const geometry = new THREE.PlaneGeometry(50, 30);
+            const material = new THREE.MeshBasicMaterial({ 
+                map: texture,
+                side: THREE.DoubleSide 
+            });
+    
+            const plane = new THREE.Mesh(geometry, material);
+            plane.position.z = -15;  
+            this.scene.add(plane);
+        });
+    }    
+ 
     animateBallHit() {
         const particleCount = 50;
         const particles = new THREE.BufferGeometry();
