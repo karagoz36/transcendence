@@ -12,6 +12,7 @@ export class PongScene {
         1000,
     )
     renderer = new THREE.WebGLRenderer({"antialias": true});
+	backGround = this.addTexturedGridBackground();
     paddle1 = this.addPaddle(10, 0xff0000);
     paddle2 = this.addPaddle(-10, 0x0000ff);
     ball = this.addBall()
@@ -21,7 +22,6 @@ export class PongScene {
 
     constructor() {
         this.addLights()
-        this.addTexturedGridBackground()
         this.cameraControl()
         this.camera.position.z = 10;
         document.querySelector("#pong-container")?.appendChild(this.renderer.domElement);
@@ -29,30 +29,34 @@ export class PongScene {
             this.controls.update()
             this.renderer.render(this.scene, this.camera)
         });
-
-        window.addEventListener("resize", this.onWindowResize.bind(this));
+		
+        // window.addEventListener("resize", this.onWindowResize.bind(this));
+        window.addEventListener("resize", this.onWindowResize);
         this.onWindowResize();
     }
-    
-    addTexturedGridBackground() {
-        const loader = new THREE.TextureLoader();
-        loader.load("/static/assets/grid.jpg", (texture) => {
-            texture.wrapS = THREE.ClampToEdgeWrapping;
-            texture.wrapT = THREE.ClampToEdgeWrapping; 
-            texture.repeat.set(1, 1);
-    
-            const geometry = new THREE.PlaneGeometry(50, 30);
-            const material = new THREE.MeshBasicMaterial({ 
-                map: texture,
-                side: THREE.DoubleSide 
-            });
-    
-            const plane = new THREE.Mesh(geometry, material);
-            plane.position.z = -15;  
-            this.scene.add(plane);
-        });
-    }    
+     
  
+	addTexturedGridBackground() {
+		const boundaries = new THREE.Vector2(20, 20);
+		const planeBoundaries = new THREE.PlaneGeometry(boundaries.x * 2, boundaries.y * 2, boundaries.x * 2, boundaries.y * 2);
+		planeBoundaries.rotateZ(-Math.PI * 0.5);
+	
+		// const planeMaterial = new THREE.MeshBasicMaterial({ 
+		// 	color: 0x2222ff,
+		// 	wireframe: true,
+		// 	transparent: true, 
+		// 	opacity: 0.5
+		// });
+		const planeMaterial = new THREE.MeshBasicMaterial({wireframe: true});
+		const plane = new THREE.Mesh(planeBoundaries, planeMaterial);
+	
+		plane.position.z = -0.8;
+	
+		this.scene.add(plane);
+		return (plane);
+	}
+	
+
     animateBallHit() {
         const particleCount = 50;
         const particles = new THREE.BufferGeometry();
@@ -104,7 +108,6 @@ export class PongScene {
     cameraControl() {
 		this.controls.enableZoom = false;
         this.controls.enablePan = false;
-        this.controls.enablePan = false
         this.controls.mouseButtons = {
             RIGHT: THREE.MOUSE.ROTATE,
         }
@@ -149,8 +152,34 @@ export class PongScene {
         return paddle;
     }
 
-    onWindowResize() {
-        const height = window.innerWidth / this.ASPECT_RATIO;
-        this.renderer.setSize(window.innerWidth, height, false);
-    }
+    // onWindowResize() {
+    //     const height = window.innerWidth / this.ASPECT_RATIO;
+    //     this.renderer.setSize(window.innerWidth, height, false);
+    // }
+	onWindowResize = () => {
+		var width = window.innerWidth;
+		var height = window.innerHeight;
+		this.renderer.setSize( width, height );
+		this.camera.aspect = width / height;
+		this.camera.updateProjectionMatrix();
+
+		// // Mise à jour du ratio d'aspect
+		// this.ASPECT_RATIO = width / height;
+		// this.camera.aspect = this.ASPECT_RATIO;
+		// this.camera.updateProjectionMatrix();
+	
+		// // Ajuster la taille du rendu
+		// this.renderer.setSize(width, height);
+		// this.renderer.setPixelRatio(window.devicePixelRatio);
+	
+		// // // Ajuster dynamiquement la taille du fond pour qu'il remplisse l'écran
+		// // if (this.backGround) {
+		// // 	const scaleX = this.camera.aspect * 20; // Ajuster la largeur
+		// // 	const scaleY = 20; // Hauteur fixe
+		// // 	this.backGround.scale.set(scaleX, scaleY, 1);
+		// // }
+		// const baseZoom = 20;  // Valeur de base (correspond à la position actuelle)
+		// this.camera.position.z = baseZoom / this.ASPECT_RATIO; 
+	}
+	
 }
