@@ -220,11 +220,10 @@ class PongSocketConsumer(AsyncWebsocketConsumer):
         else:
             redisClient.delete(key)
 
-
     async def start_game_loop(self):
         while self.game_running:
-            self.p1.move()
-            self.p2.move()
+            self.p1.move_key()
+            self.p2.move_key()
             self.ball.move()
             hit_detected = False
             if self.ball.pos.x > 0 and self.p1.collided(self.ball.pos) != 0:

@@ -13,6 +13,7 @@ export class PongScene {
     )
     renderer = new THREE.WebGLRenderer({"antialias": true});
 	backGround = this.addTexturedGridBackground();
+	// Boundaries = [this.addBoundaries()];
     paddle1 = this.addPaddle(10, 0xff0000);
     paddle2 = this.addPaddle(-10, 0x0000ff);
     ball = this.addBall()
@@ -22,6 +23,7 @@ export class PongScene {
 
     constructor() {
         this.addLights()
+		this.addBoundaries()
         this.cameraControl()
         this.camera.position.z = 10;
         document.querySelector("#pong-container")?.appendChild(this.renderer.domElement);
@@ -29,8 +31,6 @@ export class PongScene {
             this.controls.update()
             this.renderer.render(this.scene, this.camera)
         });
-		
-        // window.addEventListener("resize", this.onWindowResize.bind(this));
         window.addEventListener("resize", this.onWindowResize);
         this.onWindowResize();
     }
@@ -41,21 +41,36 @@ export class PongScene {
 		const planeBoundaries = new THREE.PlaneGeometry(boundaries.x * 2, boundaries.y * 2, boundaries.x * 2, boundaries.y * 2);
 		planeBoundaries.rotateZ(-Math.PI * 0.5);
 	
-		// const planeMaterial = new THREE.MeshBasicMaterial({ 
-		// 	color: 0x2222ff,
-		// 	wireframe: true,
-		// 	transparent: true, 
-		// 	opacity: 0.5
-		// });
-		const planeMaterial = new THREE.MeshBasicMaterial({wireframe: true});
+		const planeMaterial = new THREE.MeshBasicMaterial({ 
+			color: 0x2222ff,
+			wireframe: true,
+			transparent: true, 
+			opacity: 0.5
+		});
+		// const planeMaterial = new THREE.MeshBasicMaterial({wireframe: true});
 		const plane = new THREE.Mesh(planeBoundaries, planeMaterial);
 	
 		plane.position.z = -0.8;
+		plane.receiveShadow = true;
 	
 		this.scene.add(plane);
 		return (plane);
 	}
 	
+	addBoundaries() {
+		// const bound = new THREE.Vector2(20,20);
+		const boundGeo = new THREE.BoxGeometry(25, 5, 2);
+		const boundMat = new THREE.MeshNormalMaterial();
+		const leftBound = new THREE.Mesh(boundGeo, boundMat);
+		leftBound.position.y = -10;
+		const rightBound = leftBound.clone();
+		rightBound.position.y = 10;
+		leftBound.castShadow = true
+		rightBound.receiveShadow = true
+		rightBound.castShadow = true
+		this.scene.add(leftBound, rightBound);
+		// return (leftBound, rightBound);
+	}
 
     animateBallHit() {
         const particleCount = 50;
@@ -113,13 +128,30 @@ export class PongScene {
         }
     }
 
-    addLights() {
-        this.paddle1.castShadow = true
-        this.paddle2.castShadow = true
-        this.ball.castShadow = true
-        const ambientLight = new THREE.AmbientLight(0xffffff, 1)
-        this.scene.add(ambientLight);
-    }
+	addLights() {
+		const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+		const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+	
+		dirLight.position.set(20, 20, 20);
+		dirLight.castShadow = true;
+		dirLight.shadow.mapSize.set(1024, 1024);
+		dirLight.shadow.camera.top = 30;
+		dirLight.shadow.camera.bottom = -30;
+		dirLight.shadow.camera.left = -30;
+		dirLight.shadow.camera.right = 30;
+		dirLight.shadow.radius = 10;
+		dirLight.shadow.blurSamples = 20;
+	
+		this.scene.add(dirLight, ambientLight);
+	}
+
+    // addLights() {
+        // this.paddle1.castShadow = true
+        // this.paddle2.castShadow = true
+        // this.ball.castShadow = true
+        // const ambientLight = new THREE.AmbientLight(0xffffff, 1)
+        // this.scene.add(ambientLight);
+    // }
 
     addBall() {
         const geometry = new THREE.SphereGeometry(0.5);
@@ -139,7 +171,8 @@ export class PongScene {
      * @param {number} color
      */
     addPaddle(position, color) {
-        const geometry = new THREE.BoxGeometry(-0.5, 3, 1);
+        // const geometry = new THREE.BoxGeometry(-0.5, 3, 1);
+		const geometry = new THREE.CapsuleGeometry(0.25, 3, 20, 10);
         const material = new THREE.MeshStandardMaterial({ color });
         const neonMaterial = new THREE.MeshStandardMaterial({
             color,
@@ -152,34 +185,26 @@ export class PongScene {
         return paddle;
     }
 
-    // onWindowResize() {
-    //     const height = window.innerWidth / this.ASPECT_RATIO;
-    //     this.renderer.setSize(window.innerWidth, height, false);
-    // }
 	onWindowResize = () => {
-		var width = window.innerWidth;
-		var height = window.innerHeight;
-		this.renderer.setSize( width, height );
+		const containerWidth = window.innerWidth;
+		const containerHeight = window.innerHeight;
+	
+		const targetAspectRatio = this.ASPECT_RATIO;
+		let width = containerWidth;
+		let height = containerHeight;
+	
+		if (containerWidth / containerHeight > targetAspectRatio) {
+			width = containerHeight * targetAspectRatio;
+		} else {
+			height = containerWidth / targetAspectRatio;
+		}
+	
+		this.renderer.setSize(width, height);
+	
 		this.camera.aspect = width / height;
 		this.camera.updateProjectionMatrix();
-
-		// // Mise à jour du ratio d'aspect
-		// this.ASPECT_RATIO = width / height;
-		// this.camera.aspect = this.ASPECT_RATIO;
-		// this.camera.updateProjectionMatrix();
 	
-		// // Ajuster la taille du rendu
-		// this.renderer.setSize(width, height);
-		// this.renderer.setPixelRatio(window.devicePixelRatio);
-	
-		// // // Ajuster dynamiquement la taille du fond pour qu'il remplisse l'écran
-		// // if (this.backGround) {
-		// // 	const scaleX = this.camera.aspect * 20; // Ajuster la largeur
-		// // 	const scaleY = 20; // Hauteur fixe
-		// // 	this.backGround.scale.set(scaleX, scaleY, 1);
-		// // }
-		// const baseZoom = 20;  // Valeur de base (correspond à la position actuelle)
-		// this.camera.position.z = baseZoom / this.ASPECT_RATIO; 
+		const baseZoom = 20;
+		this.camera.position.z = baseZoom / (this.camera.aspect);
 	}
-	
 }
