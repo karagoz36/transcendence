@@ -2,23 +2,93 @@
 {% block title %}Tournament{% endblock %}
 {% block content %}
 {% include "modules/navbar.html" %}
-<div style="margin: 0 auto; max-width: 95vw; width: 20rem; text-align: center; padding: 0.5rem; margin-bottom: 1rem;" class="alert alert-danger hide-empty">{{ERROR}}</div>
-<div style="margin: 0 auto; max-width: 95vw; width: 20rem; text-align: center; padding: 0.5rem; margin-bottom: 1rem;" class="alert alert-success hide-empty">{{SUCCESS}}</div>
 
-<div style="display: flex; justify-content: center; align-items: center; margin-bottom: 0.6rem">
-  <a class="btn btn-danger" href="/tournament/leave/?id={{organizer.id}}">Delete tournament</a>
-</div>
+<style>
+  .card-header {
+    font-weight: bold;
+  }
 
-<h3 style="text-align: center">Players</h3>
+  .alert {
+    margin-bottom: 1rem;
+  }
+ 
+  .btn-custom {
+    margin: 0.2rem;
+  }
 
-{% for player in players %}
-<div style="text-align: center; margin: 0.2rem">
-  <a href="/profile/?id={{player.id}}">{{player.username}}</a>
-  <a class="btn btn-danger" href="/tournament/kick/?id={{player.id}}">Kick</a>
-</div>
-{% endfor %}
+  .table-hover td, .table-hover th {
+    vertical-align: middle;
+  }
 
-<div style="text-align: center; margin: 1rem">
-  <a class="btn btn-primary" href="/tournament/start">Start tournament</a>
+  .table-header {
+    background-color: #f8f9fa;
+  }
+
+  .table td, .table th {
+    padding: 0.75rem;
+  }
+
+</style>
+
+<div class="container">
+  <div class="title-section">
+    <h2 class="fw-bold">{{ organizer.username }}'s tournament</h2>
+  </div>
+
+  {% if ERROR %}
+  <div class="alert alert-danger">{{ ERROR }}</div>
+  {% endif %}
+  {% if SUCCESS %}
+  <div class="alert alert-success">{{ SUCCESS }}</div>
+  {% endif %}
+
+  <div class="row justify-content-center mb-4">
+    <div class="col-md-4 text-center">
+      <a class="btn btn-danger btn-custom" href="/tournament/leave/?id={{ organizer.id }}">Delete Tournament</a>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white text-center">
+          <h4>Players</h4>
+        </div>
+        <div class="card-body">
+          <table class="table table-hover text-center">
+            <thead class="table-header">
+              <tr>
+                <th>Username</th>
+                <th>Profile</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for player in players %}
+              <tr>
+                <td>{{ player.username }}</td>
+                <td>
+                  <a href="/profile/?id={{ player.id }}" class="btn btn-outline-primary btn-sm">View Profile</a>
+                </td>
+                <td>
+                  <a href="/tournament/kick/?id={{ player.id }}" class="btn btn-danger btn-sm">Kick</a>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="3">No players yet.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row justify-content-center mt-4">
+    <div class="col-md-4 text-center">
+      <a class="btn btn-primary" href="/tournament/start">Start Tournament</a>
+    </div>
+  </div>
 </div>
 {% endblock %}

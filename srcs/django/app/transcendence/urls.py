@@ -18,6 +18,9 @@ from django.contrib import admin
 from django.urls import path
 from . import views
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -28,6 +31,8 @@ urlpatterns = [
     path("profile/", views.profile, name="profile"),
     path("pong/lobby/", views.lobby, name="lobby"),
     path("pong/play/", views.play, name="playPong"),
+    path("result/", views.result, name="result"),
+
 
     path("tournament/create/", views.tournament, name="tournament"),
     path("tournament/lobby/", views.tournamentLobby, name="tournamentLobby"),
@@ -47,9 +52,14 @@ urlpatterns = [
     path("api/token", views.getToken, name="createToken"),
     path("api/token/refresh", views.refreshToken, name="refreshToken"),
     path("api/settings/update/", views.update_settings, name="update_settings"),
+    path("api/settings/remove-avatar/", views.remove_avatar, name="remove-avatar"),
     path("api/user/is_2fa_enabled/", views.is_2fa_enabled, name="is_2fa_enabled"),
     path("api/verify_otp/", views.verify_otp, name="verify_otp"),
     path("api/csrf-token/", views.get_csrf_token, name="get_csrf_token"),
     path('auth/login42/', views.auth_with_42, name='login42'),
     path('auth/callback42/', views.callback_from_42, name='callback42'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

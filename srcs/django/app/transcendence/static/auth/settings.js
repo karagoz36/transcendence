@@ -1,3 +1,5 @@
+import { getPage } from "../global/SPA.js"
+
 /** @param {SubmitEvent} e */
 async function handleSettingsUpdate(e) {
     e.preventDefault();
@@ -8,39 +10,67 @@ async function handleSettingsUpdate(e) {
     /** @type {HTMLFormElement} */
     const form = e.target;
 
-    /** Collect form data */
-    const email = form['email'].value;
-    const is_2fa_enabled = form['is_2fa_enabled'].checked;
     const csrftoken = form['csrfmiddlewaretoken'].value;
-    console.log("CSRF Token:", csrftoken);
-    console.log("Collected Data:", { email, is_2fa_enabled });
+    const username = form['username'].value;
+    const password = form['password'].value;
+    const avatar = form['avatar'].files[0];
+    const email = form['email'].value.trim();
+    const is_2fa_enabled = form['is_2fa_enabled'].checked;
+
+    if (is_2fa_enabled && email === "") {
+        alert("You must provide an email address to enable 2FA.");
+        return;
+    }
 
     try {
+        const formData = new FormData();
+        formData.append("username", username);
+        formData.append("email", email);
+        formData.append("is_2fa_enabled", is_2fa_enabled);
+        formData.append("avatar", avatar);
+        formData.append("password", password);
+
         const response = await fetch("/api/settings/update/", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
                 "X-CSRFToken": csrftoken,
             },
-            body: JSON.stringify({ email, is_2fa_enabled }),
+            body: formData,
         });
-
-        if (response.ok) {
-            const data = await response.json();
-            console.log("Settings update response:", data);
-            alert("Settings updated successfully!");
-            location.reload();
-        } else {
-            const errorData = await response.json();
-            alert("Error updating settings: " + (errorData.error || "Unknown error"));
-        }
+        
+        const data = await response.json();
+        alert(data.message);
+        await getPage("/settings")
     } catch (err) {
         console.error("Error in handleSettingsUpdate:", err);
         alert("An unexpected error occurred. Please try again.");
     }
 }
 
-/** Initialize event listeners */
+async function handleRemoveAvatar() {
+    const csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+    try {
+        const response = await fetch("/api/settings/remove-avatar/", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrftoken,
+            },
+        });
+
+        if (response.ok) {
+            alert("Avatar removed successfully!");
+            await getPage("/settings")
+        } else {
+            const errorData = await response.json();
+            alert("Error removing avatar: " + (errorData.error || "Unknown error"));
+        }
+    } catch (err) {
+        console.error("Error in handleRemoveAvatar:", err);
+        alert("An unexpected error occurred. Please try again.");
+    }
+}
+
 function main() {
     /** @type {HTMLFormElement|null} */
     const form = document.querySelector("#settings-form");
@@ -48,6 +78,11 @@ function main() {
         throw new Error("main: Unable to find settings form");
     }
     form.onsubmit = handleSettingsUpdate;
+
+    const removeAvatarButton = document.querySelector("#remove-avatar");
+    if (removeAvatarButton) {
+        removeAvatarButton.onclick = handleRemoveAvatar;
+    }
 }
 
 main();

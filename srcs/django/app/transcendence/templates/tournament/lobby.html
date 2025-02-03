@@ -2,31 +2,73 @@
 {% block title %}Tournament{% endblock %}
 {% block content %}
 {% include "modules/navbar.html" %}
-<style>
-  #pong-container {
-    display: flex;
-    justify-content: center;
-    overflow: hidden;
-  }
 
-  #pong-container>canvas {
-    max-height: 80vh;
-    margin-bottom: 2vh;
-  }
-</style>
 <div id="pong-container">
-  <div>
-    <h2 style="text-align: center">{{organizer.username}}'s tournament</h2>
-    <h3 style="text-align: center">Players</h3>
-    {% for player in players %}
-    <div style="text-align: center">
-      <a href="/profile/?id={{player.id}}">{{player.username}}</a>
+<div class="container">
+  <div class="title-section">
+    <h2 class="fw-bold">{{ organizer.username }}'s tournament</h2>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white text-center">
+          <h4>Players</h4>
+        </div>
+        <div class="card-body">
+          <table class="table table-hover text-center">
+            <thead class="table-header">
+              <tr>
+                <th>Username</th>
+                <th>Profile</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for player in players %}
+              <tr>
+                <td>{{ player.username }}</td>
+                <td>
+                  <a href="/profile/?id={{ player.id }}" class="btn btn-outline-primary btn-sm">View Profile</a>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="2">No players yet.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-    {% endfor %}
-    {% for game in games %}
-      <p style="text-align: center">{{game.p1.username}} vs {{game.p2.username}}</p>
-    {% endfor %}
+  </div>
+
+  <div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-success text-white text-center">
+          <h4>Games</h4>
+        </div>
+        <div class="card-body">
+          {% if games %}
+          <ul class="list-group">
+            {% for game in games %}
+            <li class="list-group-item text-center">
+              <span class="fw-bold text-primary">{{ game.p1.username }}</span> 
+              <span class="text-muted">vs</span> 
+              <span class="fw-bold text-danger">{{ game.p2.username }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p class="text-center text-muted">No games scheduled yet.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
   </div>
 </div>
+</div>
+
+
 <script type="module" src="/static/pong/PongSocket.js"></script>
 {% endblock %}

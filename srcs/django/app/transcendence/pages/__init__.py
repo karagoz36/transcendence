@@ -4,6 +4,8 @@ from . import settings
 from . import friends
 from . import play
 from . import profile
+from .pong import result
+from . import update_settings
 
 from .tournament import create as tournamentCreate
 from .tournament import lobby as tournamentLobby

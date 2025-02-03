@@ -90,9 +90,10 @@ class Tournament:
 
     async def resetTournament(self):
         lastPlayer = list(self.players.values())[0]
-        await sendMessageWS(lastPlayer, "notifications", json.dumps({
-            "redirect": f"/tournament/results/?id={self.organizer.id}"
-        }))
+        # await sendMessageWS(lastPlayer, "notifications", json.dumps({
+        #     "redirect": f"/tournament/results/?id={self.organizer.id}"
+        # }))
+        # KEVIN - a quoi sert
         await TournamentResults.objects.acreate(player=lastPlayer, score=self.round * 2)
         tournaments.pop(self.organizer.id)
 

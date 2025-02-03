@@ -4,7 +4,7 @@
 
 .card {
 	margin: 0 auto;
-	margin-bottom: 0.5rem;
+	margin-bottom: 1rem;
 	width: 20rem;
 	max-width: 90vw;
 }
@@ -14,3 +14,40 @@
 	max-width: 95vw;
 	width: 20rem; text-align: center; padding: 0.5rem; margin-bottom: 1rem;
 }
+
+.title-section {
+    text-align: center;
+    padding: 0.7rem 0.7rem;
+    background: linear-gradient(135deg, #6c757d 0%, #343a40 100%);
+    color: white;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 90%; 
+    max-width: 30rem; 
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.title-section h2 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+}
+.container {
+  margin-top: 2rem;
+}
+
+#pong-container {
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+       margin-top: 2rem;
+}
+
+#pong-container>canvas {
+  max-height: 80vh;
+  margin-bottom: 2vh;
+}
+	
