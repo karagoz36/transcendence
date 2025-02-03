@@ -6,17 +6,21 @@ from database.models import FriendList, getFriendship, Messages
 from websockets.consumers import sendMessageWS
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
+from asgiref.sync import sync_to_async
+import json
+from django.http import JsonResponse
 
 async def getMessages(friendship: FriendList):
 	arr = []
 
 	async for message in Messages.objects.select_related("sender").filter(friendship=friendship).order_by("created_at"):
-		arr.append({"text": message.message, "sender": message.sender.username})
+		arr.append({"text": message.message, "sender": message.sender.username, "created_at": message.created_at,})
 	return arr
 
 async def sendNewMessageToFriend(sender: User, receiver: User, message: str):
+	latest_message = await sync_to_async(Messages.objects.order_by('-created_at').first)()
 	context = {}
-	context["message"] = {"sender": sender.username, "text": message}
+	context["message"] = {"sender": sender.username, "text": message, "created_at":latest_message.created_at}
 	html = render_to_string("friendlist/message.html", context=context)
 	await sendMessageWS(receiver, "messages", html)
 
@@ -27,17 +31,14 @@ async def response(request: Request) -> HttpResponse:
 		return redirect("/api/logout")
 	if "friendID" not in request.data:
 		return Response({"message": "friend id missing in request body"}, status=401)
-	if "message" not in request.data or request.data["message"].strip() == "":
+
+	if "message" not in request.data or not request.data["message"].strip():
 		return Response({"message": "message missing in request body"}, status=401)
-	if request.data["message"].strip() == "":
-		# return Response({"message": "message missing in request body"}, status=401)
-		return redirect("/friends/?error=This friendship already exists.")
-	print("Requête reçue :", request.data)
 	message: str = request.data["message"]
-	id: int = request.data["friendID"]
+	friend_id: int = request.data["friendID"]
 
 	try:
-		friend = await User.objects.aget(id=id)
+		friend = await User.objects.aget(id=friend_id)
 	except:
 		return Response({"message": "invalid friend id in request body"}, status=401)
 
@@ -52,4 +53,9 @@ async def response(request: Request) -> HttpResponse:
 	if friend.id == user.id:
 		friend = friendship.user
 	await sendNewMessageToFriend(user, friend, message)
-	return render(request, "friendlist/message-list.html", context={"messages": messageList })
+	message = {"message": f"New message received from {user.username}.", "link":f"/friends/?id={user.id}", "refresh": ["friends/"]}
+	await sendMessageWS(friend, "notifications", json.dumps(message))
+	return render(request, "friendlist/modal-content.html", context={
+		"messages": messageList,
+		"friend": friend
+		})

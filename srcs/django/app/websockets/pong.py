@@ -27,15 +27,23 @@ e_direction = {
 }
 
 class PongPlayer:
+    field_height: float = 15.0
     user: User
     width: float = 3
+    thickness: float = 0.5
     pos: Vector2
     score: int = 0
 
     def __init__(self, user: User, x: float):
         self.user = user
         self.pos = Vector2(x)
-        
+    
+    def check_walls(self):
+        if self.pos.y >= self.field_height / 2 - 1.5:
+            self.pos.y = self.field_height / 2 - 1.5
+        if self.pos.y <= -self.field_height / 2 + 1.5:
+            self.pos.y = -self.field_height / 2 + 1.5
+
     def move(self):
         key = f"pong_direction:{self.user.id}"
         direction = redisClient.hgetall(key)
@@ -43,8 +51,10 @@ class PongPlayer:
         match direction:
             case "up":
                 self.pos.y += 0.25
+                self.check_walls()
             case "down":
                 self.pos.y -= 0.25
+                self.check_walls()
             case None:
                 return        
         redisClient.delete(key)
@@ -63,7 +73,7 @@ class PongPlayer:
         playerPos = self.pos.abs()
         ballPos = pos.abs()
 
-        if playerPos.x >= ballPos.x:
+        if playerPos.x >= (ballPos.x + self.thickness):
             return False
 
         if self.collidedBottom(pos):
@@ -77,6 +87,7 @@ class PongPlayer:
         return max(-1.0, min(1.0, relative_impact))
 
 class Ball:
+    field_height: float = 15.0
     velocity = Vector2(0.2, 0)
     pos: Vector2 = Vector2()
     p1: PongPlayer
@@ -154,11 +165,13 @@ async def gameLoop(user1: User, user2: User, tournament: bool = False) -> User:
         p1.move()
         p2.move()
         ball.move()
-
-        winner = await ball.getWinner()
-        if winner != None:
-            break
-
+        if p1.score == 3 or p2.score == 3:
+            data = {"type": "game_over"}
+            await sendMessageWS(p1.user, "pong", json.dumps(data))
+            await sendMessageWS(p2.user, "pong", json.dumps(data))
+            await PongHistory.objects.acreate(player1=p1.user, player2=p2.user,
+                player1_score=p1.score, player2_score=p2.score)
+            return
         data = {
             "type": "update_pong",
             "p1": {"x": p1.pos.x, "y": p1.pos.y},

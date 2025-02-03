@@ -17,19 +17,17 @@ class BaseConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         user: User = self.scope.get("user")
     
-        if user is None:
+        if user is None or user.username == "":
             self.group_name = "unauthenticated"
             await self.close(code=4000)
-            print(f"WebSocket: {self.group_name} connected", flush=True)
+            print(f"WebSocket: {self.group_name} closed", flush=True)
             return
 
-        await self.accept()
         self.group_name = f"{user.id}_{self.consumerName}"
-        print(f"WebSocket: {self.group_name} connected", flush=True)
-        if user.username == "":
-            await self.close(code=4000)
-            return
+
+        await self.accept()
         await self.channel_layer.group_add(self.group_name, self.channel_name)
+        print(f"WebSocket: {self.group_name} connected", flush=True)
 
     async def disconnect(self, close_code):
         print(f"WebSocket: {self.group_name} disconnected", flush=True)

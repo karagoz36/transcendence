@@ -18,6 +18,8 @@ services:
     restart: always
     build: ./django
     container_name: django
+    expose:
+      - "8000"
     volumes:
       - ./django/app:/app/
     networks:
@@ -34,7 +36,7 @@ services:
     restart: always
     build: ./nginx
     container_name: nginx
-    volumes: 
+    volumes:
       - ./django/app/transcendence/static:/static
     networks:
       - app-network
@@ -44,6 +46,7 @@ services:
       - 8000:443
     depends_on:
       - django
+      - prometheus
 
   redis:
     image: redis:7.4.1
@@ -53,7 +56,7 @@ services:
     networks:
       - app-network
     restart: always
-    
+
   celery:
     build:
       context: ./django
@@ -70,6 +73,71 @@ services:
     env_file:
       .env
     restart: always
+
+  node-exporter:
+    build:
+      context: ./monitoring/node-exporter
+      dockerfile: Dockerfile
+    container_name: node-exporter
+    networks:
+      - app-network
+    pull_policy: never
+    restart: unless-stopped
+
+  prometheus:
+    build:
+      context: ./monitoring/prometheus
+      dockerfile: Dockerfile
+    container_name: prometheus
+    expose:
+      - "9090" # Sadece Nginx erişebilsin
+    volumes:
+      - ./monitoring/prometheus/conf/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - app-network
+    restart: always
+
+  grafana:
+    build:
+      context: ./monitoring/grafana
+      dockerfile: Dockerfile
+    container_name: grafana
+    expose:
+      - "3000"
+    networks:
+      - app-network
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+      - GF_SERVER_ROOT_URL=https://localhost:8000/grafana/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - GF_SERVER_HTTP_ADDR=0.0.0.0
+    restart: always
+    depends_on:
+      - prometheus
+
+  alertmanager:
+    build:
+      context: ./monitoring/alertmanager
+      dockerfile: Dockerfile
+    container_name: alertmanager
+    volumes:
+      - ./monitoring/alertmanager/conf/alertmanager.yml:/etc/alertmanager/alertmanager.yml:rw
+    expose:
+      - "9093"
+    networks:
+      - app-network
+    environment:
+      EMAIL_HOST_USER: "${EMAIL_HOST_USER}"
+      EMAIL_HOST_PASSWORD: "${EMAIL_HOST_PASSWORD}"
+
+volumes:
+  grafana_data: {}
+  prometheus_data: {}
 
 networks:
   app-network:

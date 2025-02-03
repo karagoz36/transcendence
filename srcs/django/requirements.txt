@@ -11,3 +11,4 @@ pyotp
 python-decouple
 celery
 requests
+django-prometheus

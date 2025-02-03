@@ -10,13 +10,15 @@
 }
 </style>
 <div style="width: 15rem;" class="card">
-	<div class="card-header">
-		<a href="/profile/?id={{friend.id}}">{{friend.username}}</a>
-		{{friend.status}}
+	<div class="card-header d-flex justify-content-between align-items-center">
+		<a href="/profile/?id={{friend.id}}" class="text-decoration-none">{{friend.username}}</a>
+		<span class="badge {% if friend.status == 'online' %}bg-success{% else %}bg-danger{% endif %}">
+            {{ friend.status }}
+        </span>
 	</div>
 	<div class="d-flex flex-wrap md-nowrap gap-2 card-body friend-button-container">
-		<button data-bs-toggle="modal" data-bs-target="#exampleModal"
-		id="open-chat-modal" user-id={{friend.id}} class="btn friend-button btn-primary">Send message</button>
+		<button data-bs-toggle="modal" data-bs-target="#chatModal"
+		id="open-chat-modal" user-id={{friend.id}} user-name={{friend.username}} class="btn friend-button btn-primary">Chat with friend</button>
 		{% if friend.status == "online" %}
         <a class="btn btn-primary" href="/pong/lobby/?opponent={{friend.username}}">Play pong</a>
 		{% else %}

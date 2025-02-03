@@ -1,8 +1,24 @@
-<div class="d-flex {% if message.sender == user.username %}justify-content-end{% else %}justify-content-start{% endif %} mb-2">
-    <div class="message {% if message.sender == user.username %}bg-primary text-white{% else %}bg-light text-dark{% endif %} p-2 rounded">
-            <div class="text-break">
-            <small><b>{{ message.sender }}</b></small><br>
-            {{ message.text }}
-        </div>
+<div class="d-flex {% if message.sender == user.username %}
+    justify-content-end
+  {% else %}
+    justify-content-start
+  {% endif %} mb-2">
+  <div class="message {% if message.sender == user.username %}
+      bg-primary text-white
+    {% else %}
+      bg-light text-dark
+    {% endif %} p-2 rounded">
+    <div class="text-break">
+      <small><b>{{ message.sender }}</b></small><br />
+      {{ message.text }}<br />
+      <small style="bottom: 2px; float: right; font-size: 0.6rem; line-height: 1;"
+        class="{% if message.sender == user.username %}
+          text-white
+        {% else %}
+          text-dark
+        {% endif %}">
+        {{ message.created_at|date:'d/m H:i' }}
+      </small>
     </div>
+  </div>
 </div>

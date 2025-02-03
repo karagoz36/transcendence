@@ -17,4 +17,4 @@ from .pong import lobby
 
 from .api.auth import login, logout, register
 
-from .api.friends import addFriend, acceptFriend, removeFriend, sendMessage
+from .api.friends import addFriend, acceptFriend, removeFriend, sendMessage, openMessage

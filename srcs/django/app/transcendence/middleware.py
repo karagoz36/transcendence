@@ -24,7 +24,7 @@ class RequiredLoginMiddleware:
 	def __call__(self, request: Request):
 		user, _ = CustomAuthentication().authenticate(request=request)
 		path: str = request.path
-	
+
 		if path.startswith("/api"):
 			return self.get_response(request)
 		if not path.startswith("/auth"):

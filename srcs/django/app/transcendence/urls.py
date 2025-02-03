@@ -18,9 +18,10 @@ from django.contrib import admin
 from django.urls import path
 from . import views
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from django.conf import settings
+from django_prometheus import exports
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.static import static
-
+from django.conf import settings
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -29,6 +30,8 @@ urlpatterns = [
     path("settings/", views.settings, name="settings"),
     path("friends/", views.friends, name="friends"),
     path("profile/", views.profile, name="profile"),
+    path("profile_list/", views.profile_list, name="profile_list"),
+
     path("pong/lobby/", views.lobby, name="lobby"),
     path("pong/play/", views.play, name="playPong"),
     path("result/", views.result, name="result"),
@@ -48,6 +51,7 @@ urlpatterns = [
     path("api/friend/accept", views.acceptFriend, name="acceptFriend"),
     path("api/friend/remove", views.removeFriend, name="rejectFriend"),
     path("api/friend/send-message", views.sendMessage, name="sendMessage"),
+    path("api/friend/open-message", views.openMessage, name="openMessage"),
 
     path("api/token", views.getToken, name="createToken"),
     path("api/token/refresh", views.refreshToken, name="refreshToken"),
@@ -58,6 +62,7 @@ urlpatterns = [
     path("api/csrf-token/", views.get_csrf_token, name="get_csrf_token"),
     path('auth/login42/', views.auth_with_42, name='login42'),
     path('auth/callback42/', views.callback_from_42, name='callback42'),
+	path('api/metrics/', exports.ExportToDjangoView, name='django-metrics'),
 ]
 
 if settings.DEBUG:

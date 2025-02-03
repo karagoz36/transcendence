@@ -1,18 +1,5 @@
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Send message</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div id="messages-container" class="modal-body">
-        </div>
-        <div class="modal-footer">
-          <form class="input-group mb-3" id="send-message-form">
-            <input type="text" class="form-control" name="message" id="message-input" placeholder="Type your message..." />
-            <button id="send-message" type="submit" class="btn btn-outline-primary">Send</button>
-          </form>
-        </div>
-      </div>
-    </div>
+<div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+    {% include "friendlist/modal-content.html" %}
   </div>
+</div>
