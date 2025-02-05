@@ -12,7 +12,7 @@ wait-django:
 test:
 	cp srcs/.env.template srcs/.env
 	docker compose -f srcs/docker-compose.yml build
-	docker compose -f srcs/docker-compose.yml up -d
+	docker compose -f srcs/docker-compose.yml up
 	make wait-django
 	docker exec django python /app/manage.py test unittests.tests
 
@@ -21,7 +21,7 @@ build:
 	docker compose -f srcs/docker-compose.yml build
 
 up:
-	docker compose -f srcs/docker-compose.yml up -d
+	docker compose -f srcs/docker-compose.yml up
 
 down:
 	docker compose -f srcs/docker-compose.yml down

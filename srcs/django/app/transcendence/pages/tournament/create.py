@@ -136,7 +136,7 @@ class Tournament:
             task.add_done_callback(callback)
 
     async def announceGames(self):
-        format = f"<a href='/tournament/lobby?id={self.organizer.id}'>"
+        format = f"<a href='/tournament/lobby?id={self.organizer.id}' style='text-decoration: none;'>"
         format += f"You will play against $OPPONENT in {self.organizer.username}'s tournament in {self.waitTime} seconds."
         format += "</a>"
         dict = {"message": format, "redirect": f"/tournament/lobby/?id={self.organizer.id}"}

@@ -25,10 +25,15 @@ async def response(request: Request):
 	if friendship is None:
 		return redirect("/friends?error=Friendship not found", status=400)
 	await friendship.adelete()
+	format = "<a href='/friends' style='text-decoration: none;'>"
 	if type == "remove":
-		await sendMessageWS(friend, "notifications",
-			json.dumps({"message": f"{user.username} removed you from your friend list.", "link":"/friends", "refresh": ["/friends/"]}))
+		format += f"{user.username} removed you from your friend list."
+		format += "</a>"
+		dict = {"message": format, "redirect": f"/friends"}
+		await sendMessageWS(friend, "notifications", json.dumps(dict))
 	elif type == "reject":
-		await sendMessageWS(friend, "notifications",
-			json.dumps({"message": f"{user.username} rejected your friend invitation.", "link":"/friends", "refresh": ["/friends/"]}))
+		format += f"{user.username} rejected your friend invitation."
+		format += "</a>"
+		dict = {"message": format, "redirect": f"/friends"}
+		await sendMessageWS(friend, "notifications", json.dumps(dict))
 	return redirect("/friends?success=Friend successfully removed")

@@ -1,14 +1,13 @@
 // @ts-check
 import {getPage, setAnchorEvent} from "./SPA.js"
 import BaseWebSocket from "./websockets.js";
-import { openChat } from "../friends/message.js";
 
 
 /**
  * @param {string} text 
  * @returns {HTMLDivElement}
  **/
-function createToast(text, link) {
+function createToast(text) {
 	const toast = document.createElement("div")
 	toast.id = "liveToast";
 	toast.className = "toast show";
@@ -27,10 +26,6 @@ function createToast(text, link) {
 		event.stopPropagation();
 	});
 	
-	toast.addEventListener("click", async (event) => {
-		event.preventDefault();
-		await getPage(link);
-	});
 	return toast
 }
 
@@ -38,8 +33,8 @@ function createToast(text, link) {
  * @param {string} message
  * @param {number} duration 
 */
-function addNotif(message, link, duration) {	
-	const toast = createToast(message, link)
+function addNotif(message, duration) {	
+	const toast = createToast(message)
 	const toastContainer = document.querySelector(".toast-container")
 	toastContainer?.append(toast)
 	setAnchorEvent()
@@ -64,9 +59,7 @@ class NotificationHandler extends BaseWebSocket {
 	async receive(e) {
 		const data = JSON.parse(e.data)
 		if (data.message){
-			let link = data.link
-			console.log(link)
-			addNotif(data.message, link, data.duration)
+			addNotif(data.message, data.duration)
 		}
 		if (data.redirect)
 			await getPage(data.redirect)

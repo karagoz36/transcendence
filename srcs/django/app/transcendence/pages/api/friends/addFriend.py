@@ -30,7 +30,9 @@ async def response(request: Request) -> HttpResponse:
 
 	await FriendList.objects.acreate(user=user, friend=friend)
 
-	message = {"message": f"Friend invitation received from {user.username}.", "link":"/friends", "refresh": ["/friends/"]}
-
-	await sendMessageWS(friend, "notifications", json.dumps(message))
+	format = "<a href='/friends' style='text-decoration: none;'>"
+	format += f"Friend invitation received from {user.username}."
+	format += "</a>"
+	dict = {"message": format, "redirect": f"/friends"}
+	await sendMessageWS(friend, "notifications", json.dumps(dict))
 	return redirect("/friends/?success=Friend invitation successfully sent!")

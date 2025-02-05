@@ -22,6 +22,7 @@ async def sendNewMessageToFriend(sender: User, receiver: User, message: str):
 	context = {}
 	context["message"] = {"sender": sender.username, "text": message, "created_at":latest_message.created_at}
 	html = render_to_string("friendlist/message.html", context=context)
+ 
 	await sendMessageWS(receiver, "messages", html)
 
 async def response(request: Request) -> HttpResponse:
@@ -54,7 +55,13 @@ async def response(request: Request) -> HttpResponse:
 		friend = friendship.user
 	await sendNewMessageToFriend(user, friend, message)
 	message = {"message": f"New message received from {user.username}.", "link":f"/friends/?id={user.id}", "refresh": ["friends/"]}
-	await sendMessageWS(friend, "notifications", json.dumps(message))
+	
+	format = f"<a href='/friends/?id={user.id}' style='text-decoration: none;'>"
+	format += f"New message received from {user.username}."
+	format += "</a>"
+	dict = {"message": format,}
+	await sendMessageWS(friend, "notifications", json.dumps(dict))	
+	# await sendMessageWS(friend, "notifications", json.dumps(message))
 	return render(request, "friendlist/modal-content.html", context={
 		"messages": messageList,
 		"friend": friend
