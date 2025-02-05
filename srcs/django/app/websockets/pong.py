@@ -111,6 +111,8 @@ class Ball:
     field_height: float = 15.0
     velocity = Vector2(0.2, 0)
     pos: Vector2 = Vector2()
+    speed_multiplier = 1
+    accelerate_rate = 0.0005
     lastscore1 = False
     lastscore2 = False
     p1: PongPlayer
@@ -142,6 +144,7 @@ class Ball:
             self.pos.y = -self.field_height / 2
 
     def reset_ball(self):
+        self.speed_multiplier = 1
         angles = [random.uniform(-35, 35), random.uniform(135, 225)]
         angle = math.radians(random.choice(angles)) 
         if self.lastscore2:
@@ -180,8 +183,10 @@ class Ball:
             
             asyncio.create_task(notify_hit([self.p1, self.p2]))
 
-        self.pos.x += self.velocity.x
-        self.pos.y += self.velocity.y
+        self.speed_multiplier += self.accelerate_rate
+
+        self.pos.x += self.velocity.x * self.speed_multiplier
+        self.pos.y += self.velocity.y * self.speed_multiplier
 
 async def notify_hit(players, socket_type="pong"):
     data = {"type": "hitBall"}
