@@ -1,6 +1,7 @@
 import json
 import asyncio
 import math
+import random
 import redis
 from django.contrib.auth.models import User
 from utils.websocket import sendMessageWS
@@ -110,6 +111,8 @@ class Ball:
     field_height: float = 15.0
     velocity = Vector2(0.2, 0)
     pos: Vector2 = Vector2()
+    lastscore1 = False
+    lastscore2 = False
     p1: PongPlayer
     p2: PongPlayer
 
@@ -120,9 +123,13 @@ class Ball:
     def scored(self) -> int:
         if self.pos.x >= self.p1.pos.x + 1:
             self.p1.score += 1
+            self.lastscore1 = True
+            self.lastscore2 = False
             return True
         if self.pos.x <= self.p2.pos.x - 1:
             self.p2.score += 1
+            self.lastscore2 = True
+            self.lastscore1 = False
             return True
         return False
 
@@ -135,8 +142,18 @@ class Ball:
             self.pos.y = -self.field_height / 2
 
     def reset_ball(self):
-        self.pos = Vector2(0, 0)
-        self.velocity = Vector2(0.2, 0)
+        angles = [random.uniform(-35, 35), random.uniform(135, 225)]
+        angle = math.radians(random.choice(angles)) 
+        if self.lastscore2:
+            self.pos = Vector2(0, 0)
+            speed = 0.2  
+            self.velocity = Vector2(speed * math.cos(angle), speed * math.sin(angle))
+            # self.velocity = Vector2(0.2, 0)
+        elif self.lastscore1:
+            self.pos = Vector2(0, 0)
+            speed = -0.2  
+            self.velocity = Vector2(speed * math.cos(angle), speed * math.sin(angle))
+            # self.velocity = Vector2(-0.2, 0)
 
     def move(self):
         if self.scored():

@@ -23,9 +23,12 @@ export class PongScene {
 
     constructor() {
         this.addLights()
+        this.addShadow()
 		this.addBoundaries()
         this.cameraControl()
         this.camera.position.z = 10;
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.querySelector("#pong-container")?.appendChild(this.renderer.domElement);
         this.renderer.setAnimationLoop(() => {
             this.controls.update()
@@ -35,42 +38,67 @@ export class PongScene {
         this.onWindowResize();
     }
      
- 
 	addTexturedGridBackground() {
 		const boundaries = new THREE.Vector2(20, 20);
 		const planeBoundaries = new THREE.PlaneGeometry(boundaries.x * 2, boundaries.y * 2, boundaries.x * 2, boundaries.y * 2);
 		planeBoundaries.rotateZ(-Math.PI * 0.5);
 	
-		const planeMaterial = new THREE.MeshBasicMaterial({ 
-			color: 0x2222ff,
-			wireframe: true,
-			transparent: true, 
-			opacity: 0.5
-		});
-		// const planeMaterial = new THREE.MeshBasicMaterial({wireframe: true});
+		// const planeMaterial = new THREE.MeshBasicMaterial({ 
+		// 	color: 0x2222ff,
+		// 	wireframe: true,
+		// 	transparent: true, 
+		// 	opacity: 0.5
+		// });
+        const planeMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0x8c93ec,
+            transparent: false 
+        });
 		const plane = new THREE.Mesh(planeBoundaries, planeMaterial);
 	
 		plane.position.z = -0.8;
-		plane.receiveShadow = true;
+        plane.receiveShadow = true;
+        plane.castShadow = false;        
 	
 		this.scene.add(plane);
 		return (plane);
 	}
+
+    addShadow() {
+        const shadowPlaneGeometry = new THREE.PlaneGeometry(40, 40);
+        const shadowPlaneMaterial = new THREE.ShadowMaterial({ opacity: 0.5 });  // Ombre douce
+        const shadowPlane = new THREE.Mesh(shadowPlaneGeometry, shadowPlaneMaterial);
+        shadowPlane.receiveShadow = true;
+        this.scene.add(shadowPlane);
+    }
 	
-	addBoundaries() {
-		// const bound = new THREE.Vector2(20,20);
-		const boundGeo = new THREE.BoxGeometry(25, 5, 2);
-		const boundMat = new THREE.MeshNormalMaterial();
-		const leftBound = new THREE.Mesh(boundGeo, boundMat);
-		leftBound.position.y = -10;
-		const rightBound = leftBound.clone();
-		rightBound.position.y = 10;
-		leftBound.castShadow = true
-		rightBound.receiveShadow = true
-		rightBound.castShadow = true
-		this.scene.add(leftBound, rightBound);
-		// return (leftBound, rightBound);
-	}
+    addBoundaries() {
+        const radius = 0.4;
+        const length = 20;
+        const capSegments = 8;
+        const radialSegments = 16;
+    
+        const boundGeometry = new THREE.CapsuleGeometry(radius, length, capSegments, radialSegments);
+        // const boundMat = new THREE.MeshNormalMaterial();
+        const boundMat = new THREE.MeshStandardMaterial({
+            color: 0x8c93ec,
+            emissive: 0x8c93ec,
+            emissiveIntensity: 0.5,
+            metalness: 2,
+            roughness: 1,
+            // transparent: false
+        });
+        const leftBound = new THREE.Mesh(boundGeometry, boundMat);
+        leftBound.rotateZ(-Math.PI * 0.5) ;
+        leftBound.position.y = -8.2;
+        leftBound.position.z = 0.2;
+        leftBound.castShadow = true;
+    
+        const rightBound = leftBound.clone();
+        rightBound.position.y = 8.2;
+        rightBound.castShadow = true;
+    
+        this.scene.add(leftBound, rightBound);
+    }    
 
     animateBallHit() {
         const particleCount = 50;
@@ -129,29 +157,24 @@ export class PongScene {
     }
 
 	addLights() {
-		const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-		const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+		const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+		const dirLight = new THREE.DirectionalLight(0xffffff, 1);
 	
-		dirLight.position.set(20, 20, 20);
+		dirLight.position.set(30, 20, 30);
+        dirLight.target.position.set(0, 0, 0); 
 		dirLight.castShadow = true;
-		dirLight.shadow.mapSize.set(1024, 1024);
-		dirLight.shadow.camera.top = 30;
-		dirLight.shadow.camera.bottom = -30;
-		dirLight.shadow.camera.left = -30;
-		dirLight.shadow.camera.right = 30;
-		dirLight.shadow.radius = 10;
-		dirLight.shadow.blurSamples = 20;
+        dirLight.shadow.mapSize.set(2048, 2048);
+        dirLight.shadow.camera.near = 0.1;
+        dirLight.shadow.camera.far = 100;
+        dirLight.shadow.camera.left = -30;
+        dirLight.shadow.camera.right = 30;
+        dirLight.shadow.camera.top = 30;
+        dirLight.shadow.camera.bottom = -30;
+    
+        dirLight.shadow.bias = 0.00;
 	
 		this.scene.add(dirLight, ambientLight);
 	}
-
-    // addLights() {
-        // this.paddle1.castShadow = true
-        // this.paddle2.castShadow = true
-        // this.ball.castShadow = true
-        // const ambientLight = new THREE.AmbientLight(0xffffff, 1)
-        // this.scene.add(ambientLight);
-    // }
 
     addBall() {
         const geometry = new THREE.SphereGeometry(0.5);
@@ -162,6 +185,8 @@ export class PongScene {
             emissiveIntensity: 2,
         });
         const ball = new THREE.Mesh(geometry, neonMaterial);
+        ball.castShadow = true;
+        ball.receiveShadow = true;
         this.scene.add(ball);
         return ball;
     }
@@ -171,7 +196,6 @@ export class PongScene {
      * @param {number} color
      */
     addPaddle(position, color) {
-        // const geometry = new THREE.BoxGeometry(-0.5, 3, 1);
 		const geometry = new THREE.CapsuleGeometry(0.25, 3, 20, 10);
         const material = new THREE.MeshStandardMaterial({ color });
         const neonMaterial = new THREE.MeshStandardMaterial({
@@ -181,6 +205,7 @@ export class PongScene {
         });
         const paddle = new THREE.Mesh(geometry, neonMaterial);
         paddle.position.x = position;
+        paddle.castShadow = true;
         this.scene.add(paddle);
         return paddle;
     }
