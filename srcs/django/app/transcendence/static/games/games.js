@@ -127,10 +127,20 @@ class LocalGameWebSocket extends BaseWebSocket {
                 window.pongScene.paddle2.position.y = data.p2.y;
                 window.pongScene.ball.position.x = data.ball.x;
                 window.pongScene.ball.position.y = data.ball.y;
+                window.PongScene.score1 = data.score.p1;
+                window.PongScene.score2 = data.score.p2;
+                const playerScoreElement = document.querySelector("#player-score");
+                const opponentScoreElement = document.querySelector("#opponent-score");
+            
+                if (playerScoreElement && opponentScoreElement) {
+                    playerScoreElement.textContent = data.score.p1;
+                    opponentScoreElement.textContent = data.score.p2;
+                }
                 break;
             case "game_over":
                 break;
         }
+
     }
 }
 

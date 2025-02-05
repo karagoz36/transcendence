@@ -185,7 +185,7 @@ class PongSocketConsumer(AsyncWebsocketConsumer):
         self.p2 = PongPlayer(LocalGamer("p2"), -10)
         self.ball = Ball(self.p1, self.p2)
 
-        htmlSTR = render_to_string("pong/play.html")
+        htmlSTR = render_to_string("pong/localplay.html")
         await self.send(json.dumps({"type": "launch_game", "html": htmlSTR}))
         self.game_running = True
         asyncio.create_task(self.start_game_loop())
@@ -235,6 +235,7 @@ class PongSocketConsumer(AsyncWebsocketConsumer):
                 "p1": {"x": self.p1.pos.x, "y": self.p1.pos.y},
                 "p2": {"x": self.p2.pos.x, "y": self.p2.pos.y},
                 "ball": {"x": self.ball.pos.x, "y": self.ball.pos.y},
+                "score": {"p1": self.p1.score, "p2": self.p2.score}
             }
             if hit_detected:
                 data["type"] = "hitBall"
