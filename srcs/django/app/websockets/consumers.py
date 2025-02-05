@@ -17,6 +17,7 @@ class BaseConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         user: User = self.scope.get("user")
     
+        await self.accept()
         if user is None or user.username == "":
             self.group_name = "unauthenticated"
             await self.close(code=4000)
@@ -25,7 +26,6 @@ class BaseConsumer(AsyncWebsocketConsumer):
 
         self.group_name = f"{user.id}_{self.consumerName}"
 
-        await self.accept()
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         print(f"WebSocket: {self.group_name} connected", flush=True)
 
