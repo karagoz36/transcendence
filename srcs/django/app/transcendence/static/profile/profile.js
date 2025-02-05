@@ -1,8 +1,8 @@
 // @ts-check
 function udpatePie() {
     const canvas = document.getElementById('statsPieChart');
-    if (!canvas) return;
-    console.log("canvas=", canvas)
+    // if (!canvas) return;
+    // console.log("canvas=", canvas)
 
     const existingChart = Chart.getChart(canvas); // Chart.js v3+
     if (existingChart) {

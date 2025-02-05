@@ -133,7 +133,6 @@ def verify_otp(request):
 
 @api_view(['POST'])
 async def sendMessage(request: Request):
-    print(request.user)
     return await pages.sendMessage.response(request)
 
 @api_view(['POST'])

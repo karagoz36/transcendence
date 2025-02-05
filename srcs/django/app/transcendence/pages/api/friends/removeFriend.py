@@ -29,11 +29,11 @@ async def response(request: Request):
 	if type == "remove":
 		format += f"{user.username} removed you from your friend list."
 		format += "</a>"
-		dict = {"message": format, "redirect": f"/friends"}
+		dict = {"message": format, "refresh": ["/friends/"]}
 		await sendMessageWS(friend, "notifications", json.dumps(dict))
 	elif type == "reject":
 		format += f"{user.username} rejected your friend invitation."
 		format += "</a>"
-		dict = {"message": format, "redirect": f"/friends"}
+		dict = {"message": format, "refresh": ["/friends/"]}
 		await sendMessageWS(friend, "notifications", json.dumps(dict))
 	return redirect("/friends?success=Friend successfully removed")

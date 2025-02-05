@@ -13,7 +13,6 @@ def response(request: Request) -> Response:
 	if user.is_anonymous:
 		return redirect("/api/logout")
 
-	# tournament_results1 = TournamentResults.objects.all().order_by('-score')
 	tournament_results = TournamentResults.objects.values('player') \
         .annotate(total_score=Sum('score')) \
         .order_by('-total_score')

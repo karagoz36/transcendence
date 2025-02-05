@@ -101,10 +101,10 @@ class Tournament:
         htmlSTR = render_to_string("pong/play.html")
 
         async def onGameover(winner: User, game: GameData):
-            print("C'EST ICI WESH")
+            # print("C'EST ICI WESH")
             for game in self.games:
                 print(game.p1, game.p2)
-            print(game.p1, game.p2, flush=True)
+            # print(game.p1, game.p2, flush=True)
             self.games.pop(self.games.index(game))
             loser: User = game.p2
             if loser == winner:

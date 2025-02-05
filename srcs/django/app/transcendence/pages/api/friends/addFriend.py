@@ -33,6 +33,6 @@ async def response(request: Request) -> HttpResponse:
 	format = "<a href='/friends' style='text-decoration: none;'>"
 	format += f"Friend invitation received from {user.username}."
 	format += "</a>"
-	dict = {"message": format, "redirect": f"/friends"}
+	dict = {"message": format, "refresh": ["/friends/"]}
 	await sendMessageWS(friend, "notifications", json.dumps(dict))
 	return redirect("/friends/?success=Friend invitation successfully sent!")

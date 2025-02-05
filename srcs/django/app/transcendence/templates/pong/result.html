@@ -4,85 +4,84 @@
 {% include "modules/navbar.html" %}
 
 
-<style>
-    .winner-text {
-      font-size: 2rem;
-      font-weight: bold;
-      text-transform: uppercase;
-      animation: pop-in 0.5s ease-out;
-    }
-    @keyframes pop-in {
-        0% {
-          transform: scale(0.8);
-          opacity: 0;
+    <style>
+        .winner-text {
+        font-size: 2rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        animation: pop-in 0.5s ease-out;
         }
-        100% {
-          transform: scale(1);
-          opacity: 1;
+        @keyframes pop-in {
+            0% {
+            transform: scale(0.8);
+            opacity: 0;
+            }
+            100% {
+            transform: scale(1);
+            opacity: 1;
+            }
         }
+
+    .loser-text {
+        font-size: 3rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        color: red;
+        animation: shake 0.5s infinite alternate, flash-red 1s infinite alternate;
     }
 
-  .loser-text {
-    font-size: 3rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    color: red;
-    animation: shake 0.5s infinite alternate, flash-red 1s infinite alternate;
-  }
+    @keyframes shake {
+        0% { transform: translateX(-5px) rotate(-2deg); }
+        100% { transform: translateX(5px) rotate(2deg); }
+    }
 
-  @keyframes shake {
-    0% { transform: translateX(-5px) rotate(-2deg); }
-    100% { transform: translateX(5px) rotate(2deg); }
-  }
+    @keyframes flash-red {
+        0% { color: red; }
+        100% { color: darkred; }
+    }
 
-  @keyframes flash-red {
-    0% { color: red; }
-    100% { color: darkred; }
-  }
-
-</style>
+    </style>
 
 
-<div class="container text-center mt-5">
-    {% if is_winner %}
-        <h2 class="winner-text text-success">🎉 Well Done! 🎉</h2>
-    {% else %}
-        <h2 class="loser-text">😞 Game Over 😞</h2>
-    {% endif %}
+    <div class="container text-center mt-5">
+        {% if is_winner %}
+            <h2 class="winner-text text-success">🎉 Well Done! 🎉</h2>
+        {% else %}
+            <h2 class="loser-text">😞 Game Over 😞</h2>
+        {% endif %}
 
-    <div class="card mt-4 shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h4>Match Result</h4>
+        <div class="card mt-4 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4>Match Result</h4>
+            </div>
+            <div class="card-body">
+                <h3>
+                    <!-- Vérification du joueur avec le score le plus élevé et affectation de la couleur -->
+                    <span class="{% if game.player1_score > game.player2_score %}text-success{% else %}text-danger{% endif %}">
+                        {{ game.player1.username }}
+                    </span>
+                    <span class="text-muted">vs</span>
+                    <span class="{% if game.player2_score > game.player1_score %}text-success{% else %}text-danger{% endif %}">
+                        {{ game.player2.username }}
+                    </span>
+                </h3>
+                <h4 class="mt-3">
+                    <span class="badge {% if game.player1_score > game.player2_score %}bg-success{% else %}bg-danger{% endif %} fs-4">
+                        {{ game.player1_score }}
+                    </span>
+                    <span class="fs-4"> - </span>
+                    <span class="badge {% if game.player2_score > game.player1_score %}bg-success{% else %}bg-danger{% endif %} fs-4">
+                        {{ game.player2_score }}
+                    </span>
+                </h4>
+
+            </div>
         </div>
-        <div class="card-body">
-            <h3>
-                <span class="text-success">{{ game.player1.username }}</span>
-                <span class="text-muted">vs</span>
-                <span class="text-danger">{{ game.player2.username }}</span>
-            </h3>
-            <h4 class="mt-3">
-                <span class="badge bg-success fs-4">{{ game.player1_score }}</span>
-                <span class="fs-4"> - </span>
-                <span class="badge bg-danger fs-4">{{ game.player2_score }}</span>
-            </h4>
 
-            {% if winner %}
-            <p class="mt-3">
-                <strong>🏆 Winner:</strong> 
-                <span class="fw-bold">{{ winner.username }}</span>
-            </p>
-            {% else %}
-            <p class="mt-3"><strong>⚖️ It's a Draw!</strong></p>
-            {% endif %}
+        <div class="mt-4">
+            <a href="/" class="btn btn-outline-secondary">🏠 Go Back Home</a>
         </div>
     </div>
-
-    <!-- Bouton de retour ou rejouer -->
-    <div class="mt-4">
-        <a href="/" class="btn btn-outline-secondary">🏠 Go Back Home</a>
-        <a href="/tournament/create/" class="btn btn-primary">🔄 Play Again</a>
-    </div>
-</div>
 
 {% comment %} 
 <!-- Script de confettis -->

@@ -13,6 +13,8 @@ def getStats(user: User):
     losses = PongHistory.objects.filter(
         Q(player1=user) | Q(player2=user)
     ).exclude(winner=user).count()
+    # print("wins=", user, wins, flush=True)
+    # print("loss=", user, losses, flush=True)
 
     return {
         "wins": wins,

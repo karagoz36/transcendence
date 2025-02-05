@@ -138,12 +138,22 @@ class Ball:
         if self.p1.score != 3 and self.p2.score != 3:
             return None
 
-        game = await PongHistory.objects.acreate(player1=self.p1.user, player2=self.p2.user,
-            player1_score=self.p1.score, player2_score=self.p2.score)
+        game = await PongHistory.objects.acreate(
+            player1=self.p1.user,
+            player2=self.p2.user,
+            player1_score=self.p1.score,
+            player2_score=self.p2.score
+        )
+    
+        winner = self.p1.user if self.p1.score > self.p2.score else self.p2.user
+    
+        game.winner = winner
+        await game.asave()
+        
         data = {"redirect": f"/result/?game={game.id}"}
         await sendMessageWS(self.p1.user, "notifications", json.dumps(data))
         await sendMessageWS(self.p2.user, "notifications", json.dumps(data))
-        return self.p1.user if self.p1.score > self.p2.score else self.p2.user
+        return winner
 
 async def gameLoop(user1: User, user2: User, tournament: bool = False) -> User:
     p1 = PongPlayer(user1, 10)
