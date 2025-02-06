@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.template.loader import render_to_string
 import json
 import asyncio
-from .pong import gameLoop, redisClient
+from .pong import gameLoop, redisClient, PongPlayer, Ball
 from utils.friends import getFriends
 from utils.users import onlineUsers, userIsLoggedIn
 from database.models import getFriendship
@@ -89,6 +89,19 @@ class Messages(BaseConsumer):
     def __init__(self):
         super().__init__("messages")
 
+class LocalGamer:
+    def __init__(self, username='LocalGamer'):
+        self.username = username
+        self.is_local = True
+        self.id = 99999
+        self.score = 0
+
+    def __eq__(self, other):
+        return isinstance(other, LocalGamer)
+    
+    def __hash__(self):
+        return hash('LocalGamer')
+
 class Pong(BaseConsumer):
     def __init__(self):
         super().__init__("pong")
@@ -99,6 +112,7 @@ class Pong(BaseConsumer):
         try:
             opponent: User = await User.objects.aget(username=self.data.get("opponent"))
         except:
+<<<<<<< HEAD
             id: int = self.data.get("id")
             if id is None:
                 await sendMessageWS(self.user, "pong", "failed to find opponent")
@@ -114,6 +128,13 @@ class Pong(BaseConsumer):
             await sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "you are not friend with this user"}))
             return
 
+=======
+            return sendMessageWS(self.user, "pong", "failed to find opponent")
+        if not userIsLoggedIn(opponent):
+            return sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "opponent not logged in"}))
+        if await getFriendship(self.user, opponent) is None:
+            return sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "you are not friend with this user"}))
+>>>>>>> pong
         self.opponent = opponent
         await sendMessageWS(opponent, "pong", json.dumps({"type": "invite_accepted", "friend": self.user.username}))
 
@@ -145,8 +166,22 @@ class Pong(BaseConsumer):
                     await sendMessageWS(self.user, "pong", json.dumps(err))
                     return
                 htmlSTR = render_to_string("pong/play.html")
-                await sendMessageWS(self.opponent, "pong", json.dumps({"type": "launch_game", "html": htmlSTR}))
-                await sendMessageWS(self.user, "pong", json.dumps({"type": "launch_game", "html": htmlSTR}))
+                launch_data = {
+                    "type": "launch_game",
+                    "html": htmlSTR,
+                    "player": self.user.username,
+                    "opponent": self.opponent.username,
+                    "initiator": self.user.username,
+				}
+                launch_data_opponent = {
+                    "type": "launch_game",
+                    "html": htmlSTR,
+                    "player": self.opponent.username,
+                    "opponent": self.user.username,
+                    "initiator": self.user.username,
+				}
+                await sendMessageWS(self.opponent, "pong", json.dumps(launch_data))
+                await sendMessageWS(self.user, "pong", json.dumps(launch_data_opponent))
                 asyncio.create_task(gameLoop(self.user, self.opponent))
 
             case "join_game":
@@ -163,3 +198,72 @@ class Pong(BaseConsumer):
                         redisClient.hmset(key, {"direction": "down"})
                     case _:
                         redisClient.delete(key)
+
+class PongSocketConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        await self.accept()
+        self.p1 = PongPlayer(LocalGamer("p1"), 10)
+        self.p2 = PongPlayer(LocalGamer("p2"), -10)
+        self.ball = Ball(self.p1, self.p2)
+
+        htmlSTR = render_to_string("pong/localplay.html")
+        await self.send(json.dumps({"type": "launch_game", "html": htmlSTR}))
+        self.game_running = True
+        asyncio.create_task(self.start_game_loop())
+
+    async def disconnect(self, close_code):
+        self.game_running = False
+
+    async def receive(self, text_data):
+        try:
+            data = json.loads(text_data)
+        except json.JSONDecodeError:
+            await self.send(json.dumps({"error": "Invalid JSON format"}))
+            return
+
+        match data.get("type"):
+            case "move":
+                await self.handle_move(data)
+            case _:
+                await self.send(json.dumps({"error": "Unknown message type"}))
+
+    async def handle_move(self, data):
+        direction = data.get("direction", "none")
+        player = data.get("player", "none")
+        
+        if isinstance(self.p1.user, LocalGamer) or isinstance(self.p2.user, LocalGamer):
+            key = f"pong_direction:{player}"
+        else:
+            key = f"pong_direction:{self.p1.user.id if player == 'p1' else self.p2.user.id}"
+
+        if direction in ["up", "down"]:
+            redisClient.hmset(key, {"direction": direction})
+        else:
+            redisClient.delete(key)
+
+    async def start_game_loop(self):
+        while self.game_running:
+            self.p1.move_key()
+            self.p2.move_key()
+            self.ball.move()
+            hit_detected = False
+            if self.p1.score == 3 or self.p2.score == 3:
+                data = {"type": "game_over"}
+                await self.send(json.dumps(data))
+                return
+            if self.ball.pos.x > 0 and self.p1.collided(self.ball.pos) != 0:
+                hit_detected = True
+            elif self.ball.pos.x < 0 and self.p2.collided(self.ball.pos) != 0:
+                hit_detected = True
+            data = {
+                "type": "update_pong",
+                "p1": {"x": self.p1.pos.x, "y": self.p1.pos.y},
+                "p2": {"x": self.p2.pos.x, "y": self.p2.pos.y},
+                "ball": {"x": self.ball.pos.x, "y": self.ball.pos.y},
+                "score": {"p1": self.p1.score, "p2": self.p2.score}
+            }
+            if hit_detected:
+                data["type"] = "hitBall"
+
+            await self.send(json.dumps(data))
+            await asyncio.sleep(1 / 60)

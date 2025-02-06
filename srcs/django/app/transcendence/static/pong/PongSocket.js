@@ -8,9 +8,15 @@ import { PongScene } from "./PongScene.js"
  * @property {string} [type]
  * @property {string} [friend]
  * @property {string} [html]
+<<<<<<< HEAD
  * @property {Object} [p1]
  * @property {Object} [p2]
  * @property {Object} [ball]
+=======
+ * @property {string} [player]
+ * @property {string} [opponent]
+ * @property {string} [initiator]
+>>>>>>> pong
 */
 
 class PongSocket extends BaseWebSocket {
@@ -28,8 +34,8 @@ class PongSocket extends BaseWebSocket {
 			this.socket.onmessage = null
 			this.socket.close()
 		})
-	}
-    
+	} 
+
     open() {
         const urlParams = new URLSearchParams(window.location.search) // @ts-ignore
         const id = urlParams.get("id")
@@ -70,7 +76,7 @@ class PongSocket extends BaseWebSocket {
         this.game = new PongScene()
         /** @type {HTMLCanvasElement} */
         const canvas = this.game.renderer.domElement
-        
+
         canvas.addEventListener("mousedown", (e) => {
             if (e.buttons != 1) return
             this.clickPressed = true
@@ -105,6 +111,7 @@ class PongSocket extends BaseWebSocket {
         setInterval(this.sendDirection.bind(this), 1_000 / 60_000)
     }
 
+<<<<<<< HEAD
     /** @param {string} html */
     launchGame(html) {
         const container = document.querySelector("#pong-container")
@@ -113,6 +120,40 @@ class PongSocket extends BaseWebSocket {
         this.inGame = true
         this.initGame()
     }
+=======
+	/** @param {string} html */
+	async launchGame(html, player, opponent, initiator) {
+		const container = document.querySelector("#pong-container");
+		if (!container) return;
+		container.innerHTML = html;
+		await refreshScripts(container, container, "#pong-container");
+		this.state = e_states.IN_GAME;
+		this.initGame();
+	
+        /** @type {HTMLElement|null} */
+		const playerName = document.querySelector("#player-name");
+        /** @type {HTMLElement|null} */
+		const opponentName = document.querySelector("#opponent-name");
+		const namesContainer = document.querySelector("#pong-names");
+	
+		if (!playerName || !opponentName || !namesContainer) {
+			return;
+		}
+		if (!this.game)
+			return
+		if (player === initiator) {
+			playerName.textContent = "YOU";
+			opponentName.textContent = opponent;
+			playerName.style.left = this.game.paddle1.position.x + "px";
+			opponentName.style.left = this.game.paddle2.position.x + "px"; 
+		} else {
+			playerName.textContent = opponent;
+			opponentName.textContent = "YOU";
+			playerName.style.left = this.game.paddle1.position.x + "px"; 
+			opponentName.style.left = this.game.paddle2.position.x + "px"; 
+		}
+	}
+>>>>>>> pong
 
     /** @param {PongSocketData} json */
     updatePong(json) {
@@ -133,21 +174,63 @@ class PongSocket extends BaseWebSocket {
         /** @type {PongSocketData} */
         const json = JSON.parse(e.data)
 
+<<<<<<< HEAD
         if (json.type == "update_pong")
             return this.updatePong(json)
 
         if (json.type == "invite_accepted" && this.inGame)
-            return this.socket.send(JSON.stringify({"type": "join_game"}))
+=======
+        if (json.type == "game_over")
+            return await getPage("/friends")
+        
+        if (json.type == "update_pong" && this.state == e_states.IN_GAME) {
+            if (!this.game)
+                return
+            this.game.paddle1.position.x = json.p1.x
+            this.game.paddle1.position.y = json.p1.y
 
+            this.game.paddle2.position.x = json.p2.x
+            this.game.paddle2.position.y = json.p2.y
+
+            this.game.ball.position.x = json.ball.x
+            this.game.ball.position.y = json.ball.y
+			
+			const playerScoreElement = document.querySelector("#player-score");
+			const opponentScoreElement = document.querySelector("#opponent-score");
+	
+			if (playerScoreElement && opponentScoreElement) {
+				playerScoreElement.textContent = json.score.p1;
+				opponentScoreElement.textContent = json.score.p2;
+			}
+        }
+        if (json.type == "hitBall" && this.game)
+            this.game?.animateBallHit();
+        if (json.type == "invite_accepted" && this.state == e_states.IN_GAME)
+>>>>>>> pong
+            return this.socket.send(JSON.stringify({"type": "join_game"}))
         if (json.type == "invite_accepted" && this.opponent == json.friend)
             return this.socket.send(JSON.stringify({"type": "launch_game"}))
 
+<<<<<<< HEAD
         if (json.type == "launch_game") {
             if (!json.html) {
                 console.error(json)
                 throw new Error("expected html")
             }
             this.launchGame(json.html)
+=======
+        switch (this.state) {
+            case e_states.INVITE_ACCEPTED:
+                this.socket.send(JSON.stringify({"type": "launch_game"}))
+                break;
+            case e_states.LAUNCH_GAME:
+                if (!json.html || !json.player || !json.opponent || !json.initiator) {
+                    console.error(json)
+                    throw new Error("expected html")
+                }
+                await this.launchGame(json.html, json.player, json.opponent, json.initiator)
+                break
+>>>>>>> pong
         }
     }
 }

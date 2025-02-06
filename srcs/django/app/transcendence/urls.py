@@ -30,8 +30,12 @@ urlpatterns = [
     path("settings/", views.settings, name="settings"),
     path("friends/", views.friends, name="friends"),
     path("profile/", views.profile, name="profile"),
+<<<<<<< HEAD
     path("profile_list/", views.profile_list, name="profile_list"),
 
+=======
+    path("games/", views.games_view, name="games"),
+>>>>>>> pong
     path("pong/lobby/", views.lobby, name="lobby"),
     path("pong/play/", views.play, name="playPong"),
     path("result/", views.result, name="result"),

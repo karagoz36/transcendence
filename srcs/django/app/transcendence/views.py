@@ -7,6 +7,7 @@ from rest_framework.decorators import authentication_classes, permission_classes
 from django.core.cache import cache
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from . import pages
+from transcendence.pages import games
 import pyotp
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
@@ -77,12 +78,17 @@ async def profile(request: Request):
     return await pages.profile.response(request)
 
 @api_view(['GET'])
+<<<<<<< HEAD
 def profile_list(request: Request):
     return pages.profile_list.response(request)
 
 # @api_view(['GET'])
 # def profile_detail(request: Request, id):
 #     return pages.profile_detail.response(request, id)
+=======
+async def games_view(request: Request):
+    return await games.response(request)
+>>>>>>> pong
 
 @api_view(['POST'])
 async def addFriend(request: Request):

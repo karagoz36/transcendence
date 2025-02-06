@@ -11,4 +11,7 @@ pyotp
 python-decouple
 celery
 requests
+<<<<<<< HEAD
 django-prometheus
+=======
+>>>>>>> pong
