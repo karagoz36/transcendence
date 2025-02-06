@@ -46,10 +46,9 @@ class NotificationTest(APITestCase):
     async def testWithoutUser(self):
         websocket = WebsocketCommunicator(Notification.as_asgi(), "websocket/notifications/")
         connected, _ = await websocket.connect()
-        self.assertFalse(connected)
-
-    async def testWithUser(self):
-        websocket = await self.connectWebSocket(self.user["user"])
+        self.assertTrue(connected)
+        msg = await websocket.receive_output(timeout=5)
+        self.assertEqual(msg.get("type"), "websocket.close")
 
     async def testBasicNotif(self):
         websockets = {
