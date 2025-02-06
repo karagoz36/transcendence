@@ -1,8 +1,13 @@
 <style>
+	/* #pong-glob {
+	  position: relative;
+	} */
+
 	#pong-container {
 	  display: flex;
 	  justify-content: center;
 	  overflow: hidden;
+	  position: relative
 	}
   
 	#pong-container > canvas {
@@ -18,7 +23,7 @@
 	  font-size: 20px;
 	  font-weight: bold;
 	  color: white;
-	  position: absolute;
+	  position: fixed;
 	  bottom: 20px;
 	  left: 0;
 	  text-align: center;
@@ -35,35 +40,23 @@
 	  font-weight: normal;
 	  margin-top: 5px;
 	}
+	
 </style>
-
-
+  
 {% block content %}
 <div id="pong-container">
-  <canvas></canvas>
+<canvas></canvas>
 </div>
 
 <div id="pong-names">
-  <div class="player-container"> 
-    <span id="player-score" class="badge bg-primary">0</span> 
-	<span id="player-name">YOU</span>  
+<div class="player-container"> 
+	<span id="player-score" class="badge bg-primary">0</span> 
+	<div class="score">Player 1</div>
 </div>
 
-  <div class="player-container"> 
-    <span id="opponent-score" class="badge bg-danger">0</span> 
-	<span id="opponent-name"></span>
-  </div>
+<div class="player-container"> 
+	<span id="opponent-score" class="badge bg-danger">0</span> 
+	<div class="score">Player 2</div>
+</div>
 </div>
 {% endblock %}
-<!-- 
-<div id="pong-names">
-<div class="player-container">
-	<span id="player-score" class="score">0</span>
-	<span id="player-name">YOU</span>
-</div>
-<div class="player-container">
-	<span id="opponent-score" class="score">0</span>
-	<span id="opponent-name"></span>
-</div>
-</div> -->
-  

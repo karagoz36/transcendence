@@ -1,0 +1,28 @@
+<style>
+	#pong-container {
+	  display: flex;
+	  justify-content: center;
+	  overflow: hidden;
+	}
+  
+	#pong-container > canvas {
+	  max-height: 80vh;
+	  margin-bottom: 2vh;
+	}
+</style>
+
+{% extends 'modules/base.html' %}
+{% block title %}Pong{% endblock %}
+{% block content %}
+  {% include 'modules/navbar.html' %}
+
+  <div class="container text-center mt-5">
+    <h1 class="mb-4" id="title">Choisissez un mode de jeu</h1>
+    <div class="btn-group" id="group" role="group" aria-label="Modes de jeu">
+        <button class="btn btn-primary" id="submit">Multijoueur Local</button>
+    </div>
+    <div id="pong-container" style="width: 100%; height: 80vh;"></div>
+  </div>
+
+  <script type="module" src="/static/games/games.js"></script>
+{% endblock %}

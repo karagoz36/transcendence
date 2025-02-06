@@ -32,6 +32,7 @@ urlpatterns = [
     path("profile/", views.profile, name="profile"),
     path("profile_list/", views.profile_list, name="profile_list"),
 
+    path("games/", views.games_view, name="games"),
     path("pong/lobby/", views.lobby, name="lobby"),
     path("pong/play/", views.play, name="playPong"),
     path("result/", views.result, name="result"),
