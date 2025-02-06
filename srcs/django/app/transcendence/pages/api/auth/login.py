@@ -26,7 +26,8 @@ def response(request: Request) -> JsonResponse:
             if not user_profile.otp_secret:
                 user_profile.generate_otp_secret()
             otp = pyotp.TOTP(user_profile.otp_secret).now()
-            sendingEmail.delay(otp, user.email)  
+            sendingEmail.delay(otp, user.email)
+            login(request, user)
             return JsonResponse({"is_2fa_enabled": True}, status=200)
     except UserProfile.DoesNotExist:
         pass
