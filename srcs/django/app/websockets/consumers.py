@@ -112,29 +112,11 @@ class Pong(BaseConsumer):
         try:
             opponent: User = await User.objects.aget(username=self.data.get("opponent"))
         except:
-<<<<<<< HEAD
-            id: int = self.data.get("id")
-            if id is None:
-                await sendMessageWS(self.user, "pong", "failed to find opponent")
-            id = int(id)
-            await sendMessageWS(self.user, "pong", json.dumps({"type": "invite_accepted", "friend": None}))
-            return
-
-        if not userIsLoggedIn(opponent):
-            await sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "opponent not logged in"}))
-            return
-
-        if await getFriendship(self.user, opponent) is None:
-            await sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "you are not friend with this user"}))
-            return
-
-=======
             return sendMessageWS(self.user, "pong", "failed to find opponent")
         if not userIsLoggedIn(opponent):
             return sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "opponent not logged in"}))
         if await getFriendship(self.user, opponent) is None:
             return sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "you are not friend with this user"}))
->>>>>>> pong
         self.opponent = opponent
         await sendMessageWS(opponent, "pong", json.dumps({"type": "invite_accepted", "friend": self.user.username}))
 
@@ -204,7 +186,7 @@ class PongSocketConsumer(AsyncWebsocketConsumer):
         await self.accept()
         self.p1 = PongPlayer(LocalGamer("p1"), 10)
         self.p2 = PongPlayer(LocalGamer("p2"), -10)
-        self.ball = Ball(self.p1, self.p2)
+        self.ball = Ball(self.p1, self.p2, False)
 
         htmlSTR = render_to_string("pong/localplay.html")
         await self.send(json.dumps({"type": "launch_game", "html": htmlSTR}))

@@ -18,8 +18,7 @@ export class PongScene {
     paddle2 = this.addPaddle(-10, 0x0000ff);
     ball = this.addBall()
     controls = new OrbitControls(this.camera, this.renderer.domElement)
-	score1 = 0;
-	score2 = 0;
+	score = 0;
 
     constructor() {
         this.addLights()

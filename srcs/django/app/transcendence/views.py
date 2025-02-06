@@ -78,17 +78,16 @@ async def profile(request: Request):
     return await pages.profile.response(request)
 
 @api_view(['GET'])
-<<<<<<< HEAD
 def profile_list(request: Request):
     return pages.profile_list.response(request)
 
 # @api_view(['GET'])
 # def profile_detail(request: Request, id):
 #     return pages.profile_detail.response(request, id)
-=======
+
+@api_view(['GET'])
 async def games_view(request: Request):
     return await games.response(request)
->>>>>>> pong
 
 @api_view(['POST'])
 async def addFriend(request: Request):

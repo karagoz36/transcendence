@@ -32,13 +32,12 @@ class PongPlayer:
     width: float = 3
     pos: Vector2
     score: int = 0
+    thickness: float = 0.5
+    field_height: float = 15.0
 
     def __init__(self, user: User, x: float):
         self.user = user
         self.pos = Vector2(x)
-<<<<<<< HEAD
-        
-=======
     
     def check_walls(self):
         if self.pos.y >= self.field_height / 2 - 1.5:
@@ -46,25 +45,24 @@ class PongPlayer:
         if self.pos.y <= -self.field_height / 2 + 1.5:
             self.pos.y = -self.field_height / 2 + 1.5
 
-    def move_key(self):
-        if (self.user.username == "p1" or self.user.username == "p2"):
-            key = f"pong_direction:{self.user.username}"
-        else:
-            key = f"pong_direction:{self.user.id}"
-        direction = redisClient.hgetall(key)
-        direction: str | None = direction.get("direction")
-        match direction:
-            case "up":
-                self.pos.y += 0.5
-                self.check_walls()
-            case "down":
-                self.pos.y -= 0.5
-                self.check_walls()
-            case None:
-                return        
-        redisClient.delete(key)
+    # def move_key(self):
+    #     if (self.user.username == "p1" or self.user.username == "p2"):
+    #         key = f"pong_direction:{self.user.username}"
+    #     else:
+    #         key = f"pong_direction:{self.user.id}"
+    #     direction = redisClient.hgetall(key)
+    #     direction: str | None = direction.get("direction")
+    #     match direction:
+    #         case "up":
+    #             self.pos.y += 0.5
+    #             self.check_walls()
+    #         case "down":
+    #             self.pos.y -= 0.5
+    #             self.check_walls()
+    #         case None:
+    #             return        
+    #     redisClient.delete(key)
 
->>>>>>> pong
     def move(self):
         if (self.user.username == "p1" or self.user.username == "p2"):
             key = f"pong_direction:{self.user.username}"
@@ -74,8 +72,10 @@ class PongPlayer:
         direction: str | None = direction.get("direction")
         match direction:
             case "up":
+                self.check_walls()
                 self.pos.y += 0.25
             case "down":
+                self.check_walls()
                 self.pos.y -= 0.25
             case None:
                 return        
@@ -95,20 +95,11 @@ class PongPlayer:
             if pos.x > self.pos.x + self.thickness or pos.x < self.pos.x - self.thickness:
                 return e_direction["NONE"]
 
-<<<<<<< HEAD
-        if playerPos.x >= ballPos.x:
-            return False
-
-        if self.collidedBottom(pos):
-            return e_direction["BOTTOM"]
-        if self.collidedTop(pos):
-=======
         y_dist = abs(pos.y - self.pos.y)
         if y_dist > self.width / 2:
             return e_direction["NONE"]
         
         if pos.y > self.pos.y:
->>>>>>> pong
             return e_direction["TOP"]
         return e_direction["BOTTOM"]
 
@@ -135,12 +126,6 @@ class Ball:
 
     def scored(self) -> int:
         if self.pos.x >= self.p1.pos.x + 1:
-<<<<<<< HEAD
-            self.p2.score += 1
-            return True
-        if self.pos.x <= self.p2.pos.x - 1:
-            self.p1.score += 1
-=======
             self.p1.score += 1
             self.lastscore1 = True
             self.lastscore2 = False
@@ -149,7 +134,6 @@ class Ball:
             self.p2.score += 1
             self.lastscore2 = True
             self.lastscore1 = False
->>>>>>> pong
             return True
         return False
 
@@ -205,6 +189,24 @@ class Ball:
 
         self.pos.x += self.velocity.x * self.speed_multiplier
         self.pos.y += self.velocity.y * self.speed_multiplier
+        
+    async def getWinner(self) -> User|None:
+        if self.p1.score != 3 and self.p2.score != 3:
+            return None
+        game = await PongHistory.objects.acreate(
+            player1=self.p1.user,
+            player2=self.p2.user,
+            player1_score=self.p1.score,
+            player2_score=self.p2.score
+            )
+        winner = self.p1.user if self.p1.score > self.p2.score else self.p2.user
+        game.winner = winner
+        await game.asave()
+            
+        data = {"redirect": f"/result/?game={game.id}"}
+        await sendMessageWS(self.p1.user, "notifications", json.dumps(data))
+        await sendMessageWS(self.p2.user, "notifications", json.dumps(data))
+        return winner
 
 async def notify_hit(players, socket_type="pong"):
     data = {"type": "hitBall"}
@@ -215,28 +217,6 @@ async def notify_hit(players, socket_type="pong"):
             socket_name = socket_type
     for player in players:
         await sendMessageWS(player.user, socket_name, json.dumps(data))
-
-
-    async def getWinner(self) -> User|None:
-        if self.p1.score != 3 and self.p2.score != 3:
-            return None
-
-        game = await PongHistory.objects.acreate(
-            player1=self.p1.user,
-            player2=self.p2.user,
-            player1_score=self.p1.score,
-            player2_score=self.p2.score
-        )
-    
-        winner = self.p1.user if self.p1.score > self.p2.score else self.p2.user
-    
-        game.winner = winner
-        await game.asave()
-        
-        data = {"redirect": f"/result/?game={game.id}"}
-        await sendMessageWS(self.p1.user, "notifications", json.dumps(data))
-        await sendMessageWS(self.p2.user, "notifications", json.dumps(data))
-        return winner
 
 async def gameLoop(user1: User, user2: User, tournament: bool = False) -> User:
     p1 = PongPlayer(user1, 10)
