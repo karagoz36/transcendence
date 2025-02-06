@@ -96,6 +96,7 @@ class LocalGamer:
         self.username = username
         self.is_local = True
         self.id = 99999
+        self.score = 0
 
     def __eq__(self, other):
         return isinstance(other, LocalGamer)
@@ -226,6 +227,10 @@ class PongSocketConsumer(AsyncWebsocketConsumer):
             self.p2.move_key()
             self.ball.move()
             hit_detected = False
+            if self.p1.score == 3 or self.p2.score == 3:
+                data = {"type": "game_over"}
+                await self.send(json.dumps(data))
+                return
             if self.ball.pos.x > 0 and self.p1.collided(self.ball.pos) != 0:
                 hit_detected = True
             elif self.ball.pos.x < 0 and self.p2.collided(self.ball.pos) != 0:
