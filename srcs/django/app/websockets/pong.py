@@ -45,23 +45,23 @@ class PongPlayer:
         if self.pos.y <= -self.field_height / 2 + 1.5:
             self.pos.y = -self.field_height / 2 + 1.5
 
-    # def move_key(self):
-    #     if (self.user.username == "p1" or self.user.username == "p2"):
-    #         key = f"pong_direction:{self.user.username}"
-    #     else:
-    #         key = f"pong_direction:{self.user.id}"
-    #     direction = redisClient.hgetall(key)
-    #     direction: str | None = direction.get("direction")
-    #     match direction:
-    #         case "up":
-    #             self.pos.y += 0.5
-    #             self.check_walls()
-    #         case "down":
-    #             self.pos.y -= 0.5
-    #             self.check_walls()
-    #         case None:
-    #             return        
-    #     redisClient.delete(key)
+    def move_key(self):
+        if (self.user.username == "p1" or self.user.username == "p2"):
+            key = f"pong_direction:{self.user.username}"
+        else:
+            key = f"pong_direction:{self.user.id}"
+        direction = redisClient.hgetall(key)
+        direction: str | None = direction.get("direction")
+        match direction:
+            case "up":
+                self.pos.y += 0.5
+                self.check_walls()
+            case "down":
+                self.pos.y -= 0.5
+                self.check_walls()
+            case None:
+                return        
+        redisClient.delete(key)
 
     def move(self):
         if (self.user.username == "p1" or self.user.username == "p2"):
