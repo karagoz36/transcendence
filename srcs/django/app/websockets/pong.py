@@ -31,13 +31,14 @@ class PongPlayer:
     user: User
     width: float = 3
     pos: Vector2
-    score: int = 0
+    score: int
     thickness: float = 0.5
     field_height: float = 15.0
 
     def __init__(self, user: User, x: float):
         self.user = user
         self.pos = Vector2(x)
+        self.score = 0
     
     def check_walls(self):
         if self.pos.y >= self.field_height / 2 - 1.5:
@@ -108,12 +109,12 @@ class PongPlayer:
         return max(-1.0, min(1.0, relative_impact))
 
 class Ball:
-    velocity = Vector2(0.2, 0)
-    pos: Vector2 = Vector2()
+    velocity: Vector2
+    pos: Vector2
     speed_multiplier = 1
     accelerate_rate = 0.0005
-    lastscore1 = False
-    lastscore2 = False
+    lastscore1: bool
+    lastscore2: bool
     p1: PongPlayer
     p2: PongPlayer
     field_height: float = 15.0
@@ -123,6 +124,10 @@ class Ball:
         self.p1 = p1
         self.p2 = p2
         self.tournament = tournament
+        self.pos = Vector2()
+        self.velocity = Vector2(0.2, 0)
+        self.lastscore1 = False
+        self.lastscore2 = False
 
     def scored(self) -> int:
         if self.pos.x >= self.p1.pos.x + 1:
