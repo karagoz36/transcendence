@@ -200,18 +200,32 @@ class LocalGameWebSocket extends BaseWebSocket {
 }
 
 function setupGame() {
-    const localButton = document.getElementById("submit");
+    const localButton = document.getElementById("multiplayer");
     if (localButton) {
         localButton.addEventListener("click", async () => {
-            const title = document.getElementById("title");
-            if (title) title.remove();
-            localButton.remove();
+            // const title = document.getElementById("title");
+            // if (title) title.remove();
+            // localButton.remove();
             
             try {
                 await initializeLocalMode();
             } catch (error) {
                 console.error("Erreur lors de l'initialisation:", error);
             }
+        });
+    }
+
+    const tournamentButton = document.getElementById("tournament");
+    if (tournamentButton) {
+        tournamentButton.addEventListener("click", () => {
+            getPage("/tournament/create/");
+        });
+    }
+
+    const friendsButton = document.getElementById("friends");
+    if (friendsButton) {
+        friendsButton.addEventListener("click", () => {
+            getPage("/friends/");
         });
     }
 }

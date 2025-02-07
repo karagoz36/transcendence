@@ -4,8 +4,14 @@
 {% endblock %}
 {% block content %}
   {% include 'modules/navbar.html' %}
-  <div style="margin: 0 auto; max-width: 95vw; width: 20rem; text-align: center; padding: 0.5rem; margin-bottom: 1rem;" class="alert alert-danger hide-empty">{{ERROR_MESSAGE}}</div>
-  <div style="margin: 0 auto; max-width: 95vw; width: 20rem; text-align: center; padding: 0.5rem; margin-bottom: 1rem;" class="alert alert-success hide-empty">{{SUCCESS_MESSAGE}}</div>
+  
+
+<div class="container">
+  <div class="title-section">
+    <h2 class="fw-bold">Friends</h2>
+  </div>
+  {% comment %} <div style="margin: 0 auto; max-width: 95vw; width: 20rem; text-align: center; padding: 0.5rem; margin-bottom: 1rem;" class="alert alert-danger hide-empty">{{ERROR_MESSAGE}}</div>
+  <div style="margin: 0 auto; max-width: 95vw; width: 20rem; text-align: center; padding: 0.5rem; margin-bottom: 1rem;" class="alert alert-success hide-empty">{{SUCCESS_MESSAGE}}</div> {% endcomment %}
   {% include 'friendlist/add-friend.html' %}
   {% for user in invitesReceived %}
   	{% include 'friendlist/pending-invite.html' %}
@@ -17,9 +23,11 @@
   </ul>
   {%for user in invitesSent%}
   <div class="card">
-	<div class="card-body">
-		<div>Waiting for {{user.username}} to accept friendship...</div>
-	</div>
+	  <div class="card-body">
+		  <div>Waiting for {{user.username}} to accept friendship...</div>
+	    </div>
+    </div>
+  </div>
 </div>
   {%endfor%}
   {% include 'friendlist/message-modal.html' with show=showModal %}
