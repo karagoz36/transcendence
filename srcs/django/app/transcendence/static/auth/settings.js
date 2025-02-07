@@ -37,7 +37,6 @@ async function handleSettingsUpdate(e) {
             },
             body: formData,
         });
-        
         const data = await response.json();
         alert(data.message);
         await getPage("/settings")

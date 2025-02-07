@@ -57,30 +57,67 @@ async function completeLogin(username, password, csrftoken) {
 }
 
 function showOtpPopup(username, password, csrftoken) {
+    /** @type {HTMLElement | null} */
     const otpPopup = document.getElementById("otpPopup");
-    if (!otpPopup) throw new Error("OTP popup not found");
-
+    /** @type {HTMLFormElement|null} */
+    const otpForm = document.querySelector("#otpForm");
+    /** @type {NodeListOf<HTMLInputElement>} */
     const otpInputs = document.querySelectorAll(".otp-input");
-    if (!otpInputs) throw new Error("OTP input fields not found");
-
-    const submitButton = document.getElementById("submitOtp");
+    /** @type {HTMLElement | null} */
     const cancelButton = document.getElementById("cancelOtp");
 
-    if (!submitButton || !cancelButton) throw new Error("OTP buttons not found");
+    if (!otpPopup || !otpForm || !otpInputs || !cancelButton) {
+        throw new Error("OTP popup elements not found");
+    }
 
     otpPopup.classList.add("show");
+	let isPasting = false;
 
     otpInputs.forEach((input, index) => {
         input.value = "";
+
         input.oninput = () => {
             if (input.value.length === 1 && index < otpInputs.length - 1) {
                 otpInputs[index + 1].focus();
             }
             validateOtpInputs();
         };
+
+		input.onkeydown = (e) => {
+			if (isPasting) return;
+            if (e.key === "Backspace" && input.value === "" && index > 0) {
+                otpInputs[index - 1].focus();
+                otpInputs[index - 1].value = "";
+            } else if (e.key === "Enter") {
+                e.preventDefault();
+                /** @type {object}} */
+                const submitButton = document.getElementById("submitOtp");
+                if (!submitButton.disabled) {
+                    submitButton.click();
+                }
+            }
+        };
+
+        input.onpaste = (e) => {
+            e.preventDefault();
+			isPasting = true;
+            const pasteData = (e.clipboardData)?.getData("text") || "";
+            if (/^\d{6}$/.test(pasteData)) {
+                otpInputs.forEach((field, idx) => {
+                    field.value = pasteData[idx] || "";
+                });
+                validateOtpInputs();
+            } else {
+                alert("Please paste a valid 6-digit OTP code.");
+            }
+			setTimeout(() => {
+				isPasting = false;
+			}, 0);
+        };
     });
 
-    submitButton.onclick = async () => {
+    otpForm.onsubmit = async (e) => {
+        e.preventDefault();
         const otp = Array.from(otpInputs).map(input => input.value).join("");
         try {
             const otpResponse = await fetch("/api/verify_otp/", {
@@ -88,8 +125,8 @@ function showOtpPopup(username, password, csrftoken) {
                 body: JSON.stringify({ username, otp }),
                 headers: {
                     "content-type": "application/json",
-                    "X-CSRFToken": csrftoken
-                }
+                    "X-CSRFToken": csrftoken,
+                },
             });
 
             if (otpResponse.ok) {
@@ -111,10 +148,12 @@ function showOtpPopup(username, password, csrftoken) {
 }
 
 function validateOtpInputs() {
+     /** @type {NodeListOf<HTMLInputElement>} */
     const otpInputs = document.querySelectorAll(".otp-input");
+    /** @type {HTMLElement|null} */
     const submitButton = document.getElementById("submitOtp");
 
-    if (!submitButton) return;
+    if (!(submitButton instanceof HTMLButtonElement)) return;
 
     const allFilled = Array.from(otpInputs).every(input => input.value.trim() !== "");
     submitButton.disabled = !allFilled;
