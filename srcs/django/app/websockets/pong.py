@@ -32,7 +32,7 @@ class PongPlayer:
     width: float = 3
     pos: Vector2
     score: int = 0
-    thickness: float = 0.5
+    thickness: float = 0.8
     field_height: float = 15.0
 
     def __init__(self, user: User, x: float):
@@ -130,7 +130,7 @@ class Ball:
             self.lastscore1 = True
             self.lastscore2 = False
             return True
-        if self.pos.x <= self.p2.pos.x - 1:
+        elif self.pos.x <= self.p2.pos.x - 1:
             self.p2.score += 1
             self.lastscore2 = True
             self.lastscore1 = False
@@ -144,6 +144,10 @@ class Ball:
         elif self.pos.y <= -self.field_height / 2:  # Mur du bas
             self.velocity.y *= -1
             self.pos.y = -self.field_height / 2
+            
+    def ball_start(self):
+        self.pos = Vector2(0, 0)
+        self.velocity = Vector2(0.2, 0)
 
     def reset_ball(self):
         self.speed_multiplier = 1
@@ -222,6 +226,7 @@ async def gameLoop(user1: User, user2: User, tournament: bool = False) -> User:
     p1 = PongPlayer(user1, 10)
     p2 = PongPlayer(user2, -10)
     ball = Ball(p1, p2, tournament)
+    ball.ball_start()
 
     while True:
         p1.move()

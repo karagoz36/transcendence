@@ -94,7 +94,7 @@ class LocalGamer:
         self.username = username
         self.is_local = True
         self.id = 99999
-        self.score = 0
+        self.score: int = 0
 
     def __eq__(self, other):
         return isinstance(other, LocalGamer)
@@ -187,7 +187,9 @@ class PongSocketConsumer(AsyncWebsocketConsumer):
         self.p1 = PongPlayer(LocalGamer("p1"), 10)
         self.p2 = PongPlayer(LocalGamer("p2"), -10)
         self.ball = Ball(self.p1, self.p2, False)
-
+        self.p1.score = 0
+        self.p2.score = 0
+        self.ball.ball_start()
         htmlSTR = render_to_string("pong/localplay.html")
         await self.send(json.dumps({"type": "launch_game", "html": htmlSTR}))
         self.game_running = True
@@ -206,6 +208,8 @@ class PongSocketConsumer(AsyncWebsocketConsumer):
         match data.get("type"):
             case "move":
                 await self.handle_move(data)
+            case "player_exit":
+                self.game_running = False
             case _:
                 await self.send(json.dumps({"error": "Unknown message type"}))
 
@@ -232,7 +236,10 @@ class PongSocketConsumer(AsyncWebsocketConsumer):
             if self.p1.score == 3 or self.p2.score == 3:
                 data = {"type": "game_over"}
                 await self.send(json.dumps(data))
-                return
+                self.p1.score = 0
+                self.p2.score = 0
+                self.game_running = False
+                break
             if self.ball.pos.x > 0 and self.p1.collided(self.ball.pos) != 0:
                 hit_detected = True
             elif self.ball.pos.x < 0 and self.p2.collided(self.ball.pos) != 0:
@@ -246,6 +253,8 @@ class PongSocketConsumer(AsyncWebsocketConsumer):
             }
             if hit_detected:
                 data["type"] = "hitBall"
+            if self.game_running == False:
+                break
 
             await self.send(json.dumps(data))
             await asyncio.sleep(1 / 60)

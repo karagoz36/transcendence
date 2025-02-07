@@ -1,13 +1,14 @@
 import { PongScene } from "../pong/PongScene.js";
 import BaseWebSocket from "../global/websockets.js";
-import { getPage } from "../global/SPA.js"
+import { getPage, refreshScripts } from "../global/SPA.js"
 
 let gameInitialized = false;
+let keyboardControlInterval = null;
+let pageCheckInterval = null;
 
 async function initializeLocalMode() {
-    if (window.localPongWebSocket) {
-        window.localPongWebSocket.socket.close();
-    }
+    await cleanupGame();
+    
     window.localPongWebSocket = new LocalGameWebSocket();
     await waitForWebSocketOpen(window.localPongWebSocket.socket);
 
@@ -20,7 +21,9 @@ async function initializeLocalMode() {
                 console.error("Erreur: #pong-container introuvable");
                 return;
             }
+            
             container.innerHTML = data.html;
+            resetScoreDisplay();
 
             await new Promise(resolve => requestAnimationFrame(resolve)); 
             window.pongScene = new PongScene();
@@ -31,6 +34,9 @@ async function initializeLocalMode() {
 
             setupKeyboardControls();
             gameInitialized = true;
+			if (!pageCheckInterval) {
+                pageCheckInterval = setInterval(checkPage, 500);
+            }
         }
     });
     window.localPongWebSocket.socket.send(JSON.stringify({
@@ -38,6 +44,39 @@ async function initializeLocalMode() {
     }));
 }
 
+function resetScoreDisplay() {
+    const playerScoreElement = document.querySelector("#player-score");
+    const opponentScoreElement = document.querySelector("#opponent-score");
+    if (playerScoreElement && opponentScoreElement) {
+        playerScoreElement.textContent = "0";
+        opponentScoreElement.textContent = "0";
+    }
+}
+
+async function cleanupGame() {
+    if (keyboardControlInterval) {
+        clearInterval(keyboardControlInterval);
+        keyboardControlInterval = null;
+    }
+
+    if (pageCheckInterval) {
+        clearInterval(pageCheckInterval);
+        pageCheckInterval = null;
+    }
+    if (window.pongScene) {
+        window.pongScene = null;
+    }
+
+    if (window.localPongWebSocket) {
+        if (window.localPongWebSocket.socket.readyState === WebSocket.OPEN) {
+            window.localPongWebSocket.socket.close();
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        window.localPongWebSocket = null;
+    }
+
+    gameInitialized = false;
+}
 
 function setupKeyboardControls() {
     let keysPressed = {};
@@ -50,7 +89,7 @@ function setupKeyboardControls() {
         delete keysPressed[event.key];
     });
 
-    setInterval(() => {
+    keyboardControlInterval = setInterval(() => {
         if (!gameInitialized || !window.pongScene) return;
 
         let directionP1 = null;
@@ -69,36 +108,37 @@ function setupKeyboardControls() {
             directionP1 = "down";
         }
 
-        if (directionP1 !== null) {
-            window.localPongWebSocket.socket.send(JSON.stringify({
-                "type": "move",
-                "direction": directionP1,
-                "player": "p1"
-            }));
-        } else {
-            window.localPongWebSocket.socket.send(JSON.stringify({
-                "type": "move",
-                "direction": "none",
-                "player": "p1"
-            }));
-        }
+        if (window.localPongWebSocket && window.localPongWebSocket.socket.readyState === WebSocket.OPEN) {
+            if (directionP1 !== null) {
+                window.localPongWebSocket.socket.send(JSON.stringify({
+                    "type": "move",
+                    "direction": directionP1,
+                    "player": "p1"
+                }));
+            } else {
+                window.localPongWebSocket.socket.send(JSON.stringify({
+                    "type": "move",
+                    "direction": "none",
+                    "player": "p1"
+                }));
+            }
 
-        if (directionP2 !== null) {
-            window.localPongWebSocket.socket.send(JSON.stringify({
-                "type": "move",
-                "direction": directionP2,
-                "player": "p2"
-            }));
-        } else {
-            window.localPongWebSocket.socket.send(JSON.stringify({
-                "type": "move",
-                "direction": "none",
-                "player": "p2"
-            }));
+            if (directionP2 !== null) {
+                window.localPongWebSocket.socket.send(JSON.stringify({
+                    "type": "move",
+                    "direction": directionP2,
+                    "player": "p2"
+                }));
+            } else {
+                window.localPongWebSocket.socket.send(JSON.stringify({
+                    "type": "move",
+                    "direction": "none",
+                    "player": "p2"
+                }));
+            }
         }
     }, 50);
 }
-
 
 function waitForWebSocketOpen(socket) {
     return new Promise((resolve) => {
@@ -110,6 +150,20 @@ function waitForWebSocketOpen(socket) {
     });
 }
 
+function checkPage() {
+	let page = window.location.pathname;
+	if (page !== "/games/") {
+		if (window.localPongWebSocket && window.localPongWebSocket.socket && window.localPongWebSocket.socket.readyState === WebSocket.OPEN) {
+			window.localPongWebSocket.socket.send(JSON.stringify({ type: "player_exit" }));
+			window.localPongWebSocket.socket.close();
+		} else {
+			console.warn("⚠️ Impossible d'envoyer player_exit : WebSocket déjà fermé ou inexistant.");
+		}
+		
+		cleanupGame();
+	}
+}
+
 class LocalGameWebSocket extends BaseWebSocket {
     constructor() {
         super("pongsocket");
@@ -118,8 +172,9 @@ class LocalGameWebSocket extends BaseWebSocket {
     receive(e) {
         const data = JSON.parse(e.data);
         if (!window.pongScene || !gameInitialized) return;
-        
-        switch (data.type) {
+		console.table(data);
+
+		switch (data.type) {
             case "hitBall":
                 window.pongScene.animateBallHit();
                 break;
@@ -136,9 +191,11 @@ class LocalGameWebSocket extends BaseWebSocket {
                 }
                 break;
             case "game_over":
-				return getPage("/games")
+                cleanupGame().then(() => getPage("/games"));
+                break;
+			default:
+				break;
         }
-
     }
 }
 
