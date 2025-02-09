@@ -227,6 +227,12 @@ async def notify_hit(players, socket_type="pong"):
     for player in players:
         await sendMessageWS(player.user, socket_name, json.dumps(data))
 
+# def userIsLoggedIn(user: User) -> bool:
+#     is_logged_in = user.id in onlineUsers
+#     print(f"[DEBUG] Vérification de connexion pour {user.username}: {is_logged_in}", flush=True)
+#     return is_logged_in
+
+
 async def gameLoop(user1: User, user2: User, tournament: bool = False) -> User:
     p1 = PongPlayer(user1, 10)
     p2 = PongPlayer(user2, -10)
@@ -242,12 +248,12 @@ async def gameLoop(user1: User, user2: User, tournament: bool = False) -> User:
         winner = await ball.getWinner()
         if winner != None:
             break
-        if p1 == None or p2 == None:
-            message = json.dumps({"type": "game_aborted"})
-            await sendMessageWS(p1.user, "pong", json.dumps(message))
-            await sendMessageWS(p2.user, "pong", json.dumps(message))
-            NoWinner = True
-            break
+        # if not userIsLoggedIn(p1.user) or not userIsLoggedIn(p2.user):
+        #     message = json.dumps({"type": "game_aborted"})
+        #     await sendMessageWS(p1.user, "pong", json.dumps(message))
+        #     await sendMessageWS(p2.user, "pong", json.dumps(message))
+        #     NoWinner = True
+        #     break
 
         data = {
             "type": "update_pong",

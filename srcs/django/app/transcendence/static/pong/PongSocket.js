@@ -214,6 +214,19 @@ closeSocketAndRedirect() {
     }, 500);
 }
 
+checkPage() {
+	let page = window.location.pathname;
+	if (page !== "/games/") {
+		if (window.localPongWebSocket && window.localPongWebSocket.socket && window.localPongWebSocket.socket.readyState === WebSocket.OPEN) {
+			window.localPongWebSocket.socket.send(JSON.stringify({ type: "player_exit" }));
+			window.localPongWebSocket.socket.close();
+		} else {
+			console.warn("⚠️ Impossible d'envoyer player_exit : WebSocket déjà fermé ou inexistant.");
+		}
+		
+		this.closeSocketAndRedirect()
+	}
+}
 
 /** @param {PongSocketData} json */
 updatePong(json) {
@@ -240,6 +253,7 @@ updatePong(json) {
 async receive(e) {
 	/** @type {PongSocketData} */
 	const json = JSON.parse(e.data)
+	console.table(json)
 
 	if (json.type == "update_pong")
 		return this.updatePong(json)
@@ -264,10 +278,10 @@ async receive(e) {
 			console.error(json)
 			throw new Error("expected html")
 		}
-		if (!json.html || !json.player || !json.opponent || !json.initiator) {
-			console.error(json)
-			throw new Error("expected html")
-		}
+		// if (!json.html || !json.player || !json.opponent || !json.initiator) {
+		// 	console.error(json)
+		// 	throw new Error("expected html")
+		// }
 		this.launchGame(json.html, json.player, json.opponent, json.initiator)
 	}
 }
