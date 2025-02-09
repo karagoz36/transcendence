@@ -203,6 +203,18 @@ class PongSocket extends BaseWebSocket {
 //     }
 // }
 
+closeSocketAndRedirect() {
+    if (this.socket) {
+        this.socket.onclose = null; 
+        this.socket.close();
+    }
+
+    setTimeout(() => {
+        window.location.href = "/friends";
+    }, 500);
+}
+
+
 /** @param {PongSocketData} json */
 updatePong(json) {
 	if (!this.game)
@@ -231,6 +243,15 @@ async receive(e) {
 
 	if (json.type == "update_pong")
 		return this.updatePong(json)
+
+	if (json.type == "game_aborted")
+    {
+		return await getPage("/friends")
+	}
+	
+	if (json.type == "game_over") {
+		return await getPage("/friends")
+	}
 
 	if (json.type == "invite_accepted" && this.inGame)
 		return this.socket.send(JSON.stringify({"type": "join_game"}))

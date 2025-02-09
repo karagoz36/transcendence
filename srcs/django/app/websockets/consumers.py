@@ -52,8 +52,9 @@ class Notification(BaseConsumer):
         if user is None:
             await self.close(code=4000)
             return
-        if user.username == "":
+        if user.id in onlineUsers:
             return
+    
         onlineUsers[user.id] = user
 
         friends = await getFriends(user)
@@ -119,6 +120,21 @@ class Pong(BaseConsumer):
             return sendMessageWS(self.user, "pong", json.dumps({"type": "error", "error": "you are not friend with this user"}))
         self.opponent = opponent
         await sendMessageWS(opponent, "pong", json.dumps({"type": "invite_accepted", "friend": self.user.username}))
+	
+    async def disconnect(self, close_code):
+        # print(f"WebSocket Pong closed for {self.user.username} (code {close_code})", flush=True)
+
+        if self.user is None:
+            return
+        if self.opponent is not None:
+            message = json.dumps({
+				"type": "opponent_disconnected",
+				"message": f"{self.user.username} has left the game. You win by default."
+			})
+            await sendMessageWS(self.opponent, "pong", message)
+
+        self.opponent = None
+        self.user = None
 
     async def receive(self, text_data: str):
         await super().receive(text_data)
