@@ -6,6 +6,15 @@ let gameInitialized = false;
 let keyboardControlInterval = null;
 let pageCheckInterval = null;
 
+document.addEventListener("keydown", function(event) {
+    const keysToBlock = ["ArrowUp", "ArrowDown", "w", "W", "s", "S"];
+    
+    if (keysToBlock.includes(event.key)) {
+        event.preventDefault();
+    }
+});
+
+
 async function initializeLocalMode() {
     await cleanupGame();
     
@@ -203,10 +212,11 @@ function setupGame() {
     const localButton = document.getElementById("multiplayer");
     if (localButton) {
         localButton.addEventListener("click", async () => {
-            // const title = document.getElementById("title");
-            // if (title) title.remove();
-            // localButton.remove();
-            
+            const title = document.getElementById("title");
+            if (title) title.remove();
+            localButton.remove();
+            const section = document.getElementById("section");
+            if (section) section.remove();
             try {
                 await initializeLocalMode();
             } catch (error) {
