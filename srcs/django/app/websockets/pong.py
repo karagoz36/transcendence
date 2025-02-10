@@ -171,6 +171,8 @@ class Ball:
 
     def move(self):
         if self.scored():
+            print(self.p1.user, self.p1.score, flush=True)
+            print(self.p2.user, self.p2.score, flush=True)
             self.reset_ball()
             return
 
@@ -258,5 +260,4 @@ async def gameLoop(user1: User, user2: User, tournament: bool = False) -> User:
         await sendMessageWS(p1.user, "pong", json.dumps(data))
         await sendMessageWS(p2.user, "pong", json.dumps(data))
         await asyncio.sleep(1 / 60)
-    print(winner, flush=True)
     return winner

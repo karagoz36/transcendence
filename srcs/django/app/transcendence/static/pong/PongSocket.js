@@ -154,83 +154,83 @@ class PongSocket extends BaseWebSocket {
 		}
 	}
 
-closeSocketAndRedirect() {
-    if (this.socket) {
-        this.socket.onclose = null; 
-        this.socket.close();
+    closeSocketAndRedirect() {
+        if (this.socket) {
+            this.socket.onclose = null; 
+            this.socket.close();
+        }
+    
+        setTimeout(() => {
+            window.location.href = "/friends";
+        }, 500);
     }
 
-    setTimeout(() => {
-        window.location.href = "/friends";
-    }, 500);
+    checkPage() {
+    	let page = window.location.pathname;
+    	if (page !== "/games/") {
+    		if (window.localPongWebSocket && window.localPongWebSocket.socket && window.localPongWebSocket.socket.readyState === WebSocket.OPEN) {
+    			window.localPongWebSocket.socket.send(JSON.stringify({ type: "player_exit" }));
+    			window.localPongWebSocket.socket.close();
+    		} else {
+    			console.warn("⚠️ Impossible d'envoyer player_exit : WebSocket déjà fermé ou inexistant.");
+    		}
+        
+    		this.closeSocketAndRedirect()
+    	}
+    }
+
+    /** @param {PongSocketData} json */
+    updatePong(json) {
+    	if (!this.game)
+    		this.launchGame()
+    	this.game.paddle1.position.x = json.p1.x
+    	this.game.paddle1.position.y = json.p1.y
+
+    	this.game.paddle2.position.x = json.p2.x
+    	this.game.paddle2.position.y = json.p2.y
+
+    	this.game.ball.position.x = json.ball.x
+    	this.game.ball.position.y = json.ball.y
+    	const playerScoreElement = document.querySelector("#player-score");
+    	const opponentScoreElement = document.querySelector("#opponent-score");
+
+    	if (playerScoreElement && opponentScoreElement) {
+    		playerScoreElement.textContent = json.score.p1;
+    		opponentScoreElement.textContent = json.score.p2;
+    	}
+    }
+
+    /** @param {MessageEvent} e */
+    async receive(e) {
+    	/** @type {PongSocketData} */
+    	const json = JSON.parse(e.data)
+
+    	if (json.type == "update_pong")
+    		return this.updatePong(json)
+
+    	if (json.type == "game_aborted")
+    		return await getPage("/friends")
+
+    	if (json.type == "game_over")
+    		return await getPage("/friends")
+
+    	if (json.type == "invite_accepted" && this.inGame)
+    		return this.socket.send(JSON.stringify({"type": "join_game"}))
+
+    	if (json.type == "invite_accepted" && this.opponent == json.friend)
+    		return this.socket.send(JSON.stringify({"type": "launch_game"}))
+
+    	if (json.type == "launch_game") {
+    		if (!json.html) {
+    			console.error(json)
+    			throw new Error("expected html")
+    		}
+    		this.launchGame(json.html, json.player, json.opponent, json.initiator)
+    	}
+    }
 }
 
-checkPage() {
-	let page = window.location.pathname;
-	if (page !== "/games/") {
-		if (window.localPongWebSocket && window.localPongWebSocket.socket && window.localPongWebSocket.socket.readyState === WebSocket.OPEN) {
-			window.localPongWebSocket.socket.send(JSON.stringify({ type: "player_exit" }));
-			window.localPongWebSocket.socket.close();
-		} else {
-			console.warn("⚠️ Impossible d'envoyer player_exit : WebSocket déjà fermé ou inexistant.");
-		}
-		
-		this.closeSocketAndRedirect()
-	}
-}
-
-/** @param {PongSocketData} json */
-updatePong(json) {
-	if (!this.game)
-		this.launchGame()
-	this.game.paddle1.position.x = json.p1.x
-	this.game.paddle1.position.y = json.p1.y
-
-	this.game.paddle2.position.x = json.p2.x
-	this.game.paddle2.position.y = json.p2.y
-
-	this.game.ball.position.x = json.ball.x
-	this.game.ball.position.y = json.ball.y
-	const playerScoreElement = document.querySelector("#player-score");
-	const opponentScoreElement = document.querySelector("#opponent-score");
-
-	if (playerScoreElement && opponentScoreElement) {
-		playerScoreElement.textContent = json.score.p1;
-		opponentScoreElement.textContent = json.score.p2;
-	}
-}
-
-/** @param {MessageEvent} e */
-async receive(e) {
-	/** @type {PongSocketData} */
-	const json = JSON.parse(e.data)
-
-	if (json.type == "update_pong")
-		return this.updatePong(json)
-
-	if (json.type == "game_aborted")
-		return await getPage("/friends")
-
-	if (json.type == "game_over")
-		return await getPage("/friends")
-
-	if (json.type == "invite_accepted" && this.inGame)
-		return this.socket.send(JSON.stringify({"type": "join_game"}))
-
-	if (json.type == "invite_accepted" && this.opponent == json.friend)
-		return this.socket.send(JSON.stringify({"type": "launch_game"}))
-
-	if (json.type == "launch_game") {
-		if (!json.html) {
-			console.error(json)
-			throw new Error("expected html")
-		}
-		this.launchGame(json.html, json.player, json.opponent, json.initiator)
-	}
-}
-}
-
-function main() {
+    function main() {
 const websocket = new PongSocket()
 }
 

@@ -3,7 +3,7 @@ from django.shortcuts import render
 from database.models import PongHistory
 
 def response(request: Request):
-        
+
     game_id: int = request.query_params.get("game")
     if not game_id:
         return redirect("/")

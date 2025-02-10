@@ -165,15 +165,15 @@ class Pong(BaseConsumer):
                 launch_data = {
                     "type": "launch_game",
                     "html": htmlSTR,
-                    "player": self.user.username,
-                    "opponent": self.opponent.username,
+                    "player": self.opponent.username,
+                    "opponent": self.user.username,
                     "initiator": self.user.username,
 				}
                 launch_data_opponent = {
                     "type": "launch_game",
                     "html": htmlSTR,
-                    "player": self.opponent.username,
-                    "opponent": self.user.username,
+                    "player": self.user.username,
+                    "opponent": self.opponent.username,
                     "initiator": self.user.username,
 				}
                 await sendMessageWS(self.opponent, "pong", json.dumps(launch_data))
