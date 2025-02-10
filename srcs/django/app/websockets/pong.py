@@ -236,7 +236,6 @@ async def notify_hit(players, socket_type="pong"):
 async def gameLoop(user1: User, user2: User, tournament: bool = False) -> User:
     p1 = PongPlayer(user1, 10)
     p2 = PongPlayer(user2, -10)
-    NoWinner = False
     ball = Ball(p1, p2, tournament)
     ball.ball_start()
 
@@ -248,12 +247,6 @@ async def gameLoop(user1: User, user2: User, tournament: bool = False) -> User:
         winner = await ball.getWinner()
         if winner != None:
             break
-        # if not userIsLoggedIn(p1.user) or not userIsLoggedIn(p2.user):
-        #     message = json.dumps({"type": "game_aborted"})
-        #     await sendMessageWS(p1.user, "pong", json.dumps(message))
-        #     await sendMessageWS(p2.user, "pong", json.dumps(message))
-        #     NoWinner = True
-        #     break
 
         data = {
             "type": "update_pong",
@@ -265,6 +258,5 @@ async def gameLoop(user1: User, user2: User, tournament: bool = False) -> User:
         await sendMessageWS(p1.user, "pong", json.dumps(data))
         await sendMessageWS(p2.user, "pong", json.dumps(data))
         await asyncio.sleep(1 / 60)
-    if NoWinner:
-        return
+    print(winner, flush=True)
     return winner

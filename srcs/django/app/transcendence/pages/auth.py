@@ -23,8 +23,7 @@ async def closeWebSockets(id: int):
 
 async def logoutUser(request: Request, success: str, err: str, status: int) -> Response:
 	response = render(request, "auth.html", {"ERROR_MESSAGE": err, "SUCCESS_MESSAGE": success}, status=status)
-	response.delete_cookie("access_token")
-	response.delete_cookie("sessionid")
+	response.headers["Clear-Site-Data"] = '"*"'
 	if "already logged in" not in err:
 		await closeWebSockets(request.user.id)
 	return response
