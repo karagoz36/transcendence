@@ -29,7 +29,7 @@ const e_states = {
 }
 
 class PongSocket extends BaseWebSocket {
-    /** @type {string} */
+    /** @type {string|null} */
     opponent
     /** @type {PongScene|null} */
     game = null
@@ -54,7 +54,8 @@ class PongSocket extends BaseWebSocket {
             this.socket.send(JSON.stringify(msg))
             return
         }
-        this.opponent = urlParams.get("opponent") || "";
+		
+        this.opponent = urlParams.get("opponent");
         if (!this.opponent) {
             this.opponent = ""
             return
@@ -82,6 +83,7 @@ class PongSocket extends BaseWebSocket {
     }
 
     initGame() {
+		this.inGame = true
         this.game = new PongScene()
         /** @type {HTMLCanvasElement} */
         const canvas = this.game.renderer.domElement
@@ -120,8 +122,7 @@ class PongSocket extends BaseWebSocket {
         setInterval(this.sendDirection.bind(this), 1_000 / 60_000)
     }
 
-	/** @param {string} html */
-	async launchGame(html, player, opponent, initiator) {
+	async launchGame(html = "", player = "", opponent = "", initiator = "") {
 		const container = document.querySelector("#pong-container");
 		if (!container) return;
 		container.innerHTML = html;
@@ -153,56 +154,6 @@ class PongSocket extends BaseWebSocket {
 		}
 	}
 
-//     /** @param {MessageEvent} e */
-//     async receive(e) {
-//         /** @type {PongSocketData} */
-//         const json = JSON.parse(e.data)
-
-//         if (json.type == "game_over")
-//             return await getPage("/friends")
-        
-//         if (json.type == "update_pong" && this.state == e_states.IN_GAME) {
-//             if (!this.game)
-//                 return
-//             this.game.paddle1.position.x = json.p1.x
-//             this.game.paddle1.position.y = json.p1.y
-
-//             this.game.paddle2.position.x = json.p2.x
-//             this.game.paddle2.position.y = json.p2.y
-
-//             this.game.ball.position.x = json.ball.x
-//             this.game.ball.position.y = json.ball.y
-			
-// 			const playerScoreElement = document.querySelector("#player-score");
-// 			const opponentScoreElement = document.querySelector("#opponent-score");
-	
-// 			if (playerScoreElement && opponentScoreElement) {
-// 				playerScoreElement.textContent = json.score.p1;
-// 				opponentScoreElement.textContent = json.score.p2;
-// 			}
-//         }
-//         if (json.type == "hitBall" && this.game)
-//             this.game?.animateBallHit();
-//         if (json.type == "invite_accepted" && this.state == e_states.IN_GAME)
-//             return this.socket.send(JSON.stringify({"type": "join_game"}))
-//         if (json.type == "invite_accepted" && this.opponent == json.friend)
-//             return this.socket.send(JSON.stringify({"type": "launch_game"}))
-
-//         switch (this.state) {
-//             case e_states.INVITE_ACCEPTED:
-//                 this.socket.send(JSON.stringify({"type": "launch_game"}))
-//                 break;
-//             case e_states.LAUNCH_GAME:
-//                 if (!json.html || !json.player || !json.opponent || !json.initiator) {
-//                     console.error(json)
-//                     throw new Error("expected html")
-//                 }
-//                 await this.launchGame(json.html, json.player, json.opponent, json.initiator)
-//                 break
-//         }
-//     }
-// }
-
 closeSocketAndRedirect() {
     if (this.socket) {
         this.socket.onclose = null; 
@@ -231,7 +182,7 @@ checkPage() {
 /** @param {PongSocketData} json */
 updatePong(json) {
 	if (!this.game)
-		this.launchGame("")
+		this.launchGame()
 	this.game.paddle1.position.x = json.p1.x
 	this.game.paddle1.position.y = json.p1.y
 
@@ -253,19 +204,15 @@ updatePong(json) {
 async receive(e) {
 	/** @type {PongSocketData} */
 	const json = JSON.parse(e.data)
-	console.table(json)
 
 	if (json.type == "update_pong")
 		return this.updatePong(json)
 
 	if (json.type == "game_aborted")
-    {
 		return await getPage("/friends")
-	}
-	
-	if (json.type == "game_over") {
+
+	if (json.type == "game_over")
 		return await getPage("/friends")
-	}
 
 	if (json.type == "invite_accepted" && this.inGame)
 		return this.socket.send(JSON.stringify({"type": "join_game"}))
@@ -278,10 +225,6 @@ async receive(e) {
 			console.error(json)
 			throw new Error("expected html")
 		}
-		// if (!json.html || !json.player || !json.opponent || !json.initiator) {
-		// 	console.error(json)
-		// 	throw new Error("expected html")
-		// }
 		this.launchGame(json.html, json.player, json.opponent, json.initiator)
 	}
 }

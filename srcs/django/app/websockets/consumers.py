@@ -122,8 +122,6 @@ class Pong(BaseConsumer):
         await sendMessageWS(opponent, "pong", json.dumps({"type": "invite_accepted", "friend": self.user.username}))
 	
     async def disconnect(self, close_code):
-        # print(f"WebSocket Pong closed for {self.user.username} (code {close_code})", flush=True)
-
         if self.user is None:
             return
         if self.opponent is not None:
