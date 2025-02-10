@@ -1,5 +1,5 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.template.loader import render_to_string
 import json
 import asyncio
@@ -52,7 +52,7 @@ class Notification(BaseConsumer):
         if user is None:
             await self.close(code=4000)
             return
-        if user.id in onlineUsers:
+        if user.username == "": # this means this is an anonymous user
             return
     
         onlineUsers[user.id] = user
