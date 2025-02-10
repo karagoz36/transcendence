@@ -117,7 +117,8 @@ def callback_from_42(request):
 	user, created = User.objects.get_or_create(id=user_info.get('id'))
 
 	if created:
-		user.username = user_info.get('login', '')
+		# print(username, flush=True)
+		user.username = username
 		user.first_name = user_info.get('first_name', '')
 		user.last_name = 	user_info.get('last_name', '')
 		user.email = user_info.get('email', '')
